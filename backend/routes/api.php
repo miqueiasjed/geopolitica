@@ -4,8 +4,10 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
+use App\Http\Controllers\Api\Admin\AdminB2BController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
+use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ChatHistoricoController;
@@ -106,4 +108,24 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/eleicoes', [EleicaoAdminController::class, 'store']);
     Route::patch('/eleicoes/{id}', [EleicaoAdminController::class, 'update']);
     Route::delete('/eleicoes/{id}', [EleicaoAdminController::class, 'destroy']);
+
+    // Gestão de licenças B2B
+    Route::get('/b2b/empresas', [AdminB2BController::class, 'index']);
+    Route::post('/b2b/empresas', [AdminB2BController::class, 'store']);
+    Route::patch('/b2b/empresas/{id}', [AdminB2BController::class, 'update']);
+    Route::post('/b2b/empresas/{id}/renovar', [AdminB2BController::class, 'renovar']);
+});
+
+// Rota pública: informações do tenant atual
+Route::get('/empresa/info', [EmpresaController::class, 'info'])
+    ->middleware('identificar.tenant');
+
+// Rota pública: aceite de convite B2B
+Route::post('/convite/{token}/aceitar', [EmpresaController::class, 'aceitarConvite']);
+
+// Rotas para company_admin gerenciar equipe (requer tenant middleware)
+Route::middleware(['auth:sanctum', 'identificar.tenant', 'role:company_admin'])->group(function () {
+    Route::get('/empresa/equipe', [EmpresaController::class, 'equipe']);
+    Route::post('/empresa/convidar', [EmpresaController::class, 'convidar']);
+    Route::delete('/empresa/membros/{membroId}', [EmpresaController::class, 'removerMembro']);
 });

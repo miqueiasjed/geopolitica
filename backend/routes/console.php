@@ -45,3 +45,8 @@ Schedule::command('paises:gerar-perfis')
     ->weeklyOn(1, '03:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// B2B – desativa empresas com licenças expiradas diariamente às 00:05
+Schedule::command('b2b:desativar-expiradas')
+    ->dailyAt('00:05')
+    ->withoutOverlapping();

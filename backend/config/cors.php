@@ -10,7 +10,9 @@ return [
         env('FRONTEND_URL', 'http://localhost:5173'),
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https?://([a-z0-9-]+\.)?geopoliticainvestidores\.com\.br$#',
+    ],
 
     'allowed_headers' => ['*'],
 

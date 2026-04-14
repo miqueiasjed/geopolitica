@@ -8,6 +8,7 @@ import type {
   PaginacaoLaravel,
 } from '../types/admin'
 import type { TipoConteudo, PlanoMinimo, Conteudo } from '../types/biblioteca'
+import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
 
 export interface CriarConteudoPayload {
   tipo: TipoConteudo
@@ -28,6 +29,7 @@ export const adminKeys = {
   assinantes: (filtros: AdminAssinantesFiltros) => [...adminKeys.all, 'assinantes', filtros] as const,
   webhookEventos: (filtros: AdminWebhookEventosFiltros) => [...adminKeys.all, 'webhook-eventos', filtros] as const,
   conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
+  b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
 }
 
 function montarParams<T extends object>(filtros: T) {
@@ -82,4 +84,21 @@ export async function fetchConteudosAdmin(page: number): Promise<AdminConteudosR
 
 export async function despublicarConteudo(id: number): Promise<void> {
   await api.delete(`/admin/conteudos/${id}`)
+}
+
+// --- B2B Admin ---
+
+export async function fetchAdminB2BEmpresas(): Promise<EmpresaB2B[]> {
+  const resposta = await api.get<EmpresaB2B[]>('/admin/b2b/empresas')
+  return resposta.data
+}
+
+export async function criarLicencaB2B(payload: CriarLicencaPayload): Promise<EmpresaB2B> {
+  const resposta = await api.post<EmpresaB2B>('/admin/b2b/empresas', payload)
+  return resposta.data
+}
+
+export async function renovarLicencaB2B(id: number, payload: RenovarLicencaPayload): Promise<EmpresaB2B> {
+  const resposta = await api.post<EmpresaB2B>(`/admin/b2b/empresas/${id}/renovar`, payload)
+  return resposta.data
 }

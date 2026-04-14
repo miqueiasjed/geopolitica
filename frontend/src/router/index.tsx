@@ -14,9 +14,12 @@ import { AdminBiblioteca } from '../pages/admin/AdminBiblioteca'
 import { RedefinirSenha } from '../pages/RedefinirSenha'
 import { Biblioteca } from '../pages/dashboard/Biblioteca'
 import { ConteudoLeitura } from '../pages/dashboard/ConteudoLeitura'
+import { Equipe } from '../pages/dashboard/Equipe'
 import { Timeline } from '../pages/Timeline'
 import { RadarEleicoes } from '../pages/RadarEleicoes'
 import { AdminEleicoes } from '../pages/admin/AdminEleicoes'
+import { AdminB2BPage } from '../pages/admin/AdminB2BPage'
+import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
 import { PerfilPaisPage } from '../pages/PerfilPaisPage'
 import { ChatBriefings } from '../pages/ChatBriefings'
@@ -34,6 +37,7 @@ export function AppRouter() {
       <Route path="/login" element={<Login />} />
       <Route path="/esqueci-senha" element={<EsqueciSenha />} />
       <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+      <Route path="/convite/:token" element={<AceitarConvitePage />} />
       <Route element={<RotaProtegida />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/feed" element={<Feed />} />
@@ -48,12 +52,18 @@ export function AppRouter() {
           <Route path="/perfil" element={<Perfil />} />
         </Route>
       </Route>
+      <Route element={<RotaProtegida requiredRole="company_admin" />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard/equipe" element={<Equipe />} />
+        </Route>
+      </Route>
       <Route element={<RotaProtegida requiredRole="admin" />}>
         <Route path="/admin/assinantes" element={<AdminAssinantes />} />
         <Route path="/admin/webhook-eventos" element={<AdminWebhookEventos />} />
         <Route path="/admin/novo-conteudo" element={<AdminNovoConteudo />} />
         <Route path="/admin/biblioteca" element={<AdminBiblioteca />} />
         <Route path="/admin/eleicoes" element={<AdminEleicoes />} />
+        <Route path="/admin/b2b" element={<AdminB2BPage />} />
       </Route>
     </Routes>
   )

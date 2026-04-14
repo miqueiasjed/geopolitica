@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AlertaBadge } from './alertas/AlertaBadge'
 import { AlertaPanel } from './alertas/AlertaPanel'
 import { useAuth } from '../hooks/useAuth'
+import { useTenant } from '../contexts/TenantContext'
 
 interface TopNavProps {
   lastUpdatedLabel: string
@@ -17,6 +18,7 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { logout, user } = useAuth()
+  const { tenant, isB2B } = useTenant()
   const [painelAberto, setPainelAberto] = useState(false)
 
   return (
@@ -25,10 +27,31 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/75">terminal geopolitico</p>
-            <Link to="/dashboard/feed" className="text-lg font-semibold text-[#C9B882]">
-              Geopolítica para Investidores
-            </Link>
+            {isB2B && tenant ? (
+              <div className="flex flex-col gap-1">
+                {tenant.logo_url ? (
+                  <img
+                    src={tenant.logo_url}
+                    alt={tenant.nome}
+                    className="h-8 w-auto object-contain"
+                  />
+                ) : (
+                  <Link to="/dashboard/feed" className="text-lg font-semibold text-[#C9B882]">
+                    {tenant.nome}
+                  </Link>
+                )}
+                <span className="inline-flex w-fit items-center rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-400">
+                  B2B
+                </span>
+              </div>
+            ) : (
+              <>
+                <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/75">terminal geopolitico</p>
+                <Link to="/dashboard/feed" className="text-lg font-semibold text-[#C9B882]">
+                  Geopolítica para Investidores
+                </Link>
+              </>
+            )}
           </div>
 
           <nav className="flex items-center gap-2">
@@ -116,6 +139,18 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
               </svg>
               Chat
             </Link>
+            {isB2B && user?.role === 'company_admin' && (
+              <Link
+                to="/dashboard/equipe"
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
+                  location.pathname === '/dashboard/equipe'
+                    ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                    : 'text-zinc-500 hover:text-zinc-200'
+                }`}
+              >
+                Equipe
+              </Link>
+            )}
           </nav>
         </div>
 

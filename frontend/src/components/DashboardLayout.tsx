@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { TopNav } from './TopNav'
 import { IndicatorsBar } from './indicadores/IndicatorsBar'
+import { TenantProvider } from '../contexts/TenantContext'
 
-export function DashboardLayout() {
+function DashboardLayoutInner() {
   const [lastUpdatedLabel, setLastUpdatedLabel] = useState('Aguardando sincronização')
 
   return (
@@ -14,5 +15,13 @@ export function DashboardLayout() {
         <Outlet context={{ setLastUpdatedLabel }} />
       </main>
     </div>
+  )
+}
+
+export function DashboardLayout() {
+  return (
+    <TenantProvider>
+      <DashboardLayoutInner />
+    </TenantProvider>
   )
 }

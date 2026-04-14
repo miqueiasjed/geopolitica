@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-14 (Plano 14 concluído)
+> Última atualização: 2026-04-14 (Plano 15 concluído — todos os planos finalizados ✅)
 
 ## Legenda
 - ✅ Concluído
@@ -26,7 +26,7 @@
 | 12 | [Linha do Tempo de Crises (M07)](12.md) | ✅ | 4, 7 | 5 |
 | 13 | [Radar de Eleições (M08)](13.md) | ✅ | 7 | 5 |
 | 14 | [Chat com os Briefings (M09)](14.md) | ✅ | 7, 11, 12, 4 | 5 |
-| 15 | [Licenciamento B2B (M11)](15.md) | ⏳ | 1–14 | 6 |
+| 15 | [Licenciamento B2B (M11)](15.md) | ✅ | 1–14 | 6 |
 
 ## Ordem de execução recomendada
 
@@ -67,5 +67,5 @@
 | M08 – Radar de Eleições | Plano 13 | ✅ |
 | M09 – Chat com Briefings | Plano 14 | ✅ |
 | M10 – Hotmart/Pagamentos | Plano 3 | ✅ |
-| M11 – Licenciamento B2B | Plano 15 | ⏳ |
+| M11 – Licenciamento B2B | Plano 15 | ✅ |
 | Infra Base | Plano 1 | ✅ |
