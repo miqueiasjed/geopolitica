@@ -18,9 +18,9 @@ return new class extends Migration
             $table->text('contexto_geopolitico');
             $table->text('impacto_global');
             $table->text('impacto_brasil');
-            $table->json('metricas_globais')->default('[]');
-            $table->json('metricas_brasil')->default('[]');
-            $table->json('categorias')->default('[]');
+            $table->json('metricas_globais')->nullable();
+            $table->json('metricas_brasil')->nullable();
+            $table->json('categorias')->nullable();
             $table->string('content_slug')->nullable();
             $table->timestamps();
         });

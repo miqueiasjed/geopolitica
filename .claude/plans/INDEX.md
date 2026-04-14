@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-14 (Plano 12 concluído)
+> Última atualização: 2026-04-14 (Plano 13 concluído)
 
 ## Legenda
 - ✅ Concluído
@@ -24,7 +24,7 @@
 | 10 | [Alerta Preditivo (M05)](10.md) | ⏳ | 4, 7, 9 | 7 |
 | 11 | [Perfil de País (M06)](11.md) | ⏳ | 4, 6, 7, 9 | 7 |
 | 12 | [Linha do Tempo de Crises (M07)](12.md) | ✅ | 4, 7 | 5 |
-| 13 | [Radar de Eleições (M08)](13.md) | ⏳ | 7 | 5 |
+| 13 | [Radar de Eleições (M08)](13.md) | ✅ | 7 | 5 |
 | 14 | [Chat com os Briefings (M09)](14.md) | ⏳ | 7, 11, 12, 4 | 5 |
 | 15 | [Licenciamento B2B (M11)](15.md) | ⏳ | 1–14 | 6 |
 
@@ -64,7 +64,7 @@
 | M05 – Alerta Preditivo | Plano 10 | ⏳ |
 | M06 – Perfil de País | Plano 11 | ⏳ |
 | M07 – Linha do Tempo | Plano 12 | ✅ |
-| M08 – Radar de Eleições | Plano 13 | ⏳ |
+| M08 – Radar de Eleições | Plano 13 | ✅ |
 | M09 – Chat com Briefings | Plano 14 | ⏳ |
 | M10 – Hotmart/Pagamentos | Plano 3 | ✅ |
 | M11 – Licenciamento B2B | Plano 15 | ⏳ |

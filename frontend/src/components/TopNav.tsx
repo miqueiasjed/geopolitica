@@ -67,6 +67,16 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
             >
               Linha do Tempo
             </Link>
+            <Link
+              to="/dashboard/eleicoes"
+              className={`rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
+                location.pathname === '/dashboard/eleicoes'
+                  ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                  : 'text-zinc-500 hover:text-zinc-200'
+              }`}
+            >
+              📅 Radar de Eleições
+            </Link>
           </nav>
         </div>
 

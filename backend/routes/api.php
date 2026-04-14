@@ -5,8 +5,10 @@ use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
+use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ConteudoController;
+use App\Http\Controllers\Api\EleicaoController;
 use App\Http\Controllers\Api\IndicadoresController;
 use App\Http\Controllers\Api\IndicadoresHistoricoController;
 use App\Http\Controllers\Api\TimelineController;
@@ -62,6 +64,11 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
 
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/eleicoes', [EleicaoController::class, 'index']);
+    Route::get('/eleicoes/{id}', [EleicaoController::class, 'show']);
+});
+
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
     Route::get('/webhook-eventos', [AdminWebhookController::class, 'index']);
@@ -70,4 +77,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);
     Route::patch('/conteudos/{conteudo}', [AdminConteudoController::class, 'update']);
     Route::delete('/conteudos/{conteudo}', [AdminConteudoController::class, 'destroy']);
+
+    Route::post('/eleicoes', [EleicaoAdminController::class, 'store']);
+    Route::patch('/eleicoes/{id}', [EleicaoAdminController::class, 'update']);
+    Route::delete('/eleicoes/{id}', [EleicaoAdminController::class, 'destroy']);
 });

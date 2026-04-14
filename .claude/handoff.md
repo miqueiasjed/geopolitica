@@ -3,11 +3,11 @@ Plano: —
 Task: —
 Status: Concluído/Vazio
 O que foi feito:
-- Plano 12 concluído: Linha do Tempo de Crises (M07) com migration crises_historicas, Model CriseHistorica (scopes por categoria/período), CrisesHistoricasSeeder (25 crises), TimelineService, TimelineController, TimelineDetailController, rotas Redis-cached, types timeline.ts, hooks useTimeline + useCriseDetalhe, componentes SVG CriseMarker + EventoMarker + TimelineBar, painéis CriseDetailPanel + EventoDetailPanel, página Timeline, link no TopNav e rota /dashboard/timeline.
-- Build limpo: `npm run build ✓`, `npx tsc --noEmit` zero erros.
+- Plano 13 concluído: Radar de Eleições (M08) com migration eleicoes, Model Eleicao (scopes porAno/porRelevancia/ordenadaPorData), EleicoesSeedSeeder (15 eleições 2026), EleicaoController + EleicaoAdminController com cache Redis 1h, FormRequests, types eleicao.ts, hook useEleicoes, EleicaoFilterBar, EleicaoCard, RadarGrid (grade 12 meses), EleicaoDetailPanel (slide spring), AdminEleicaoForm (candidatos dinâmicos), páginas RadarEleicoes + AdminEleicoes, link TopNav e rotas /dashboard/eleicoes + /admin/eleicoes.
+- Build limpo: `npm run build ✓` (1347 módulos), `npx tsc --noEmit` zero erros.
 O que falta:
 - Iniciar o próximo plano pendente elegível na próxima execução do `run-plan`.
-- Próximos elegíveis: Plano 13 (Radar de Eleições M08, depende de 7 ✅) ou Plano 10 (Alerta Preditivo M05, depende de 4+7+9 ✅) ou Plano 11 (Perfil de País M06, depende de 4+6+7+9 ✅).
+- Próximos elegíveis (sequência recomendada): Plano 10 (Alerta Preditivo M05, depende de 4+7+9 ✅) ou Plano 11 (Perfil de País M06, depende de 4+6+7+9 ✅).
 Arquivos modificados:
 - `.claude/handoff.md`
 - `.claude/plans/INDEX.md`
