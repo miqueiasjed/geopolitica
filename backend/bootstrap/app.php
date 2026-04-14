@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\LimitePaisesAtingidoException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -66,6 +67,16 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => 'Os dados informados são inválidos.',
                 'errors' => $exception->errors(),
+            ], 422);
+        });
+
+        $exceptions->render(function (LimitePaisesAtingidoException $exception, Request $request) use ($deveResponderJson) {
+            if (! $deveResponderJson($request)) {
+                return null;
+            }
+
+            return response()->json([
+                'message' => $exception->getMessage(),
             ], 422);
         });
     })->create();

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             SourcesSeeder::class,
             CrisesHistoricasSeeder::class,
             EleicoesSeedSeeder::class,
+            PaisesInicialSeeder::class,
         ]);
     }
 }

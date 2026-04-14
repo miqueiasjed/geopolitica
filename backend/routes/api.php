@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\EleicaoController;
 use App\Http\Controllers\Api\AlertaController;
 use App\Http\Controllers\Api\IndicadoresController;
 use App\Http\Controllers\Api\IndicadoresHistoricoController;
+use App\Http\Controllers\Api\PaisController;
+use App\Http\Controllers\Api\PaisUsuarioController;
 use App\Http\Controllers\Api\TimelineController;
 use App\Http\Controllers\Api\TimelineDetailController;
 use App\Http\Controllers\FeedController;
@@ -69,6 +71,16 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 });
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/paises', [PaisController::class, 'index']);
+    Route::get('/paises/{codigo}', [PaisController::class, 'show']);
+    Route::get('/paises/{codigo}/eventos', [PaisController::class, 'eventos']);
+
+    Route::get('/meus-paises', [PaisUsuarioController::class, 'index']);
+    Route::post('/meus-paises', [PaisUsuarioController::class, 'store']);
+    Route::delete('/meus-paises/{codigo}', [PaisUsuarioController::class, 'destroy']);
+});
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/eleicoes', [EleicaoController::class, 'index']);

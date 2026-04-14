@@ -17,6 +17,8 @@ import { ConteudoLeitura } from '../pages/dashboard/ConteudoLeitura'
 import { Timeline } from '../pages/Timeline'
 import { RadarEleicoes } from '../pages/RadarEleicoes'
 import { AdminEleicoes } from '../pages/admin/AdminEleicoes'
+import { MeusPaisesPage } from '../pages/MeusPaisesPage'
+import { PerfilPaisPage } from '../pages/PerfilPaisPage'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -39,6 +41,8 @@ export function AppRouter() {
           <Route path="/dashboard/biblioteca/:slug" element={<ConteudoLeitura />} />
           <Route path="/dashboard/timeline" element={<Timeline />} />
           <Route path="/dashboard/eleicoes" element={<RadarEleicoes />} />
+          <Route path="/paises" element={<MeusPaisesPage />} />
+          <Route path="/paises/:codigo" element={<PerfilPaisPage />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
       </Route>

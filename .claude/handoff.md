@@ -3,13 +3,13 @@ Plano: —
 Task: —
 Status: Concluído/Vazio
 O que foi feito:
-- Plano 10 concluído: Alerta Preditivo (M05) com 3 migrations (sinais_padrao, alertas_preditivos, alertas_leituras), 3 Models com scopes, DetectorSinaisService (Haiku), AnalisadorConvergenciaService (Sonnet), EntregaAlertaService (Resend), 3 Jobs (alertas/emails), AlertaController + AlertaPreditivoService, Mailable + Blade template, CronSecretMiddleware, scheduler em console.php, types/hooks/AlertaBadge/AlertaPanel no frontend, integração na TopNav.
-- Build limpo: `npm run build ✓` (1351 módulos), `npx tsc --noEmit` zero erros.
+- Plano 11 concluído: Perfil de País (M06) com 2 migrations (perfis_paises, paises_usuarios), PaisesInicialSeeder (20 países), GeradorPerfilPaisService (Claude API), EventosPaisService, GerarPerfilPaisJob, command paises:gerar-perfis, schedule segunda 03:00, PaisController + PaisUsuarioController + LimitePaisesAtingidoException, frontend: types/hooks/BuscaPais/CardPais/MeusPaisesPage/PerfilPaisPage, integração WorldMap, link TopNav, rotas /paises e /paises/:codigo.
+- Build limpo: `npm run build ✓` (1358 módulos), `npx tsc --noEmit` zero erros.
 O que falta:
 - Iniciar o próximo plano pendente elegível na próxima execução do `run-plan`.
-- Próximos elegíveis: Plano 11 (Perfil de País M06, depende de 4+6+7+9 ✅) ou Plano 14 (Chat com Briefings M09, depende de 7+11+12+4, parcialmente ✅).
+- Próximos elegíveis: Plano 14 (Chat com Briefings M09, depende de 7+11+12+4 ✅) ou Plano 15 (Licenciamento B2B M11, depende de 1–14 — aguarda 14).
 Arquivos modificados:
 - `.claude/handoff.md`
 - `.claude/plans/INDEX.md`
 - `.claude/progress.txt`
-Próxima ação: Ler `.claude/handoff.md`; como está concluído/vazio, selecionar o próximo plano pendente elegível em `.claude/plans/INDEX.md`.
+Próxima ação: Ler `.claude/handoff.md`; como está concluído/vazio, selecionar Plano 14 (Chat com Briefings M09) — todas dependências concluídas.

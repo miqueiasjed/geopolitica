@@ -39,3 +39,9 @@ Schedule::job(new AtualizarIndicadoresJob)
     ->everyFifteenMinutes()
     ->withoutOverlapping()
     ->onFailure(fn () => Log::error('AtualizarIndicadoresJob falhou'));
+
+// Perfis de Países – gera análises via IA toda segunda-feira às 03:00
+Schedule::command('paises:gerar-perfis')
+    ->weeklyOn(1, '03:00')
+    ->withoutOverlapping()
+    ->runInBackground();

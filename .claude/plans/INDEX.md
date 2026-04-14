@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-14 (Plano 10 concluído)
+> Última atualização: 2026-04-14 (Plano 11 concluído)
 
 ## Legenda
 - ✅ Concluído
@@ -22,7 +22,7 @@
 | 8 | [Biblioteca de Conteúdo: Frontend (M03)](8.md) | ✅ | 7 | 6 |
 | 9 | [Indicadores de Risco (M04)](9.md) | ✅ | 2, 5 | 5 |
 | 10 | [Alerta Preditivo (M05)](10.md) | ✅ | 4, 7, 9 | 7 |
-| 11 | [Perfil de País (M06)](11.md) | ⏳ | 4, 6, 7, 9 | 7 |
+| 11 | [Perfil de País (M06)](11.md) | ✅ | 4, 6, 7, 9 | 7 |
 | 12 | [Linha do Tempo de Crises (M07)](12.md) | ✅ | 4, 7 | 5 |
 | 13 | [Radar de Eleições (M08)](13.md) | ✅ | 7 | 5 |
 | 14 | [Chat com os Briefings (M09)](14.md) | ⏳ | 7, 11, 12, 4 | 5 |
@@ -62,7 +62,7 @@
 | M03 – Biblioteca de Conteúdo | Planos 7, 8 | ✅ |
 | M04 – Indicadores de Risco | Plano 9 | ✅ |
 | M05 – Alerta Preditivo | Plano 10 | ✅ |
-| M06 – Perfil de País | Plano 11 | ⏳ |
+| M06 – Perfil de País | Plano 11 | ✅ |
 | M07 – Linha do Tempo | Plano 12 | ✅ |
 | M08 – Radar de Eleições | Plano 13 | ✅ |
 | M09 – Chat com Briefings | Plano 14 | ⏳ |

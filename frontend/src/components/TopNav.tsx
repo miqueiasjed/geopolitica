@@ -1,4 +1,4 @@
-import { ExitIcon } from '@radix-ui/react-icons'
+import { ExitIcon, GlobeIcon } from '@radix-ui/react-icons'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AlertaBadge } from './alertas/AlertaBadge'
@@ -81,6 +81,17 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
               }`}
             >
               📅 Radar de Eleições
+            </Link>
+            <Link
+              to="/paises"
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
+                location.pathname.startsWith('/paises')
+                  ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                  : 'text-zinc-500 hover:text-zinc-200'
+              }`}
+            >
+              <GlobeIcon className="h-3 w-3" />
+              Meus Países
             </Link>
           </nav>
         </div>
