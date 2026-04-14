@@ -1,0 +1,35 @@
+2026-04-14
+- Plano 1 concluído com validação real do Redis instalada localmente via Homebrew.
+- `php artisan config:show cache`, `session` e `queue` confirmaram `redis` como driver/default.
+- `php artisan tinker --execute="Cache::put(...); Cache::get(...)"` retornou `1`, comprovando cache em runtime.
+- `php artisan schedule:run` executou sem override temporário e `php artisan queue:work --once` encerrou sem erros.
+- Gotcha: no sandbox, conexões TCP locais para `127.0.0.1:6379` falham com `Operation not permitted`; para validar Redis em runtime foi necessário rodar os comandos do Laravel com permissão escalada.
+- Plano 2 concluído com backend e frontend de autenticação entregues.
+- Backend: migration/model `Assinante`, roles Spatie com guard `sanctum`, admin seed, endpoints `/api/auth/*` e `/api/perfil`, reset de senha e middleware `assinante.ativo`.
+- Frontend: `AuthProvider`, interceptor Bearer com fallback de chave legada (`gpi_token`), `RotaProtegida` e páginas `Login`, `EsqueciSenha`, `RedefinirSenha` e `Perfil`.
+- Validações executadas: `php artisan migrate`, `php artisan db:seed`, `php artisan test` e `npm run build`.
+- Plano 3 concluído com integração Hotmart fim a fim no backend e painel admin em React.
+- Backend: migration/model `WebhookEvento`, `HotmartHandlerService`, webhook público `/api/webhook/hotmart`, endpoints admin `/api/admin/assinantes` e `/api/admin/webhook-eventos`, mailables/templates transacionais e alias `role` do Spatie registrado no bootstrap.
+- Frontend: rotas `/admin/assinantes` e `/admin/webhook-eventos`, `RotaProtegida` com `requiredRole`, filtros com debounce de 300ms, paginação e payload JSON expansível.
+- Validações executadas: `php artisan test`, `npm run build` e `eslint` direcionado aos arquivos novos/alterados do frontend admin.
+- Gotcha: a middleware `role:admin` do Spatie não funcionava até registrar explicitamente o alias `role` em `bootstrap/app.php`.
+- Gotcha: a skill instalada de frontend apontava para outro projeto (Vue/Inertia), então a implementação correta precisou seguir o stack real deste workspace (`frontend/src` com React + React Router).
+- Plano 4 concluído com o backend do Feed de Tensões entregue ponta a ponta.
+- Backend: migrations/models `Source` e `Event`, `SourcesSeeder`, `RssFetcherService` com `vedmant/laravel-feed-reader`, `AiAnalyzerService`, `FeedUpdaterService`, job/command `feed:update`, scheduler horário, API `/api/feed` e `/api/feed/atualizar`, resources e paginação cursor-based.
+- Validações executadas: `php artisan test`, `php artisan schedule:list` com `CACHE_STORE=array`, `php artisan migrate --graceful` em SQLite efêmero e `php artisan feed:update --sync` em SQLite temporário.
+- Gotcha: no Laravel 13 o `Queueable` já define `$queue`; a fila padrão do job precisou ser configurada via `onQueue('default')` no construtor do job.
+- Gotcha: `auth:sanctum` tentava redirecionar para a rota `login` em requests não JSON; foi necessário configurar `redirectGuestsTo(null)` no `bootstrap/app.php` para preservar o fluxo de erro JSON da API.
+- Gotcha: `schedule:list` e migrations no sandbox exigiram overrides de ambiente (`CACHE_STORE=array` e `PERMISSION_CACHE_STORE=array`) porque o cache/pacote de permissões tentavam abrir Redis local, o que é bloqueado aqui.
+- Plano 5 concluído com o frontend do Feed de Tensões entregue em React.
+- Frontend: tipos `feed.ts`, hook `useFeed` com paginação cursor-based e refetch a cada 5 minutos, dashboard `/dashboard/feed`, `TopNav`, `DashboardLayout`, `FilterBar`, `EventList`, `EventCard`, `ImpactBadge`, `RefetchIndicator`, estados vazios/loading e redirecionamento inicial para o feed autenticado.
+- Validações executadas: `npm install`, `npm run lint` e `npm run build`.
+- Gotcha: o backend do feed retorna a paginação em `links.next_cursor`/`links.prev_cursor`, não no topo do payload; o hook precisou seguir o contrato real da API.
+- Gotcha: o workspace não tinha `framer-motion` instalado, então a dependência precisou ser adicionada antes da etapa de build.
+- Plano 6 concluído com o Mapa de Calor Geopolítico entregue (backend + frontend).
+- Backend: migration `gdelt_cache`, view SQL `mapa_intensidade` (fórmula M01×0.6 + GDELT×0.4), Model `GdeltCache`, `GdeltFetcherService` com normalização de tom, `MapaIntensidadeService` com cache Redis 15 min, `AtualizarGdeltJob` (tries: 3, timeout: 120), scheduler horário no minuto :30 (sem conflito com M01 no :00), endpoints `GET /api/mapa/intensidade` e `GET /api/mapa/regiao-eventos` com FormRequest.
+- Frontend: types `mapa.ts`, hooks `useMapaIntensidade` (refetch 10 min) e `useRegiaoEventos` (enabled: !!regiao), `WorldMap` com mapa ISO A2→N3 (~160 países), escala d3 `#2a2a2a→#7f1d1d`, tooltip Radix UI, `IntensityLegend` fixo no canto inferior, `RegionPanel` com slide Framer Motion, página `Mapa`, link no TopNav, rota `/dashboard/mapa`.
+- Validações: `npx tsc --noEmit` zero erros, `npm run build ✓`, `php artisan migrate --pretend` válido.
+- Gotcha: `public string $queue = 'default'` em Job conflita com o trait `Queueable` no Laravel 11+ (same as Plano 4); removido e o trait gerencia sozinho.
+- Gotcha: `react-simple-maps` v3 usa ISO N3 numérico; foi necessário incluir mapa estático ISO A2→N3 no WorldMap para correlacionar dados da API.
+- Gotcha: `react-simple-maps` depende de `prop-types` que não vem instalado; precisou de `npm install prop-types --legacy-peer-deps`.
+- Gotcha: `ease: 'easeOut'` em variants Framer Motion requer `as const` para satisfazer o tipo `Easing` do TS.

@@ -1,0 +1,17 @@
+# Backend
+backend/vendor/
+backend/.env
+backend/storage/logs/*.log
+backend/bootstrap/cache/*.php
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# macOS
+.DS_Store
+
+# Documentação binária
+*.docx
