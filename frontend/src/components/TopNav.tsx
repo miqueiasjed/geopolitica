@@ -93,6 +93,29 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
               <GlobeIcon className="h-3 w-3" />
               Meus Países
             </Link>
+            <Link
+              to="/dashboard/chat"
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
+                location.pathname === '/dashboard/chat'
+                  ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                  : 'text-zinc-500 hover:text-zinc-200'
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              Chat
+            </Link>
           </nav>
         </div>
 

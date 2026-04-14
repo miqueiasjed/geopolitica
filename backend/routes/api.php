@@ -7,6 +7,8 @@ use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\BibliotecaController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ChatHistoricoController;
 use App\Http\Controllers\Api\ConteudoController;
 use App\Http\Controllers\Api\EleicaoController;
 use App\Http\Controllers\Api\AlertaController;
@@ -71,6 +73,11 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 });
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('chat')->group(function () {
+    Route::post('/perguntar', [ChatController::class, 'perguntar']);
+    Route::get('/historico', [ChatHistoricoController::class, 'index']);
+});
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/paises', [PaisController::class, 'index']);

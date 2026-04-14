@@ -9,6 +9,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -78,5 +79,16 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => $exception->getMessage(),
             ], 422);
+        });
+
+        $exceptions->render(function (TooManyRequestsHttpException $exception, Request $request) use ($deveResponderJson) {
+            if (! $deveResponderJson($request)) {
+                return null;
+            }
+
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'upgrade' => true,
+            ], 429);
         });
     })->create();
