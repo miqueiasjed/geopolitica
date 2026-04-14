@@ -11,11 +11,11 @@
 
 | # | Título | Tipo | Status | Complexidade |
 |---|--------|------|--------|--------------|
-| 7.1 | Migration, Model Conteudo e Seeder | backend-estrutura | ⏳ | média |
-| 7.2 | ConteudoService e ConteudoPolicy | backend-logica | ⏳ | alta |
-| 7.3 | FormRequests e Resources | backend-logica | ⏳ | baixa |
-| 7.4 | BibliotecaController e ConteudoController (endpoints públicos) | backend-endpoint | ⏳ | média |
-| 7.5 | AdminConteudoController (CRUD admin) | backend-endpoint | ⏳ | média |
+| 7.1 | Migration, Model Conteudo e Seeder | backend-estrutura | ✅ | média |
+| 7.2 | ConteudoService e ConteudoPolicy | backend-logica | ✅ | alta |
+| 7.3 | FormRequests e Resources | backend-logica | ✅ | baixa |
+| 7.4 | BibliotecaController e ConteudoController (endpoints públicos) | backend-endpoint | ✅ | média |
+| 7.5 | AdminConteudoController (CRUD admin) | backend-endpoint | ✅ | média |
 
 ## Ordem de execução
 7.1 → 7.2 → 7.3 → 7.4 → 7.5

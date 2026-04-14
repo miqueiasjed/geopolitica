@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-14
+> Última atualização: 2026-04-14 (Plano 7 concluído)
 
 ## Legenda
 - ✅ Concluído
@@ -18,7 +18,7 @@
 | 4 | [Feed de Tensões: Backend (M01)](4.md) | ✅ | 2 | 6 |
 | 5 | [Feed de Tensões: Frontend (M01)](5.md) | ✅ | 4 | 5 |
 | 6 | [Mapa de Calor Geopolítico (M02)](6.md) | ✅ | 4 | 6 |
-| 7 | [Biblioteca de Conteúdo: Backend (M03)](7.md) | ⏳ | 2 | 5 |
+| 7 | [Biblioteca de Conteúdo: Backend (M03)](7.md) | ✅ | 2 | 5 |
 | 8 | [Biblioteca de Conteúdo: Frontend (M03)](8.md) | ⏳ | 7 | 6 |
 | 9 | [Indicadores de Risco (M04)](9.md) | ⏳ | 2, 5 | 5 |
 | 10 | [Alerta Preditivo (M05)](10.md) | ⏳ | 4, 7, 9 | 7 |
