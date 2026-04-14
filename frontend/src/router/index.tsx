@@ -14,6 +14,7 @@ import { AdminBiblioteca } from '../pages/admin/AdminBiblioteca'
 import { RedefinirSenha } from '../pages/RedefinirSenha'
 import { Biblioteca } from '../pages/dashboard/Biblioteca'
 import { ConteudoLeitura } from '../pages/dashboard/ConteudoLeitura'
+import { Timeline } from '../pages/Timeline'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -34,6 +35,7 @@ export function AppRouter() {
           <Route path="/dashboard/mapa" element={<Mapa />} />
           <Route path="/dashboard/biblioteca" element={<Biblioteca />} />
           <Route path="/dashboard/biblioteca/:slug" element={<ConteudoLeitura />} />
+          <Route path="/dashboard/timeline" element={<Timeline />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
       </Route>

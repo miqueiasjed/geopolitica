@@ -57,6 +57,16 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
             >
               Mapa de Calor
             </Link>
+            <Link
+              to="/dashboard/timeline"
+              className={`rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
+                location.pathname === '/dashboard/timeline'
+                  ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                  : 'text-zinc-500 hover:text-zinc-200'
+              }`}
+            >
+              Linha do Tempo
+            </Link>
           </nav>
         </div>
 

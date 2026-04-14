@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ConteudoController;
 use App\Http\Controllers\Api\IndicadoresController;
 use App\Http\Controllers\Api\IndicadoresHistoricoController;
+use App\Http\Controllers\Api\TimelineController;
+use App\Http\Controllers\Api\TimelineDetailController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MapaIntensidadeController;
 use App\Http\Controllers\PerfilController;
@@ -51,6 +53,11 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('mapa')->group(fu
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/indicadores', [IndicadoresController::class, 'index']);
     Route::get('/indicadores/historico', [IndicadoresHistoricoController::class, 'index']);
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/timeline', [TimelineController::class, 'index']);
+    Route::get('/timeline/crise/{slug}', [TimelineDetailController::class, 'show']);
 });
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
