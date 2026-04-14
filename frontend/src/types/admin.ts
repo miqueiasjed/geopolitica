@@ -39,3 +39,22 @@ export interface AdminWebhookEventosFiltros {
   processado?: string
   page?: number
 }
+
+export type StatusConteudo = 'publicado' | 'rascunho'
+
+export interface AdminConteudoItem {
+  id: number
+  tipo: import('./biblioteca').TipoConteudo
+  titulo: string
+  plano_minimo: import('./biblioteca').PlanoMinimo
+  status: StatusConteudo
+  publicado_em: string | null
+}
+
+export interface AdminConteudosResponse {
+  data: AdminConteudoItem[]
+  total: number
+  per_page: number
+  current_page: number
+  last_page: number
+}

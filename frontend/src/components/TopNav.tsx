@@ -38,6 +38,16 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
               Feed
             </Link>
             <Link
+              to="/dashboard/biblioteca"
+              className={`rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
+                location.pathname.startsWith('/dashboard/biblioteca')
+                  ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                  : 'text-zinc-500 hover:text-zinc-200'
+              }`}
+            >
+              Biblioteca
+            </Link>
+            <Link
               to="/dashboard/mapa"
               className={`rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
                 location.pathname === '/dashboard/mapa'

@@ -9,7 +9,11 @@ import { Login } from '../pages/Login'
 import { Perfil } from '../pages/Perfil'
 import { AdminAssinantes } from '../pages/admin/AdminAssinantes'
 import { AdminWebhookEventos } from '../pages/admin/AdminWebhookEventos'
+import { AdminNovoConteudo } from '../pages/admin/AdminNovoConteudo'
+import { AdminBiblioteca } from '../pages/admin/AdminBiblioteca'
 import { RedefinirSenha } from '../pages/RedefinirSenha'
+import { Biblioteca } from '../pages/dashboard/Biblioteca'
+import { ConteudoLeitura } from '../pages/dashboard/ConteudoLeitura'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -28,12 +32,16 @@ export function AppRouter() {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/feed" element={<Feed />} />
           <Route path="/dashboard/mapa" element={<Mapa />} />
+          <Route path="/dashboard/biblioteca" element={<Biblioteca />} />
+          <Route path="/dashboard/biblioteca/:slug" element={<ConteudoLeitura />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
       </Route>
       <Route element={<RotaProtegida requiredRole="admin" />}>
         <Route path="/admin/assinantes" element={<AdminAssinantes />} />
         <Route path="/admin/webhook-eventos" element={<AdminWebhookEventos />} />
+        <Route path="/admin/novo-conteudo" element={<AdminNovoConteudo />} />
+        <Route path="/admin/biblioteca" element={<AdminBiblioteca />} />
       </Route>
     </Routes>
   )

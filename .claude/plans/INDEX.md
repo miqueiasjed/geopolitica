@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-14 (Plano 7 concluído)
+> Última atualização: 2026-04-14 (Plano 8 concluído)
 
 ## Legenda
 - ✅ Concluído
@@ -19,7 +19,7 @@
 | 5 | [Feed de Tensões: Frontend (M01)](5.md) | ✅ | 4 | 5 |
 | 6 | [Mapa de Calor Geopolítico (M02)](6.md) | ✅ | 4 | 6 |
 | 7 | [Biblioteca de Conteúdo: Backend (M03)](7.md) | ✅ | 2 | 5 |
-| 8 | [Biblioteca de Conteúdo: Frontend (M03)](8.md) | ⏳ | 7 | 6 |
+| 8 | [Biblioteca de Conteúdo: Frontend (M03)](8.md) | ✅ | 7 | 6 |
 | 9 | [Indicadores de Risco (M04)](9.md) | ⏳ | 2, 5 | 5 |
 | 10 | [Alerta Preditivo (M05)](10.md) | ⏳ | 4, 7, 9 | 7 |
 | 11 | [Perfil de País (M06)](11.md) | ⏳ | 4, 6, 7, 9 | 7 |
@@ -59,7 +59,7 @@
 | M00 – Autenticação | Plano 2 | ✅ |
 | M01 – Feed de Tensões | Planos 4, 5 | ✅ |
 | M02 – Mapa de Calor | Plano 6 | ✅ |
-| M03 – Biblioteca de Conteúdo | Planos 7, 8 | ⏳ |
+| M03 – Biblioteca de Conteúdo | Planos 7, 8 | ✅ |
 | M04 – Indicadores de Risco | Plano 9 | ⏳ |
 | M05 – Alerta Preditivo | Plano 10 | ⏳ |
 | M06 – Perfil de País | Plano 11 | ⏳ |
