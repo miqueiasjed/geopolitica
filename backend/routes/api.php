@@ -7,6 +7,8 @@ use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ConteudoController;
+use App\Http\Controllers\Api\IndicadoresController;
+use App\Http\Controllers\Api\IndicadoresHistoricoController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MapaIntensidadeController;
 use App\Http\Controllers\PerfilController;
@@ -44,6 +46,11 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('mapa')->group(function () {
     Route::get('/intensidade', [MapaIntensidadeController::class, 'index']);
     Route::get('/regiao-eventos', [RegiaoEventosController::class, 'index']);
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/indicadores', [IndicadoresController::class, 'index']);
+    Route::get('/indicadores/historico', [IndicadoresHistoricoController::class, 'index']);
 });
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
