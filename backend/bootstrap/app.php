@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'assinante.ativo' => \App\Http\Middleware\EnsureAssinanteAtivo::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'cron.secret' => \App\Http\Middleware\CronSecretMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

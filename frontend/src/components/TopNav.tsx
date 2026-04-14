@@ -1,5 +1,8 @@
 import { ExitIcon } from '@radix-ui/react-icons'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { AlertaBadge } from './alertas/AlertaBadge'
+import { AlertaPanel } from './alertas/AlertaPanel'
 import { useAuth } from '../hooks/useAuth'
 
 interface TopNavProps {
@@ -14,8 +17,10 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { logout, user } = useAuth()
+  const [painelAberto, setPainelAberto] = useState(false)
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-[#1e1e20] bg-[#0a0a0b]/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
@@ -87,6 +92,8 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
 
           <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">{lastUpdatedLabel}</div>
 
+          <AlertaBadge onTogglePanel={() => setPainelAberto((prev) => !prev)} />
+
           <button
             type="button"
             onClick={async () => {
@@ -101,5 +108,8 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
         </div>
       </div>
     </header>
+
+    <AlertaPanel isOpen={painelAberto} onClose={() => setPainelAberto(false)} />
+    </>
   )
 }

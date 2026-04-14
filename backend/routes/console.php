@@ -1,7 +1,9 @@
 <?php
 
+use App\Jobs\AnalisarConvergenciaJob;
 use App\Jobs\AtualizarGdeltJob;
 use App\Jobs\AtualizarIndicadoresJob;
+use App\Jobs\DetectarSinaisJob;
 use App\Jobs\ProcessFeedUpdateJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -15,6 +17,16 @@ Artisan::command('inspire', function () {
 // M01 – atualização de feeds: roda no minuto :00
 Schedule::job(new ProcessFeedUpdateJob)
     ->hourly()
+    ->withoutOverlapping();
+
+// M09 – detecção de sinais: roda no minuto :00 (após feed)
+Schedule::job(new DetectarSinaisJob)
+    ->hourly()
+    ->withoutOverlapping();
+
+// M10 – análise de convergência: roda no minuto :05 (após detecção de sinais)
+Schedule::job(new AnalisarConvergenciaJob)
+    ->hourlyAt(5)
     ->withoutOverlapping();
 
 // GDELT – dados de intensidade por país: roda no minuto :30 (sem conflito com M01)

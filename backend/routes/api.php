@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ConteudoController;
 use App\Http\Controllers\Api\EleicaoController;
+use App\Http\Controllers\Api\AlertaController;
 use App\Http\Controllers\Api\IndicadoresController;
 use App\Http\Controllers\Api\IndicadoresHistoricoController;
 use App\Http\Controllers\Api\TimelineController;
@@ -60,6 +61,11 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/timeline', [TimelineController::class, 'index']);
     Route::get('/timeline/crise/{slug}', [TimelineDetailController::class, 'show']);
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/alertas', [AlertaController::class, 'index']);
+    Route::post('/alertas/{id}/lido', [AlertaController::class, 'marcarLido']);
 });
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
