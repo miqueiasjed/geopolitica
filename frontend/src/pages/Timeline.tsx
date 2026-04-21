@@ -28,14 +28,17 @@ export function Timeline() {
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReduced ? 0 : 0.3, ease: 'easeOut' }}
-      className="p-6"
+      className="space-y-6"
     >
       {/* Título */}
-      <h1 className="text-2xl font-bold text-[#E8E4DC] mb-1">Linha do Tempo de Crises</h1>
-      <p className="text-[#6B7280] text-sm mb-6">Crises geopolíticas históricas e eventos ativos</p>
+      <div>
+        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">linha do tempo</p>
+        <h1 className="text-2xl font-bold text-[#E8E4DC] sm:text-3xl">Linha do Tempo de Crises</h1>
+        <p className="text-[#6B7280] text-sm mt-1">Crises geopolíticas históricas e eventos ativos</p>
+      </div>
 
       {/* Legenda */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex flex-wrap gap-4">
         <span className="flex items-center gap-2 text-sm text-[#C9B882]">
           <span className="w-3 h-3 rounded-sm bg-[#C9B882]" /> Crises Históricas
         </span>
@@ -45,7 +48,8 @@ export function Timeline() {
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-4 mb-6 flex-wrap">
+      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div className="flex min-w-max gap-3">
         <select
           className="bg-[#1C1F26] border border-[#2D3240] text-[#E8E4DC] rounded px-3 py-1.5 text-sm"
           value={filtros.categoria ?? ''}
@@ -93,6 +97,7 @@ export function Timeline() {
             }))
           }
         />
+      </div>
       </div>
 
       {/* Timeline */}

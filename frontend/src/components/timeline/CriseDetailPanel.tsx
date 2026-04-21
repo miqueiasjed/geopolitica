@@ -37,7 +37,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                 ? { duration: 0 }
                 : { type: 'spring', damping: 25, stiffness: 200 }
             }
-            className="fixed right-0 top-0 h-full w-[480px] bg-[#1C1F26] overflow-y-auto z-50 border-l border-[#2D3240]"
+            className="fixed right-0 top-0 h-full w-full overflow-y-auto bg-[#1C1F26] z-50 border-l border-[#2D3240] sm:w-[480px]"
           >
             <div className="p-6">
               {/* Botão fechar */}

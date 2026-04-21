@@ -51,7 +51,7 @@ export function Perfil() {
   const usuario = perfilQuery.data ?? usuarioContexto
 
   return (
-    <main className="min-h-screen bg-[#0a0a0b] px-6 py-10 text-cyan-50">
+    <div className="space-y-6">
       <div className="mx-auto max-w-5xl space-y-6">
         <Flex justify="between" align="center" wrap="wrap" gap="4">
           <Box className="space-y-2">
@@ -195,6 +195,6 @@ export function Perfil() {
           </Card>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

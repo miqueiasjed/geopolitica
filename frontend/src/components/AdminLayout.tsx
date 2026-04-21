@@ -9,6 +9,7 @@ import {
   ActivityLogIcon,
   ExitIcon,
   ChevronRightIcon,
+  GearIcon,
 } from '@radix-ui/react-icons'
 
 const itens = [
@@ -18,6 +19,7 @@ const itens = [
   { label: 'Eleições', rota: '/admin/eleicoes', icone: GlobeIcon },
   { label: 'B2B / Empresas', rota: '/admin/b2b', icone: FileTextIcon },
   { label: 'Webhook Eventos', rota: '/admin/webhook-eventos', icone: ActivityLogIcon },
+  { label: 'Configurações', rota: '/admin/configuracoes', icone: GearIcon },
 ]
 
 export function AdminLayout() {

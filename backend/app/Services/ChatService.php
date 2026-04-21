@@ -2,20 +2,16 @@
 
 namespace App\Services;
 
-use Anthropic\Client;
-use Anthropic\Messages\RawContentBlockDeltaEvent;
-use Anthropic\Messages\TextDelta;
 use App\Models\ChatMensagem;
 use App\Models\ChatSessao;
 use App\Models\User;
+use App\Services\Ai\AiProviderFactory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class ChatService
 {
-    private const MODELO = 'claude-sonnet-4-5';
-
     private const MAX_TOKENS = 1024;
 
     private const LIMITES_POR_PLANO = [
@@ -74,7 +70,7 @@ class ChatService
             'conteudo' => $pergunta,
         ]);
 
-        $systemPrompt = "Você é um analista geopolítico especializado. Responda em português brasileiro de forma objetiva e fundamentada. Use apenas o contexto fornecido quando relevante.";
+        $systemPrompt = (string) config('ai.prompts.chat_sistema');
 
         if ($contexto !== '') {
             $systemPrompt .= "\n\n{$contexto}";
@@ -90,26 +86,12 @@ class ChatService
             'content' => $pergunta,
         ];
 
-        $cliente  = new Client(apiKey: config('claude.api_key'));
-        $stream   = $cliente->messages->createStream(
-            maxTokens: self::MAX_TOKENS,
-            messages:  $mensagensFormatadas,
-            model:     self::MODELO,
+        $respostaCompleta = AiProviderFactory::make()->stream(
             system:    $systemPrompt,
+            messages:  $mensagensFormatadas,
+            maxTokens: self::MAX_TOKENS,
+            onToken:   $aoReceberToken,
         );
-
-        $respostaCompleta = '';
-
-        foreach ($stream as $evento) {
-            if (
-                $evento instanceof RawContentBlockDeltaEvent &&
-                $evento->delta instanceof TextDelta
-            ) {
-                $token            = $evento->delta->text;
-                $respostaCompleta .= $token;
-                $aoReceberToken($token);
-            }
-        }
 
         if ($respostaCompleta !== '') {
             $sessao->mensagens()->create([

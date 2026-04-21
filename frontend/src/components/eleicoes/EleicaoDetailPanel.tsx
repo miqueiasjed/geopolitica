@@ -96,7 +96,7 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                 ? { duration: 0 }
                 : { type: 'spring', damping: 25, stiffness: 200 }
             }
-            className="fixed right-0 top-0 h-full w-[440px] overflow-y-auto bg-[#1C1F26] z-50 border-l border-[#2D3240]"
+            className="fixed right-0 top-0 h-full w-full overflow-y-auto bg-[#1C1F26] z-50 border-l border-[#2D3240] sm:w-[440px]"
             role="dialog"
             aria-modal="true"
             aria-label="Detalhes da eleição"

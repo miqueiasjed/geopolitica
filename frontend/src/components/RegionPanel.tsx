@@ -286,9 +286,9 @@ export function RegionPanel({ regiao, nome, onClose }: RegionPanelProps) {
   const slideProps = prefersReduced
     ? { initial: false, animate: { x: 0, opacity: 1 }, exit: { opacity: 0 } }
     : {
-        initial: { x: 420 },
+        initial: { x: '100%' },
         animate: { x: 0 },
-        exit: { x: 420 },
+        exit: { x: '100%' },
         transition: { duration: 0.4, ease: 'easeOut' as const },
       }
 

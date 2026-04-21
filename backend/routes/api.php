@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
+use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\EmpresaController;
@@ -108,6 +109,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/eleicoes', [EleicaoAdminController::class, 'store']);
     Route::patch('/eleicoes/{id}', [EleicaoAdminController::class, 'update']);
     Route::delete('/eleicoes/{id}', [EleicaoAdminController::class, 'destroy']);
+
+    // Configurações da plataforma
+    Route::get('/configuracoes', [AdminConfiguracaoController::class, 'index']);
+    Route::patch('/configuracoes', [AdminConfiguracaoController::class, 'update']);
 
     // Gestão de licenças B2B
     Route::get('/b2b/empresas', [AdminB2BController::class, 'index']);

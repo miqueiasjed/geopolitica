@@ -116,7 +116,7 @@ export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Painel de alertas"
-            className="fixed right-0 top-0 z-50 flex h-full w-80 flex-col bg-zinc-950 border-l border-zinc-800 md:w-96"
+            className="fixed right-0 top-0 z-50 flex h-full w-full flex-col bg-zinc-950 border-l border-zinc-800 sm:w-80 md:w-96"
             initial={panelInitial}
             animate={panelAnimate}
             exit={panelExit}

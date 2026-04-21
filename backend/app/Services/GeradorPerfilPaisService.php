@@ -2,27 +2,25 @@
 
 namespace App\Services;
 
-use Anthropic\Client;
-use Anthropic\Messages\TextBlock;
+use App\Contracts\AiProviderInterface;
 use App\Models\PerfilPais;
+use App\Services\Ai\AiProviderFactory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class GeradorPerfilPaisService
 {
-    private const MODELO = 'claude-sonnet-4-5';
-
     private const MAX_TOKENS = 500;
 
     public function gerarPerfil(PerfilPais $pais): PerfilPais
     {
-        $cliente = new Client(apiKey: config('claude.api_key'));
+        $provider = AiProviderFactory::make();
 
-        $contextoGeopolitico = $this->gerarContextoGeopolitico($cliente, $pais);
+        $contextoGeopolitico = $this->gerarContextoGeopolitico($provider, $pais);
 
         sleep(2);
 
-        $analiseLideranca = $this->gerarAnaliseLideranca($cliente, $pais);
+        $analiseLideranca = $this->gerarAnaliseLideranca($provider, $pais);
 
         $pais->update([
             'contexto_geopolitico' => $contextoGeopolitico,
@@ -38,63 +36,33 @@ class GeradorPerfilPaisService
         return $pais->fresh();
     }
 
-    private function gerarContextoGeopolitico(Client $cliente, PerfilPais $pais): string
+    private function gerarContextoGeopolitico(AiProviderInterface $provider, PerfilPais $pais): string
     {
-        $resposta = $cliente->messages->create(
+        return trim($provider->complete(
+            system:    '',
+            messages:  [['role' => 'user', 'content' => $this->promptContextoGeopolitico($pais)]],
             maxTokens: self::MAX_TOKENS,
-            model: self::MODELO,
-            messages: [[
-                'role'    => 'user',
-                'content' => $this->promptContextoGeopolitico($pais),
-            ]],
-        );
-
-        return $this->extrairTexto($resposta->content);
+        ));
     }
 
-    private function gerarAnaliseLideranca(Client $cliente, PerfilPais $pais): string
+    private function gerarAnaliseLideranca(AiProviderInterface $provider, PerfilPais $pais): string
     {
-        $resposta = $cliente->messages->create(
+        return trim($provider->complete(
+            system:    '',
+            messages:  [['role' => 'user', 'content' => $this->promptAnaliseLideranca($pais)]],
             maxTokens: self::MAX_TOKENS,
-            model: self::MODELO,
-            messages: [[
-                'role'    => 'user',
-                'content' => $this->promptAnaliseLideranca($pais),
-            ]],
-        );
-
-        return $this->extrairTexto($resposta->content);
-    }
-
-    private function extrairTexto(array $blocos): string
-    {
-        $texto = collect($blocos)
-            ->filter(fn ($bloco) => $bloco instanceof TextBlock)
-            ->map(fn (TextBlock $bloco) => $bloco->text)
-            ->implode("\n");
-
-        if ($texto === '') {
-            throw new \RuntimeException('Resposta vazia da Claude API.');
-        }
-
-        return trim($texto);
+        ));
     }
 
     private function promptContextoGeopolitico(PerfilPais $pais): string
     {
-        return <<<PROMPT
-Escreva uma análise geopolítica atual de {$pais->nome_pt} em português com 200 a 300 palavras.
-Aborde: posição atual do país na ordem global, suas principais alianças estratégicas, tensões existentes com outros países ou blocos, e impactos relevantes para investidores brasileiros.
-Seja objetivo, factual e atual. Não use introduções como "Certamente" ou "Claro".
-PROMPT;
+        $template = (string) config('ai.prompts.perfil_contexto');
+        return str_replace('{{pais}}', $pais->nome_pt, $template);
     }
 
     private function promptAnaliseLideranca(PerfilPais $pais): string
     {
-        return <<<PROMPT
-Escreva uma análise do líder atual de {$pais->nome_pt} em português com 100 a 150 palavras.
-Aborde: nome e cargo do líder atual, estilo de governo, posicionamento político, e como suas decisões impactam as relações internacionais do país e os mercados globais.
-Seja objetivo e factual. Não use introduções como "Certamente" ou "Claro".
-PROMPT;
+        $template = (string) config('ai.prompts.perfil_lideranca');
+        return str_replace('{{pais}}', $pais->nome_pt, $template);
     }
 }

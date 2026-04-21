@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use Anthropic\Client;
-use Anthropic\Messages\TextBlock;
+use App\Services\Ai\AiProviderFactory;
 use Illuminate\Support\Facades\Log;
 
 class AiAnalyzerService
@@ -19,7 +18,7 @@ class AiAnalyzerService
         }
 
         try {
-            if (! config('claude.api_key')) {
+            if (! AiProviderFactory::hasApiKey()) {
                 return array_map(fn (array $item) => $this->analisarLocalmente($item), $itens);
             }
 
@@ -42,33 +41,12 @@ class AiAnalyzerService
 
     protected function solicitarAnalise(array $itens): string
     {
-        $cliente = new Client(apiKey: config('claude.api_key'));
-
-        $resposta = $cliente->messages->create(
-            maxTokens: config('claude.max_tokens', 1024),
-            model: config('claude.model'),
-            system: [[
-                'type' => 'text',
-                'text' => $this->systemPrompt(),
-                'cache_control' => ['type' => 'ephemeral'],
-            ]],
-            temperature: 0,
-            messages: [[
-                'role' => 'user',
-                'content' => $this->userPrompt($itens),
-            ]],
+        return AiProviderFactory::make()->complete(
+            system:      $this->systemPrompt(),
+            messages:    [['role' => 'user', 'content' => $this->userPrompt($itens)]],
+            maxTokens:   (int) config('claude.max_tokens', 1024),
+            temperature: 0.0,
         );
-
-        $texto = collect($resposta->content)
-            ->filter(fn ($block) => $block instanceof TextBlock)
-            ->map(fn (TextBlock $block) => $block->text)
-            ->implode("\n");
-
-        if ($texto === '') {
-            throw new \RuntimeException('Resposta vazia da Claude API.');
-        }
-
-        return $texto;
     }
 
     private function parsearResposta(string $conteudo, int $quantidadeEsperada): array
@@ -194,13 +172,7 @@ class AiAnalyzerService
 
     private function systemPrompt(): string
     {
-        return <<<PROMPT
-Você é um analista geopolítico focado em impactos para investidores brasileiros.
-Avalie cada notícia considerando energia, petróleo, gás, câmbio, alimentos, commodities, sanções, eleições relevantes, conflitos e rotas comerciais.
-Responda apenas com um JSON array válido, na mesma ordem dos itens recebidos.
-Cada item deve ter: relevante (boolean), impact_score (1-10), analise_ia (português, 2 a 3 frases), regiao (string|null), categorias (array).
-Se não for relevante, use impact_score 1 e categorias vazias.
-PROMPT;
+        return (string) config('ai.prompts.analise_sistema');
     }
 
     private function userPrompt(array $itens): string

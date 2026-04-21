@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
-use Anthropic\Client;
-use Anthropic\Messages\TextBlock;
 use App\Jobs\EnviarEmailAlertaJob;
 use App\Models\AlertaPreditivo;
 use App\Models\SinalPadrao;
+use App\Services\Ai\AiProviderFactory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -88,19 +87,11 @@ class AnalisadorConvergenciaService
                 'sinais' => $dadosSinais,
             ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '{}';
 
-            $cliente = new Client(apiKey: config('claude.api_key'));
-
-            $resposta = $cliente->messages->create(
+            $texto = AiProviderFactory::make()->complete(
+                system:    (string) config('ai.prompts.convergencia_sistema'),
+                messages:  [['role' => 'user', 'content' => $prompt]],
                 maxTokens: 512,
-                model: 'claude-sonnet-4-6',
-                system: 'Você é analista geopolítico. Gere uma análise breve sobre convergência de sinais geopolíticos na região indicada. Responda com JSON: {"titulo": "...", "analise": "..."}',
-                messages: [['role' => 'user', 'content' => $prompt]],
             );
-
-            $texto = collect($resposta->content)
-                ->filter(fn ($bloco) => $bloco instanceof TextBlock)
-                ->map(fn (TextBlock $bloco) => $bloco->text)
-                ->implode("\n");
 
             $dados = json_decode($texto, true);
 
@@ -109,7 +100,7 @@ class AnalisadorConvergenciaService
                 $analise = (string) $dados['analise'];
             }
         } catch (\Throwable $erro) {
-            Log::warning('AnalisadorConvergenciaService: falha ao chamar Claude API.', [
+            Log::warning('AnalisadorConvergenciaService: falha ao chamar IA API.', [
                 'erro'   => $erro->getMessage(),
                 'regiao' => $regiao,
             ]);

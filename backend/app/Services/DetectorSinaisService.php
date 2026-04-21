@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use Anthropic\Client;
-use Anthropic\Messages\TextBlock;
 use App\Models\Event;
 use App\Models\SinalPadrao;
+use App\Services\Ai\AiProviderFactory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -36,24 +35,17 @@ class DetectorSinaisService
                 'eventos'   => $dadosEventos,
             ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '[]';
 
-            $cliente = new Client(apiKey: config('claude.api_key'));
-
-            $resposta = $cliente->messages->create(
-                maxTokens: 1024,
-                model: 'claude-haiku-4-5-20251001',
-                system: 'Você é um analista geopolítico. Para cada evento, identifique se há padrão geopolítico (military: ação militar/conflito/mobilização, diplomatic: negociação/acordo/ruptura, supply: crise de abastecimento/commodity). Retorne SOMENTE um JSON array válido. Se evento não tem padrão relevante, omita-o.',
-                messages: [['role' => 'user', 'content' => $prompt]],
+            $texto = AiProviderFactory::make()->complete(
+                system:      (string) config('ai.prompts.detector_sistema'),
+                messages:    [['role' => 'user', 'content' => $prompt]],
+                maxTokens:   1024,
+                temperature: 0.0,
             );
-
-            $texto = collect($resposta->content)
-                ->filter(fn ($bloco) => $bloco instanceof TextBlock)
-                ->map(fn (TextBlock $bloco) => $bloco->text)
-                ->implode("\n");
 
             $sinais = json_decode($texto, true);
 
             if (! is_array($sinais)) {
-                Log::warning('DetectorSinaisService: resposta da Claude não é um JSON array válido.', [
+                Log::warning('DetectorSinaisService: resposta da IA não é um JSON array válido.', [
                     'resposta' => $texto,
                 ]);
 

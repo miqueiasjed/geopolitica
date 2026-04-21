@@ -125,4 +125,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'cron_secret'              => env('CRON_SECRET'),
+    'frontend_url'             => env('FRONTEND_URL', 'http://localhost:5173'),
+    'alerta_threshold_critico' => (int) env('ALERTA_THRESHOLD_CRITICAL', 10),
+    'alerta_threshold_alto'    => (int) env('ALERTA_THRESHOLD_HIGH', 7),
+    'convergencia_janela_horas'=> (int) env('CONVERGENCIA_JANELA_HORAS', 72),
+    'limite_chat_essencial'    => (int) env('LIMITE_CHAT_ESSENCIAL', 5),
+    'limite_chat_pro'          => (int) env('LIMITE_CHAT_PRO', 20),
+
 ];

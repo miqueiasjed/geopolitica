@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             EleicoesSeedSeeder::class,
             PaisesInicialSeeder::class,
             DadosProducaoFakeSeeder::class,
+            ConfiguracaoSeeder::class,
         ]);
     }
 }
