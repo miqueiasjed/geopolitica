@@ -16,11 +16,15 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesSeeder::class,
+            RolesB2BSeeder::class,
             AdminSeeder::class,
             SourcesSeeder::class,
+            IndicadoresSeeder::class,
+            ConteudoSeeder::class,
             CrisesHistoricasSeeder::class,
             EleicoesSeedSeeder::class,
             PaisesInicialSeeder::class,
+            DadosProducaoFakeSeeder::class,
         ]);
     }
 }

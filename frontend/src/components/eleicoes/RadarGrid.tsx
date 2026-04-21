@@ -1,5 +1,6 @@
 import { EleicaoCard } from './EleicaoCard'
 import type { Eleicao } from '../../types/eleicao'
+import { getMesEleicao } from '../../utils/eleicoes'
 
 interface RadarGridProps {
   eleicoes: Eleicao[]
@@ -12,7 +13,7 @@ export function RadarGrid({ eleicoes, onEleicaoClick }: RadarGridProps) {
   const mesAtual = new Date().getMonth()
 
   const eleicoesPorMes = Array.from({ length: 12 }, (_, i) =>
-    eleicoes.filter((e) => new Date(e.data_eleicao).getMonth() === i),
+    eleicoes.filter((e) => getMesEleicao(e.data_eleicao) === i),
   )
 
   return (

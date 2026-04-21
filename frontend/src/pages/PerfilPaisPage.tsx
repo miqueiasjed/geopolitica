@@ -20,16 +20,16 @@ function formatDataRelativa(dataIso: string): string {
 }
 
 function corNivelTensao(nivel: string): string {
-  switch (nivel.toLowerCase()) {
-    case 'critico':
-    case 'crítico':
+  switch (nivel.toUpperCase()) {
+    case 'CRÍTICO':
+    case 'CRITICO':
       return 'border-red-500/30 bg-red-500/10 text-red-400'
-    case 'alto':
+    case 'ALTO':
       return 'border-orange-500/30 bg-orange-500/10 text-orange-400'
-    case 'medio':
-    case 'médio':
+    case 'MÉDIO':
+    case 'MEDIO':
       return 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400'
-    case 'baixo':
+    case 'MONITORAR':
       return 'border-green-500/30 bg-green-500/10 text-green-400'
     default:
       return 'border-zinc-500/30 bg-zinc-500/10 text-zinc-400'
@@ -120,6 +120,10 @@ export function PerfilPaisPage() {
       </section>
     )
   }
+
+  const indicadoresRelevantes = Array.isArray(perfil.indicadores_relevantes)
+    ? perfil.indicadores_relevantes
+    : []
 
   return (
     <motion.section
@@ -230,13 +234,13 @@ export function PerfilPaisPage() {
       </div>
 
       {/* Seção 4 — Indicadores Econômicos (ocultar se vazio) */}
-      {perfil.indicadores_relevantes.length > 0 && (
+      {indicadoresRelevantes.length > 0 && (
         <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-6">
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
             indicadores econômicos
           </p>
           <div className="flex flex-wrap gap-2">
-            {perfil.indicadores_relevantes.map((indicador) => (
+            {indicadoresRelevantes.map((indicador) => (
               <span
                 key={indicador}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/20 bg-[#C9B882]/8 px-3 py-1.5 font-mono text-xs text-[#C9B882]"
@@ -279,24 +283,28 @@ export function PerfilPaisPage() {
           <p className="text-sm text-zinc-500">Nenhum evento recente encontrado.</p>
         ) : (
           <ul className="space-y-3">
-            {eventos.map((evento) => (
-              <li
-                key={evento.id}
-                className="flex flex-col gap-1.5 rounded-xl border border-[#1e1e20] bg-[#0a0a0b] p-4 sm:flex-row sm:items-start sm:justify-between"
-              >
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm text-zinc-200">{evento.titulo}</p>
-                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                    {formatDataRelativa(evento.created_at)}
-                  </p>
-                </div>
-                <span
-                  className={`inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${corNivelTensao(evento.nivel_tensao)}`}
+            {eventos.map((evento) => {
+              const nivelTensao = evento.impact_label ?? 'MONITORAR'
+
+              return (
+                <li
+                  key={evento.id}
+                  className="flex flex-col gap-1.5 rounded-xl border border-[#1e1e20] bg-[#0a0a0b] p-4 sm:flex-row sm:items-start sm:justify-between"
                 >
-                  {evento.nivel_tensao}
-                </span>
-              </li>
-            ))}
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm text-zinc-200">{evento.titulo}</p>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      {formatDataRelativa(evento.created_at)}
+                    </p>
+                  </div>
+                  <span
+                    className={`inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${corNivelTensao(nivelTensao)}`}
+                  >
+                    {nivelTensao}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>

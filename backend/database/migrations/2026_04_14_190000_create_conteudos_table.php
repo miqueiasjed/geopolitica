@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -23,7 +24,10 @@ return new class extends Migration
             $table->timestamp('publicado_em')->nullable();
             $table->timestamps();
 
-            $table->fullText(['titulo', 'corpo']);
+            if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+                $table->fullText(['titulo', 'corpo']);
+            }
+
             $table->index(['tipo', 'regiao', 'publicado', 'publicado_em'], 'conteudos_tipo_regiao_publicado_idx');
         });
     }

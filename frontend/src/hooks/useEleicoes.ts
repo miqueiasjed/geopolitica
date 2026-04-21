@@ -14,18 +14,19 @@ async function fetchEleicoes(filtros: FiltrosEleicao): Promise<Eleicao[]> {
     params.relevancia = filtros.relevancia
   }
 
-  const response = await api.get<Eleicao[]>('/eleicoes', { params })
-  return response.data
+  const response = await api.get<{ data: Eleicao[] }>('/eleicoes', { params })
+  return response.data.data
 }
 
 export function useEleicoes(filtros: FiltrosEleicao) {
   const query = useQuery({
     queryKey: eleicoesKeys.lista(filtros),
     queryFn: () => fetchEleicoes(filtros),
+    refetchOnMount: 'always',
     staleTime: 60 * 60 * 1000,
   })
 
-  const eleicoes: Eleicao[] = query.data ?? []
+  const eleicoes: Eleicao[] = Array.isArray(query.data) ? query.data : []
 
   return {
     ...query,

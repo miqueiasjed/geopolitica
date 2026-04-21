@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChatSessao extends Model
 {
+    protected $table = 'chat_sessoes';
+
     protected $fillable = [
         'user_id',
         'data_sessao',

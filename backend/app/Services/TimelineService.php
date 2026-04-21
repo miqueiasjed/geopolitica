@@ -44,7 +44,7 @@ class TimelineService
         return Event::whereBetween('created_at', [$dataInicio, $dataFim])
             ->orderBy('created_at')
             ->limit(100)
-            ->get(['id', 'titulo', 'nivel_tensao', 'created_at']);
+            ->get(['id', 'titulo', 'impact_score', 'impact_label', 'created_at']);
     }
 
     public function buscarCrisePorSlug(string $slug): ?CriseHistorica

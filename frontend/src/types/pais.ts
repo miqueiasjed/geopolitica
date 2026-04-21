@@ -29,7 +29,7 @@ export interface PaisUsuario {
 export interface EventoPais {
   id: number
   titulo: string
-  descricao: string
-  nivel_tensao: string
+  descricao: string | null
+  impact_label: string
   created_at: string
 }

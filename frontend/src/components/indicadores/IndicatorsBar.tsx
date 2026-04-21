@@ -4,6 +4,8 @@ import { useIndicadorHistorico } from '../../hooks/useIndicadorHistorico'
 import { IndicatorCard } from './IndicatorCard'
 import type { Indicador } from '../../types/indicadores'
 
+const SIMBOLOS_COM_HISTORICO = new Set(['BZ=F', 'USDBRL=X', 'NG=F', 'ZS=F', 'ZW=F', 'TIO=F'])
+
 function formatarTimestamp(ultimaAtualizacao: string | null): string {
   if (!ultimaAtualizacao) return ''
 
@@ -23,8 +25,17 @@ interface IndicatorCardWithHistoricoProps {
 }
 
 function IndicatorCardWithHistorico({ indicador }: IndicatorCardWithHistoricoProps) {
-  const { historico } = useIndicadorHistorico(indicador.simbolo)
+  const simbolo = typeof indicador.simbolo === 'string' ? indicador.simbolo : ''
+  const { historico } = useIndicadorHistorico(simbolo, SIMBOLOS_COM_HISTORICO.has(simbolo))
   return <IndicatorCard indicador={indicador} historico={historico} />
+}
+
+function getIndicadorKey(indicador: Indicador, index: number): string {
+  const id = indicador.id ?? 'sem-id'
+  const simbolo = indicador.simbolo ?? 'sem-simbolo'
+  const nome = indicador.nome ?? 'sem-nome'
+
+  return `indicador-${id}-${simbolo}-${nome}-${index}`
 }
 
 const skeletonVariants: Variants = {
@@ -43,7 +54,7 @@ const skeletonItemVariants: Variants = {
 function SkeletonCards({ prefersReduced }: { prefersReduced: boolean | null }) {
   return (
     <motion.div
-      className="flex gap-4 px-4"
+      className="flex h-12 items-center"
       variants={prefersReduced ? undefined : skeletonVariants}
       initial={prefersReduced ? false : 'hidden'}
       animate={prefersReduced ? undefined : 'visible'}
@@ -52,7 +63,7 @@ function SkeletonCards({ prefersReduced }: { prefersReduced: boolean | null }) {
         <motion.div
           key={i}
           variants={prefersReduced ? undefined : skeletonItemVariants}
-          className="min-w-[140px] h-[72px] rounded-lg bg-zinc-800 animate-pulse"
+          className="mx-3 h-7 min-w-[132px] rounded bg-white/[0.06] animate-pulse"
         />
       ))}
     </motion.div>
@@ -78,43 +89,49 @@ export function IndicatorsBar() {
   const timestamp = formatarTimestamp(ultimaAtualizacao)
 
   return (
-    <div
-      className="h-16 bg-[#0d0d0f] border-b border-zinc-800 flex items-center justify-between overflow-hidden"
+    <section
+      className="border-b border-[#1e1e20] bg-[#080809]/95"
       role="region"
       aria-label="Indicadores de mercado"
     >
-      {/* Label esquerdo */}
-      <span className="text-xs text-zinc-500 px-4 shrink-0">Mercados</span>
+      <div className="mx-auto flex max-w-7xl items-center px-4 sm:px-6">
+        <div className="flex h-12 shrink-0 items-center gap-3 border-r border-white/8 pr-4">
+          <p className="font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-[#C9B882]/80">
+            Mercados
+          </p>
+          {timestamp && (
+            <p className="hidden whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-600 sm:block">
+              {timestamp}
+            </p>
+          )}
+        </div>
 
-      {/* Cards com scroll horizontal */}
-      <div className="flex-1 overflow-x-auto scrollbar-hide min-w-0">
-        {isLoading ? (
-          <SkeletonCards prefersReduced={prefersReduced} />
-        ) : (
-          <motion.div
-            className="flex gap-4 px-4 py-2"
-            variants={prefersReduced ? undefined : cardsVariants}
-            initial={prefersReduced ? false : 'hidden'}
-            animate={prefersReduced ? undefined : 'visible'}
-          >
-            {indicadores.slice(0, 6).map((indicador) => (
+        <div className="relative min-w-0 flex-1">
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#080809] to-transparent" />
+          <div className="overflow-x-auto scrollbar-hide">
+            {isLoading ? (
+              <SkeletonCards prefersReduced={prefersReduced} />
+            ) : (
               <motion.div
-                key={indicador.simbolo}
-                variants={prefersReduced ? undefined : cardItemVariants}
+                className="flex h-12 pr-10"
+                variants={prefersReduced ? undefined : cardsVariants}
+                initial={prefersReduced ? false : 'hidden'}
+                animate={prefersReduced ? undefined : 'visible'}
               >
-                <IndicatorCardWithHistorico indicador={indicador} />
+                {indicadores.slice(0, 6).map((indicador, index) => (
+                  <motion.div
+                    key={getIndicadorKey(indicador, index)}
+                    className="shrink-0"
+                    variants={prefersReduced ? undefined : cardItemVariants}
+                  >
+                    <IndicatorCardWithHistorico indicador={indicador} />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
-        )}
+            )}
+          </div>
+        </div>
       </div>
-
-      {/* Timestamp direito */}
-      {timestamp && (
-        <span className="text-xs text-zinc-600 px-4 shrink-0 whitespace-nowrap">
-          atualizado {timestamp}
-        </span>
-      )}
-    </div>
+    </section>
   )
 }

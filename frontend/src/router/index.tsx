@@ -19,6 +19,7 @@ import { Timeline } from '../pages/Timeline'
 import { RadarEleicoes } from '../pages/RadarEleicoes'
 import { AdminEleicoes } from '../pages/admin/AdminEleicoes'
 import { AdminB2BPage } from '../pages/admin/AdminB2BPage'
+import { AdminLayout } from '../components/AdminLayout'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
 import { PerfilPaisPage } from '../pages/PerfilPaisPage'
@@ -50,20 +51,21 @@ export function AppRouter() {
           <Route path="/paises" element={<MeusPaisesPage />} />
           <Route path="/paises/:codigo" element={<PerfilPaisPage />} />
           <Route path="/perfil" element={<Perfil />} />
-        </Route>
-      </Route>
-      <Route element={<RotaProtegida requiredRole="company_admin" />}>
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard/equipe" element={<Equipe />} />
+          <Route element={<RotaProtegida requiredRole="company_admin" />}>
+            <Route path="/dashboard/equipe" element={<Equipe />} />
+          </Route>
         </Route>
       </Route>
       <Route element={<RotaProtegida requiredRole="admin" />}>
-        <Route path="/admin/assinantes" element={<AdminAssinantes />} />
-        <Route path="/admin/webhook-eventos" element={<AdminWebhookEventos />} />
-        <Route path="/admin/novo-conteudo" element={<AdminNovoConteudo />} />
-        <Route path="/admin/biblioteca" element={<AdminBiblioteca />} />
-        <Route path="/admin/eleicoes" element={<AdminEleicoes />} />
-        <Route path="/admin/b2b" element={<AdminB2BPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="/admin/assinantes" replace />} />
+          <Route path="assinantes" element={<AdminAssinantes />} />
+          <Route path="webhook-eventos" element={<AdminWebhookEventos />} />
+          <Route path="novo-conteudo" element={<AdminNovoConteudo />} />
+          <Route path="biblioteca" element={<AdminBiblioteca />} />
+          <Route path="eleicoes" element={<AdminEleicoes />} />
+          <Route path="b2b" element={<AdminB2BPage />} />
+        </Route>
       </Route>
     </Routes>
   )

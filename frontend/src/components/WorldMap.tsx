@@ -3,11 +3,7 @@ import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
 import { scaleLinear } from 'd3-scale'
 import { motion, useReducedMotion } from 'framer-motion'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import api from '../lib/axios'
 import type { PaisIntensidade } from '../types/mapa'
-import type { PaisResumo } from '../types/pais'
 
 const GEO_URL = '/world-110m.json'
 
@@ -73,29 +69,11 @@ interface WorldMapProps {
   onPaisClick: (codigo: string, nome: string) => void
 }
 
-async function fetchListaPaises(): Promise<PaisResumo[]> {
-  const resposta = await api.get<PaisResumo[] | { data: PaisResumo[] }>('/paises')
-  const dados = resposta.data
-  if (Array.isArray(dados)) return dados
-  return dados.data ?? []
-}
-
 export function WorldMap({ paises, onPaisClick }: WorldMapProps) {
   const prefersReduced = useReducedMotion()
-  const navigate = useNavigate()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [tooltipInfo, setTooltipInfo] = useState<TooltipInfo | null>(null)
   const [tooltipOpen, setTooltipOpen] = useState(false)
-
-  const { data: paisesComPerfil = [] } = useQuery({
-    queryKey: ['paises'],
-    queryFn: fetchListaPaises,
-    staleTime: 10 * 60 * 1000,
-  })
-
-  const codigosComPerfil = useCallback(() => {
-    return new Set(paisesComPerfil.map((p) => p.codigo_pais.toUpperCase()))
-  }, [paisesComPerfil])()
 
   // Indexa os países por ISO N3 para lookup eficiente
   const intensidadeByN3 = useCallback(() => {
@@ -168,11 +146,7 @@ export function WorldMap({ paises, onPaisClick }: WorldMapProps) {
                           }}
                           onClick={() => {
                             if (pais) {
-                              if (codigosComPerfil.has(pais.codigo_pais.toUpperCase())) {
-                                navigate(`/paises/${pais.codigo_pais}`)
-                              } else {
-                                onPaisClick(pais.codigo_pais, pais.nome_pais)
-                              }
+                              onPaisClick(pais.codigo_pais, pais.nome_pais)
                             }
                           }}
                         />

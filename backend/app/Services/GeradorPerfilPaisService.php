@@ -31,6 +31,7 @@ class GeradorPerfilPaisService
         ]);
 
         Cache::forget("perfil_pais_{$pais->codigo_pais}");
+        Cache::forget("perfil_pais_v2_{$pais->codigo_pais}");
 
         Log::info("Perfil gerado com sucesso para o país: {$pais->nome_pt} ({$pais->codigo_pais})");
 

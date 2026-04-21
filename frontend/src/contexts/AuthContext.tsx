@@ -47,15 +47,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       startTransition(() => {
         setToken(tokenAtual)
         setUser(usuario)
+        setIsLoading(false)
       })
     } catch {
       removerTokenAutenticacao()
       startTransition(() => {
         setToken(null)
         setUser(null)
+        setIsLoading(false)
       })
-    } finally {
-      setIsLoading(false)
     }
   }
 

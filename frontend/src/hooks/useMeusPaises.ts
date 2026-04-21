@@ -8,8 +8,8 @@ export const meusPaisesKeys = {
 }
 
 async function fetchMeusPaises(): Promise<PaisUsuario[]> {
-  const resposta = await api.get<PaisUsuario[]>('/meus-paises')
-  return resposta.data
+  const resposta = await api.get<{ data: PaisUsuario[] }>('/meus-paises')
+  return resposta.data.data
 }
 
 async function postAdicionarPais(codigo_pais: string): Promise<void> {
@@ -28,6 +28,7 @@ export function useMeusPaises() {
   const query = useQuery({
     queryKey: meusPaisesKeys.all,
     queryFn: fetchMeusPaises,
+    refetchOnMount: 'always',
   })
 
   const mutacaoAdicionar = useMutation({
@@ -44,7 +45,7 @@ export function useMeusPaises() {
     },
   })
 
-  const data: PaisUsuario[] = query.data ?? []
+  const data: PaisUsuario[] = Array.isArray(query.data) ? query.data : []
 
   return {
     data,

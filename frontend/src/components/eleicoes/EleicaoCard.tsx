@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { CORES_RELEVANCIA } from '../../types/eleicao'
 import type { Eleicao, RelevanciaEleicao } from '../../types/eleicao'
+import { formatarDataEleicao } from '../../utils/eleicoes'
 
 interface EleicaoCardProps {
   eleicao: Eleicao
@@ -36,14 +37,6 @@ const BADGE_LABEL: Record<RelevanciaEleicao, string> = {
   baixa: 'Baixa',
 }
 
-function formatarData(dataIso: string): string {
-  const data = new Date(dataIso)
-  const dia = String(data.getUTCDate()).padStart(2, '0')
-  const mes = String(data.getUTCMonth() + 1).padStart(2, '0')
-  const ano = data.getUTCFullYear()
-  return `${dia}/${mes}/${ano}`
-}
-
 export function EleicaoCard({ eleicao, onClick }: EleicaoCardProps) {
   const prefersReducedMotion = useReducedMotion()
   const cor = CORES_RELEVANCIA[eleicao.relevancia]
@@ -60,7 +53,7 @@ export function EleicaoCard({ eleicao, onClick }: EleicaoCardProps) {
     <motion.button
       type="button"
       onClick={() => onClick(eleicao.id)}
-      aria-label={`Ver detalhes da eleição: ${eleicao.pais}, ${formatarData(eleicao.data_eleicao)}`}
+      aria-label={`Ver detalhes da eleição: ${eleicao.pais}, ${formatarDataEleicao(eleicao.data_eleicao)}`}
       initial={prefersReducedMotion ? false : { opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
@@ -96,7 +89,9 @@ export function EleicaoCard({ eleicao, onClick }: EleicaoCardProps) {
 
       {/* Data + Tipo */}
       <div className="mt-2 space-y-0.5">
-        <p className="font-mono text-xs text-zinc-400">{formatarData(eleicao.data_eleicao)}</p>
+        <p className="whitespace-nowrap font-mono text-xs text-zinc-400">
+          {formatarDataEleicao(eleicao.data_eleicao)}
+        </p>
         <p className="truncate font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
           {eleicao.tipo_eleicao}
         </p>

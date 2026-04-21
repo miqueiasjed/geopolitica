@@ -20,7 +20,7 @@ class MapaIntensidadeService
         return Cache::remember(
             self::CHAVE_CACHE,
             now()->addMinutes(self::TTL_MINUTOS),
-            fn () => DB::table('mapa_intensidade')->get()->toArray()
+            fn () => ['paises' => DB::table('mapa_intensidade')->get()->toArray()]
         );
     }
 

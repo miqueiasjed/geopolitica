@@ -38,7 +38,8 @@ export interface CriseHistoricaDetalhe extends CriseHistorica {
 export interface EventoTimeline {
   id: number
   titulo: string
-  nivel_tensao: string
+  impact_score: number
+  impact_label: string
   created_at: string
 }
 

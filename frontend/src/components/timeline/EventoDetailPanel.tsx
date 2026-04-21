@@ -61,7 +61,7 @@ export function EventoDetailPanel({ eventoId, eventos, onClose }: EventoDetailPa
 
                     {/* Badge nível de tensão */}
                     <span className="inline-block px-2 py-0.5 rounded text-xs bg-[#2D3240] text-[#C9B882] mb-2">
-                      {evento.nivel_tensao}
+                      {evento.impact_label}
                     </span>
 
                     {/* Data */}

@@ -31,8 +31,8 @@ export function useTimeline(filtros: FiltrosTimeline = {}) {
     staleTime: 30 * 60 * 1000,
   })
 
-  const crises: CriseHistorica[] = query.data?.crises ?? []
-  const eventos: EventoTimeline[] = query.data?.eventos ?? []
+  const crises: CriseHistorica[] = Array.isArray(query.data?.crises) ? query.data.crises : []
+  const eventos: EventoTimeline[] = Array.isArray(query.data?.eventos) ? query.data.eventos : []
 
   return {
     crises,

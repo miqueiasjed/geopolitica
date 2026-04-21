@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '../../lib/axios'
 import type { EleicaoDetalhe, RelevanciaEleicao } from '../../types/eleicao'
 import { CORES_RELEVANCIA } from '../../types/eleicao'
+import { formatarDataEleicaoLonga } from '../../utils/eleicoes'
 
 interface EleicaoDetailPanelProps {
   eleicaoId: number | null
@@ -15,19 +16,14 @@ const eleicaoDetalheKeys = {
 }
 
 async function fetchEleicaoDetalhe(id: number): Promise<EleicaoDetalhe> {
-  const response = await api.get<EleicaoDetalhe>(`/eleicoes/${id}`)
-  return response.data
+  const response = await api.get<{ data: EleicaoDetalhe }>(`/eleicoes/${id}`)
+  return response.data.data
 }
 
 const LABEL_RELEVANCIA: Record<RelevanciaEleicao, string> = {
   alta: 'Alta',
   media: 'Média',
   baixa: 'Baixa',
-}
-
-function formatarData(dataStr: string): string {
-  const date = new Date(dataStr + 'T12:00:00')
-  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
 }
 
 function BadgeRelevancia({ relevancia }: { relevancia: RelevanciaEleicao }) {
@@ -138,7 +134,7 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                   {/* Data e tipo */}
                   <div className="flex flex-wrap items-center gap-3 mt-2">
                     <span className="font-mono text-sm text-[#C9B882]">
-                      {formatarData(eleicao.data_eleicao)}
+                      {formatarDataEleicaoLonga(eleicao.data_eleicao)}
                     </span>
                     <span className="rounded bg-[#2D3240] px-2 py-0.5 font-mono text-xs text-zinc-400">
                       {eleicao.tipo_eleicao}
@@ -229,8 +225,8 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
  * Converte código de país ISO 3166-1 alpha-2 para emoji de bandeira.
  * Funciona em sistemas que suportam Regional Indicator Symbols.
  */
-function getFlagEmoji(codigoPais: string): string {
-  const codigo = codigoPais.toUpperCase().slice(0, 2)
+function getFlagEmoji(codigoPais?: string | null): string {
+  const codigo = codigoPais?.toUpperCase().slice(0, 2) ?? ''
   if (!/^[A-Z]{2}$/.test(codigo)) return '🌍'
   const base = 0x1F1E6
   const charA = 65

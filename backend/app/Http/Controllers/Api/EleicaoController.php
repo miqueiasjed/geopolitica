@@ -33,7 +33,14 @@ class EleicaoController extends Controller
                 'data_eleicao',
                 'tipo_eleicao',
                 'relevancia',
-            ]);
+            ])->map(fn (Eleicao $eleicao) => [
+                'id' => $eleicao->id,
+                'pais' => $eleicao->pais,
+                'codigo_pais' => $eleicao->codigo_pais,
+                'data_eleicao' => $eleicao->data_eleicao?->toDateString(),
+                'tipo_eleicao' => $eleicao->tipo_eleicao,
+                'relevancia' => $eleicao->relevancia,
+            ])->values()->all();
         });
 
         return response()->json(['data' => $eleicoes]);
@@ -42,7 +49,22 @@ class EleicaoController extends Controller
     public function show(int $id): JsonResponse
     {
         $eleicao = Cache::remember("eleicao_{$id}", 3600, function () use ($id) {
-            return Eleicao::find($id);
+            $eleicao = Eleicao::find($id);
+
+            return $eleicao ? [
+                'id' => $eleicao->id,
+                'pais' => $eleicao->pais,
+                'codigo_pais' => $eleicao->codigo_pais,
+                'data_eleicao' => $eleicao->data_eleicao?->toDateString(),
+                'tipo_eleicao' => $eleicao->tipo_eleicao,
+                'relevancia' => $eleicao->relevancia,
+                'contexto_geopolitico' => $eleicao->contexto_geopolitico,
+                'impacto_brasil' => $eleicao->impacto_brasil,
+                'candidatos_principais' => $eleicao->candidatos_principais ?? [],
+                'content_slug' => $eleicao->content_slug,
+                'created_at' => $eleicao->created_at?->toIso8601String(),
+                'updated_at' => $eleicao->updated_at?->toIso8601String(),
+            ] : null;
         });
 
         if (! $eleicao) {

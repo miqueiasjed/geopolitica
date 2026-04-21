@@ -15,6 +15,7 @@ export function useMapaIntensidade() {
   const query = useQuery({
     queryKey: mapaKeys.all,
     queryFn: fetchMapaIntensidade,
+    refetchOnMount: 'always',
     refetchInterval: 10 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
   })

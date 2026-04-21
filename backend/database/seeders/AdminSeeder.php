@@ -25,7 +25,7 @@ class AdminSeeder extends Seeder
             'password' => $senha,
         ])->save();
 
-        if (! $usuario->hasRole('admin')) {
+        if (!$usuario->hasRole('admin')) {
             $usuario->assignRole('admin');
         }
     }

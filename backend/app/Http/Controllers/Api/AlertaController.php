@@ -13,7 +13,6 @@ class AlertaController extends Controller
     public function __construct(
         private readonly AlertaPreditivoService $alertaPreditivoService
     ) {
-        $this->middleware('auth:sanctum');
     }
 
     public function index(Request $request): JsonResponse

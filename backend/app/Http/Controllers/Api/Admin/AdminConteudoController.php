@@ -16,7 +16,6 @@ class AdminConteudoController extends Controller
     public function __construct(
         private readonly ConteudoService $conteudoService,
     ) {
-        $this->middleware(['auth:sanctum', 'role:admin']);
     }
 
     public function index(Request $request): JsonResponse

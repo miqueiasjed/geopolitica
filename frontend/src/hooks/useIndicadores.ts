@@ -7,8 +7,8 @@ export const indicadoresKeys = {
 }
 
 async function fetchIndicadores(): Promise<Indicador[]> {
-  const response = await api.get<Indicador[]>('/indicadores')
-  return response.data
+  const response = await api.get<{ data: Indicador[] }>('/indicadores')
+  return response.data.data
 }
 
 export function useIndicadores() {

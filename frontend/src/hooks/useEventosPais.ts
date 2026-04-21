@@ -2,14 +2,18 @@ import { useQuery } from '@tanstack/react-query'
 import api from '../lib/axios'
 import type { EventoPais } from '../types/pais'
 
+interface EventosPaisResponse {
+  data: EventoPais[]
+}
+
 export const eventosPaisKeys = {
   all: ['eventos-pais'] as const,
   lista: (codigoPais: string) => [...eventosPaisKeys.all, codigoPais] as const,
 }
 
 async function fetchEventosPais(codigoPais: string): Promise<EventoPais[]> {
-  const resposta = await api.get<EventoPais[]>(`/paises/${codigoPais}/eventos`)
-  return resposta.data
+  const resposta = await api.get<EventosPaisResponse>(`/paises/${codigoPais}/eventos`)
+  return resposta.data.data
 }
 
 export function useEventosPais(codigoPais: string) {

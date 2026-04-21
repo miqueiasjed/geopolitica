@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Conteudo;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ConteudoSeeder extends Seeder
 {
@@ -111,10 +112,13 @@ class ConteudoSeeder extends Seeder
         ];
 
         foreach ($conteudos as $dados) {
-            Conteudo::create(array_merge($dados, [
-                'slug'      => Conteudo::gerarSlug($dados['titulo']),
-                'publicado' => true,
-            ]));
+            Conteudo::updateOrCreate(
+                ['slug' => Str::slug($dados['titulo'])],
+                array_merge($dados, [
+                    'slug'      => Str::slug($dados['titulo']),
+                    'publicado' => true,
+                ])
+            );
         }
     }
 }

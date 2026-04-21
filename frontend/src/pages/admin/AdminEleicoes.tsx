@@ -47,8 +47,8 @@ function BadgeRelevancia({ relevancia }: { relevancia: RelevanciaEleicao }) {
 }
 
 async function fetchEleicaoDetalhe(id: number): Promise<EleicaoDetalhe> {
-  const res = await api.get<EleicaoDetalhe>(`/eleicoes/${id}`)
-  return res.data
+  const res = await api.get<{ data: EleicaoDetalhe }>(`/eleicoes/${id}`)
+  return res.data.data
 }
 
 async function deletarEleicao(id: number): Promise<void> {

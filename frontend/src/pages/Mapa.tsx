@@ -37,11 +37,10 @@ export function Mapa() {
 
   return (
     <motion.div
-      className="fixed inset-0 top-0 flex flex-col bg-[#0a0a0b] overflow-hidden"
+      className="relative -mx-4 -my-6 flex h-[calc(100vh-13rem)] min-h-[620px] flex-col overflow-hidden bg-[#0a0a0b] sm:-mx-6 lg:-my-8 lg:h-[calc(100vh-14rem)]"
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReduced ? 0 : 0.3, ease: 'easeOut' }}
-      style={{ zIndex: 30 }}
     >
       {/* Header compacto */}
       <div className="flex-shrink-0 border-b border-[#1e1e20] bg-[#0a0a0b]/95 px-6 py-3 backdrop-blur">
@@ -75,14 +74,14 @@ export function Mapa() {
             Clique em um país para ver eventos
           </motion.p>
         )}
-      </div>
 
-      {/* Painel lateral com animação */}
-      <RegionPanel
-        regiao={paisSelecionado?.codigoPais ?? null}
-        nome={paisSelecionado?.nomePais ?? null}
-        onClose={handleClose}
-      />
+        {/* Painel lateral com animação */}
+        <RegionPanel
+          regiao={paisSelecionado?.codigoPais ?? null}
+          nome={paisSelecionado?.nomePais ?? null}
+          onClose={handleClose}
+        />
+      </div>
     </motion.div>
   )
 }

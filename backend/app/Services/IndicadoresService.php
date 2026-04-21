@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class IndicadoresService
 {
-    private const CHAVE_CACHE   = 'indicadores:lista';
+    private const CHAVE_CACHE   = 'indicadores:lista:v2';
     private const TTL_CACHE_MIN = 15;
     private const DIAS_HISTORICO = 8;
 
@@ -82,14 +82,27 @@ class IndicadoresService
     /**
      * Retorna a lista de indicadores, usando cache Redis com TTL de 15 minutos.
      *
-     * @return array<int, Indicador>
+     * @return array<int, array<string, mixed>>
      */
     public function listarComCache(): array
     {
         return Cache::remember(
             self::CHAVE_CACHE,
             now()->addMinutes(self::TTL_CACHE_MIN),
-            fn () => Indicador::porOrdem()->get()->all()
+            fn () => Indicador::porOrdem()
+                ->get()
+                ->map(fn (Indicador $indicador) => [
+                    'id'             => $indicador->id,
+                    'simbolo'        => $indicador->simbolo,
+                    'nome'           => $indicador->nome,
+                    'valor'          => $indicador->valor,
+                    'moeda'          => $indicador->moeda,
+                    'unidade'        => $indicador->unidade,
+                    'variacao_pct'   => $indicador->variacao_pct,
+                    'variacao_abs'   => $indicador->variacao_abs,
+                    'atualizado_em'  => $indicador->atualizado_em?->toISOString(),
+                ])
+                ->all()
         );
     }
 
