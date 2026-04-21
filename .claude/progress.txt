@@ -85,3 +85,10 @@
 - Gotcha: RolesB2BSeeder usa guard_name 'sanctum' (não 'web') para alinhar com o guard do projeto — detectado automaticamente ao ler o UserModel.
 - Gotcha: Laravel 11 usa bootstrap/app.php para registrar middleware aliases (não Kernel.php).
 - Validações: import Badge não utilizado em MembersList corrigido, `npx tsc --noEmit` zero erros, `npm run build ✓` (1367 módulos).
+
+2026-04-21
+- Plano 16 concluído: Admin IA v2 — Descrições Enriquecidas e Restaurar Padrão (F1+F2).
+- Backend: ConfiguracaoService.definicoes() recebeu 4 campos estáticos (tela, trigger, saida, variaveis) nos 6 prompts; método todos() propagá-los somente para grupo 'prompts'. Endpoint GET /api/admin/configuracoes/defaults adicionado ao AdminConfiguracaoController lendo exclusivamente de config/ai.php; rota registrada dentro do bloco admin (auth:sanctum + role:admin).
+- Frontend: Interface Configuracao (configuracao.ts) recebeu campos opcionais tela/trigger/saida/variaveis. AdminConfiguracoes.tsx exibe pills de metadados (bg-slate-800) abaixo da descrição de cada prompt; badges de variáveis (bg-blue-950/border-blue-800) apenas quando variaveis.length > 0. Query TanStack (staleTime:Infinity) busca defaults; botão "↺ Restaurar padrão" visível apenas para prompts com configurado===true; ao clicar, preenche o textarea com "" (string vazia → o atualizar() do service salva null no banco) e ativa estado restaurado; textarea restaurado recebe ring-1 ring-amber-500/50; tooltip âmbar abaixo indica "Restaurado. Clique em Salvar para confirmar."; reset automático ao editar manualmente ou ao salvar com sucesso.
+- Gotcha: atualizar() do ConfiguracaoService trata trim($valor) === '' salvando null — portanto a abordagem "string vazia" é suficiente para restaurar ao padrão sem passar o texto completo do default.
+- Validações: npx tsc --noEmit zero erros; npm run build ✓ (1533 módulos).

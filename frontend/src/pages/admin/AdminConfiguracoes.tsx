@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import api from '../../lib/axios'
 import type { Configuracao, GrupoConfiguracao, GruposConfiguracao } from '../../types/configuracao'
+
+// ─── API: defaults ────────────────────────────────────────────────────────────
+
+async function buscarDefaults(): Promise<Record<string, string>> {
+  const res = await api.get<{ data: Record<string, string> }>('/admin/configuracoes/defaults')
+  return res.data.data
+}
 
 // ─── Labels dos grupos ────────────────────────────────────────────────────────
 
@@ -43,10 +50,20 @@ interface CampoProps {
   config: Configuracao
   valor: string
   onChange: (chave: string, valor: string) => void
+  defaultValor?: string
+  salvoSucesso?: boolean
 }
 
-function Campo({ config, valor, onChange }: CampoProps) {
+function Campo({ config, valor, onChange, defaultValor, salvoSucesso }: CampoProps) {
   const [visivel, setVisivel] = useState(false)
+  const [restaurado, setRestaurado] = useState(false)
+
+  // Reset feedback âmbar quando o grupo é salvo com sucesso
+  useEffect(() => {
+    if (salvoSucesso && restaurado) {
+      setRestaurado(false)
+    }
+  }, [salvoSucesso, restaurado])
 
   const placeholder = config.sensivel && config.configurado && valor === ''
     ? '••••••••  (deixe em branco para manter)'
@@ -54,19 +71,39 @@ function Campo({ config, valor, onChange }: CampoProps) {
 
   const baseInput = 'w-full rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
 
+  const mostrarBotaoRestaurar =
+    config.tipo === 'textarea' &&
+    config.configurado === true &&
+    defaultValor !== undefined
+
   const header = (
-    <div className="flex items-center gap-2">
-      <label className="text-sm font-medium text-zinc-200">{config.label}</label>
-      {config.configurado ? (
-        <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 font-mono text-[10px] text-green-400">
-          <CheckCircledIcon className="h-3 w-3" />
-          Configurado
-        </span>
-      ) : (
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] text-amber-400">
-          <ExclamationTriangleIcon className="h-3 w-3" />
-          Padrão
-        </span>
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-zinc-200">{config.label}</label>
+        {config.configurado ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 font-mono text-[10px] text-green-400">
+            <CheckCircledIcon className="h-3 w-3" />
+            Configurado
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] text-amber-400">
+            <ExclamationTriangleIcon className="h-3 w-3" />
+            Padrão
+          </span>
+        )}
+      </div>
+      {mostrarBotaoRestaurar && (
+        <button
+          type="button"
+          onClick={() => {
+            onChange(config.chave, '')
+            setRestaurado(true)
+          }}
+          className="text-xs text-slate-500 hover:text-amber-400 flex items-center gap-1 transition-colors"
+          aria-label="Restaurar prompt para o valor padrão"
+        >
+          ↺ Restaurar padrão
+        </button>
       )}
     </div>
   )
@@ -94,17 +131,70 @@ function Campo({ config, valor, onChange }: CampoProps) {
 
   // ── textarea ──────────────────────────────────────────────────────────────
   if (config.tipo === 'textarea') {
+    const temMetadados = config.grupo === 'prompts' && (config.tela || config.trigger || config.saida)
+    const temVariaveis = config.grupo === 'prompts' && config.variaveis && config.variaveis.length > 0
+
     return (
       <div className="col-span-full space-y-1.5">
         {header}
         {config.descricao && <p className="text-xs text-zinc-500">{config.descricao}</p>}
+
+        {temMetadados && (
+          <div className="flex flex-wrap gap-2 mb-3 text-xs">
+            {config.tela && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-800 text-slate-400">
+                <span className="text-slate-500">Tela:</span>
+                <span className="text-slate-300">{config.tela}</span>
+              </span>
+            )}
+            {config.trigger && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-800 text-slate-400">
+                <span className="text-slate-500">Trigger:</span>
+                <span className="text-slate-300">{config.trigger}</span>
+              </span>
+            )}
+            {config.saida && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-800 text-slate-400">
+                <span className="text-slate-500">Saída:</span>
+                <span className="text-slate-300">{config.saida}</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {temVariaveis && (
+          <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-800 text-slate-400">
+              <span className="text-slate-500">Variáveis:</span>
+            </span>
+            {config.variaveis!.map((variavel) => (
+              <span
+                key={variavel}
+                className="inline-flex px-2 py-0.5 rounded font-mono text-xs bg-blue-950 text-blue-300 border border-blue-800"
+              >
+                {variavel}
+              </span>
+            ))}
+          </div>
+        )}
+
         <textarea
           value={valor}
-          onChange={(e) => onChange(config.chave, e.target.value)}
+          onChange={(e) => {
+            onChange(config.chave, e.target.value)
+            if (restaurado) setRestaurado(false)
+          }}
           placeholder={config.valor ?? placeholder}
           rows={5}
-          className={`${baseInput} resize-y font-mono text-xs leading-relaxed`}
+          className={`${baseInput} resize-y font-mono text-xs leading-relaxed ${
+            restaurado ? 'ring-1 ring-amber-500/50 border-amber-500/50' : ''
+          }`}
         />
+        {restaurado && (
+          <p className="text-xs text-amber-400 mt-1">
+            ↑ Restaurado. Clique em Salvar para confirmar.
+          </p>
+        )}
       </div>
     )
   }
@@ -153,9 +243,10 @@ interface GrupoCardProps {
   onSalvar: (grupo: GrupoConfiguracao) => void
   salvando: boolean
   salvoSucesso: boolean
+  defaults?: Record<string, string>
 }
 
-function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salvoSucesso }: GrupoCardProps) {
+function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salvoSucesso, defaults }: GrupoCardProps) {
   const pendentes = configs.filter((c) => !c.configurado).length
 
   // Detecta provider ativo para o banner informativo no grupo IA
@@ -224,7 +315,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
         <div className="p-5 space-y-6">
           {/* Provider selector */}
           {configs.filter((c) => c.chave === 'ia_provider').map((config) => (
-            <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} />
+            <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} />
           ))}
 
           {/* Claude */}
@@ -234,7 +325,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {configs.filter((c) => c.chave.startsWith('claude_')).map((config) => (
-                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} />
+                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} />
               ))}
             </div>
           </div>
@@ -246,7 +337,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {configs.filter((c) => c.chave.startsWith('openai_')).map((config) => (
-                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} />
+                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} />
               ))}
             </div>
           </div>
@@ -260,6 +351,8 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
               config={config}
               valor={valores[config.chave] ?? ''}
               onChange={onChange}
+              defaultValor={defaults?.[config.chave]}
+              salvoSucesso={salvoSucesso}
             />
           ))}
         </div>
@@ -281,6 +374,12 @@ export function AdminConfiguracoes() {
     queryKey: ['admin', 'configuracoes'],
     queryFn: buscarConfiguracoes,
     staleTime: 30_000,
+  })
+
+  const { data: defaults } = useQuery({
+    queryKey: ['configuracoes-defaults'],
+    queryFn: buscarDefaults,
+    staleTime: Infinity,
   })
 
   const mutation = useMutation({
@@ -418,6 +517,7 @@ export function AdminConfiguracoes() {
               onSalvar={handleSalvar}
               salvando={grupoSalvando === grupo}
               salvoSucesso={gruposSalvos.has(grupo)}
+              defaults={defaults}
             />
           ))}
         </div>

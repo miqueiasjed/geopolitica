@@ -12,6 +12,10 @@ export interface Configuracao {
   sensivel: boolean
   configurado: boolean
   valor: string | null
+  tela?: string | null
+  trigger?: string | null
+  saida?: string | null
+  variaveis?: string[]
 }
 
 export type GruposConfiguracao = Partial<Record<GrupoConfiguracao, Configuracao[]>>

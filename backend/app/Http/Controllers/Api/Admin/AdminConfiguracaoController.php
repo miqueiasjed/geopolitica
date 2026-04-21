@@ -20,6 +20,25 @@ class AdminConfiguracaoController extends Controller
         ]);
     }
 
+    public function defaults(): JsonResponse
+    {
+        $chaves = [
+            'prompt_analise_sistema'      => 'analise_sistema',
+            'prompt_chat_sistema'         => 'chat_sistema',
+            'prompt_detector_sistema'     => 'detector_sistema',
+            'prompt_convergencia_sistema' => 'convergencia_sistema',
+            'prompt_perfil_contexto'      => 'perfil_contexto',
+            'prompt_perfil_lideranca'     => 'perfil_lideranca',
+        ];
+
+        $defaults = [];
+        foreach ($chaves as $chaveConfig => $chaveAi) {
+            $defaults[$chaveConfig] = config("ai.prompts.{$chaveAi}");
+        }
+
+        return response()->json(['data' => $defaults]);
+    }
+
     public function update(Request $request): JsonResponse
     {
         $dados = $request->validate([

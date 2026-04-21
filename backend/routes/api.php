@@ -111,6 +111,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/eleicoes/{id}', [EleicaoAdminController::class, 'destroy']);
 
     // Configurações da plataforma
+    Route::get('/configuracoes/defaults', [AdminConfiguracaoController::class, 'defaults']);
     Route::get('/configuracoes', [AdminConfiguracaoController::class, 'index']);
     Route::patch('/configuracoes', [AdminConfiguracaoController::class, 'update']);
 

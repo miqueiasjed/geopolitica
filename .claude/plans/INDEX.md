@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-14 (Plano 15 concluído — todos os planos finalizados ✅)
+> Última atualização: 2026-04-21 (Planos 16–18 adicionados — Admin IA v2)
 
 ## Legenda
 - ✅ Concluído
@@ -27,6 +27,9 @@
 | 13 | [Radar de Eleições (M08)](13.md) | ✅ | 7 | 5 |
 | 14 | [Chat com os Briefings (M09)](14.md) | ✅ | 7, 11, 12, 4 | 5 |
 | 15 | [Licenciamento B2B (M11)](15.md) | ✅ | 1–14 | 6 |
+| 16 | [Admin IA v2: Descrições Enriquecidas e Restaurar Padrão (F1+F2)](16.md) | ✅ | 15 | 4 |
+| 17 | [Admin IA v2: Modo de Teste de Prompt (F4)](17.md) | ⏳ | 16 | 5 |
+| 18 | [Admin IA v2: Painel de Uso da IA (F3)](18.md) | ⏳ | 15, 17 | 7 |
 
 ## Ordem de execução recomendada
 
@@ -52,6 +55,9 @@
 - **Dev B:** `1 → 2 → 7 → 8 → 12 → 13`
 - Sincronização nos planos 11, 14, 15
 
+## Admin IA v2 — ordem de execução
+`16 → 17 → 18`
+
 ## Módulos do PRD cobertos
 
 | Módulo PRD | Planos | Status |
@@ -69,3 +75,6 @@
 | M10 – Hotmart/Pagamentos | Plano 3 | ✅ |
 | M11 – Licenciamento B2B | Plano 15 | ✅ |
 | Infra Base | Plano 1 | ✅ |
+| Admin IA v2 – F1+F2 | Plano 16 | ✅ |
+| Admin IA v2 – F4 | Plano 17 | ⏳ |
+| Admin IA v2 – F3 | Plano 18 | ⏳ |

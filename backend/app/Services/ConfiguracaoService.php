@@ -96,7 +96,7 @@ class ConfiguracaoService
 
             $configurado = $registro && $registro->valor !== null;
 
-            $grupos[$definicao['grupo']][] = [
+            $item = [
                 'chave'      => $chave,
                 'label'      => $definicao['label'],
                 'descricao'  => $definicao['descricao'] ?? null,
@@ -108,6 +108,16 @@ class ConfiguracaoService
                 // Nunca retorna o valor real de campos sensíveis
                 'valor'      => $definicao['sensivel'] ? null : ($registro?->valor),
             ];
+
+            // Metadados estáticos exclusivos do grupo prompts
+            if ($definicao['grupo'] === 'prompts') {
+                $item['tela']     = $definicao['tela'];
+                $item['trigger']  = $definicao['trigger'];
+                $item['saida']    = $definicao['saida'];
+                $item['variaveis']= $definicao['variaveis'];
+            }
+
+            $grupos[$definicao['grupo']][] = $item;
         }
 
         return $grupos;
@@ -322,6 +332,10 @@ class ConfiguracaoService
                 'grupo'    => 'prompts',
                 'tipo'     => 'textarea',
                 'sensivel' => false,
+                'tela'     => 'Timeline / Feed de Tensões',
+                'trigger'  => 'Cron de ingestão de feed',
+                'saida'    => 'JSON array',
+                'variaveis'=> [],
             ],
             [
                 'chave'    => 'prompt_chat_sistema',
@@ -330,6 +344,10 @@ class ConfiguracaoService
                 'grupo'    => 'prompts',
                 'tipo'     => 'textarea',
                 'sensivel' => false,
+                'tela'     => 'Chat com os Briefings',
+                'trigger'  => 'Ação do usuário (pergunta)',
+                'saida'    => 'Texto livre (streaming)',
+                'variaveis'=> [],
             ],
             [
                 'chave'    => 'prompt_detector_sistema',
@@ -338,6 +356,10 @@ class ConfiguracaoService
                 'grupo'    => 'prompts',
                 'tipo'     => 'textarea',
                 'sensivel' => false,
+                'tela'     => 'Alertas Preditivos (background)',
+                'trigger'  => 'Cron de detecção de sinais',
+                'saida'    => 'JSON array',
+                'variaveis'=> [],
             ],
             [
                 'chave'    => 'prompt_convergencia_sistema',
@@ -346,6 +368,10 @@ class ConfiguracaoService
                 'grupo'    => 'prompts',
                 'tipo'     => 'textarea',
                 'sensivel' => false,
+                'tela'     => 'Alertas Preditivos (card de alerta)',
+                'trigger'  => 'Cron de convergência',
+                'saida'    => 'JSON {titulo, analise}',
+                'variaveis'=> [],
             ],
             [
                 'chave'    => 'prompt_perfil_contexto',
@@ -354,6 +380,10 @@ class ConfiguracaoService
                 'grupo'    => 'prompts',
                 'tipo'     => 'textarea',
                 'sensivel' => false,
+                'tela'     => 'Perfil de País (aba Contexto)',
+                'trigger'  => 'Ação admin (gerar perfil)',
+                'saida'    => 'Texto livre',
+                'variaveis'=> ['{{pais}}'],
             ],
             [
                 'chave'    => 'prompt_perfil_lideranca',
@@ -362,6 +392,10 @@ class ConfiguracaoService
                 'grupo'    => 'prompts',
                 'tipo'     => 'textarea',
                 'sensivel' => false,
+                'tela'     => 'Perfil de País (aba Liderança)',
+                'trigger'  => 'Ação admin (gerar perfil)',
+                'saida'    => 'Texto livre',
+                'variaveis'=> ['{{pais}}'],
             ],
         ];
     }
