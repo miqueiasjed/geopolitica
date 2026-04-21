@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminAiTestController;
+use App\Http\Controllers\Api\Admin\AdminAiUsoController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
 use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
@@ -115,6 +116,9 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/configuracoes/defaults', [AdminConfiguracaoController::class, 'defaults']);
     Route::get('/configuracoes', [AdminConfiguracaoController::class, 'index']);
     Route::patch('/configuracoes', [AdminConfiguracaoController::class, 'update']);
+
+    // Relatório de uso de IA
+    Route::get('ai/uso', [AdminAiUsoController::class, 'index']);
 
     // Testes de prompt IA
     Route::post('ai/testar-prompt', [AdminAiTestController::class, 'testar'])

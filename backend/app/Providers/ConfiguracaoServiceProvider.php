@@ -16,7 +16,7 @@ class ConfiguracaoServiceProvider extends ServiceProvider
 
         try {
             app(ConfiguracaoService::class)->carregarNoConfig();
-        } catch (\Exception) {
+        } catch (\Throwable) {
             // Tabela pode não existir em ambiente fresh; env() continua como fallback
         }
     }

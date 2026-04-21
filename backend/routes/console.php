@@ -50,3 +50,8 @@ Schedule::command('paises:gerar-perfis')
 Schedule::command('b2b:desativar-expiradas')
     ->dailyAt('00:05')
     ->withoutOverlapping();
+
+// IA – remove logs de ai_logs com mais de 90 dias diariamente às 03:00
+Schedule::command('ai:limpar-logs')
+    ->dailyAt('03:00')
+    ->withoutOverlapping();

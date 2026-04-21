@@ -20,6 +20,7 @@ import { RadarEleicoes } from '../pages/RadarEleicoes'
 import { AdminEleicoes } from '../pages/admin/AdminEleicoes'
 import { AdminB2BPage } from '../pages/admin/AdminB2BPage'
 import { AdminConfiguracoes } from '../pages/admin/AdminConfiguracoes'
+import { UsoPage } from '../pages/admin/ia/UsoPage'
 import { AdminLayout } from '../components/AdminLayout'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
@@ -67,6 +68,7 @@ export function AppRouter() {
           <Route path="eleicoes" element={<AdminEleicoes />} />
           <Route path="b2b" element={<AdminB2BPage />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
+          <Route path="ia/uso" element={<UsoPage />} />
         </Route>
       </Route>
     </Routes>
