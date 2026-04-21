@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import api from '../../lib/axios'
 import type { Configuracao, GrupoConfiguracao, GruposConfiguracao } from '../../types/configuracao'
+import { PromptTestPanel } from '../../components/admin/PromptTestPanel'
 
 // ─── API: defaults ────────────────────────────────────────────────────────────
 
@@ -10,6 +11,14 @@ async function buscarDefaults(): Promise<Record<string, string>> {
   const res = await api.get<{ data: Record<string, string> }>('/admin/configuracoes/defaults')
   return res.data.data
 }
+
+// ─── Prompts que exigem saída JSON ────────────────────────────────────────────
+
+const PROMPTS_EXIGE_JSON = new Set([
+  'prompt_analise_sistema',
+  'prompt_detector_sistema',
+  'prompt_convergencia_sistema',
+])
 
 // ─── Labels dos grupos ────────────────────────────────────────────────────────
 
@@ -194,6 +203,13 @@ function Campo({ config, valor, onChange, defaultValor, salvoSucesso }: CampoPro
           <p className="text-xs text-amber-400 mt-1">
             ↑ Restaurado. Clique em Salvar para confirmar.
           </p>
+        )}
+
+        {config.grupo === 'prompts' && (
+          <PromptTestPanel
+            promptSistema={valor}
+            exigeJson={PROMPTS_EXIGE_JSON.has(config.chave)}
+          />
         )}
       </div>
     )

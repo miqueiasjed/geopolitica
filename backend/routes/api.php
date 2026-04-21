@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
+use App\Http\Controllers\Api\Admin\AdminAiTestController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
 use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
@@ -114,6 +115,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/configuracoes/defaults', [AdminConfiguracaoController::class, 'defaults']);
     Route::get('/configuracoes', [AdminConfiguracaoController::class, 'index']);
     Route::patch('/configuracoes', [AdminConfiguracaoController::class, 'update']);
+
+    // Testes de prompt IA
+    Route::post('ai/testar-prompt', [AdminAiTestController::class, 'testar'])
+        ->middleware('throttle:20,1');
 
     // Gestão de licenças B2B
     Route::get('/b2b/empresas', [AdminB2BController::class, 'index']);

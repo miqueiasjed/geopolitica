@@ -28,7 +28,7 @@
 | 14 | [Chat com os Briefings (M09)](14.md) | ✅ | 7, 11, 12, 4 | 5 |
 | 15 | [Licenciamento B2B (M11)](15.md) | ✅ | 1–14 | 6 |
 | 16 | [Admin IA v2: Descrições Enriquecidas e Restaurar Padrão (F1+F2)](16.md) | ✅ | 15 | 4 |
-| 17 | [Admin IA v2: Modo de Teste de Prompt (F4)](17.md) | ⏳ | 16 | 5 |
+| 17 | [Admin IA v2: Modo de Teste de Prompt (F4)](17.md) | ✅ | 16 | 5 |
 | 18 | [Admin IA v2: Painel de Uso da IA (F3)](18.md) | ⏳ | 15, 17 | 7 |
 
 ## Ordem de execução recomendada
@@ -76,5 +76,5 @@
 | M11 – Licenciamento B2B | Plano 15 | ✅ |
 | Infra Base | Plano 1 | ✅ |
 | Admin IA v2 – F1+F2 | Plano 16 | ✅ |
-| Admin IA v2 – F4 | Plano 17 | ⏳ |
+| Admin IA v2 – F4 | Plano 17 | ✅ |
 | Admin IA v2 – F3 | Plano 18 | ⏳ |
