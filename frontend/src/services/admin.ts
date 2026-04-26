@@ -5,6 +5,10 @@ import type {
   AdminConteudosResponse,
   AdminWebhookEvento,
   AdminWebhookEventosFiltros,
+  AdminUsuario,
+  AdminUsuarioDetalhe,
+  AdminUsuariosFiltros,
+  AtualizarUsuarioPayload,
   PaginacaoLaravel,
 } from '../types/admin'
 import type { TipoConteudo, PlanoMinimo, Conteudo } from '../types/biblioteca'
@@ -30,6 +34,8 @@ export const adminKeys = {
   webhookEventos: (filtros: AdminWebhookEventosFiltros) => [...adminKeys.all, 'webhook-eventos', filtros] as const,
   conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
+  usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
+  usuario: (id: number) => [...adminKeys.all, 'usuarios', id] as const,
 }
 
 function montarParams<T extends object>(filtros: T) {
@@ -84,6 +90,34 @@ export async function fetchConteudosAdmin(page: number): Promise<AdminConteudosR
 
 export async function despublicarConteudo(id: number): Promise<void> {
   await api.delete(`/admin/conteudos/${id}`)
+}
+
+// --- Usuários Admin ---
+
+export async function buscarAdminUsuarios(
+  filtros: AdminUsuariosFiltros,
+): Promise<PaginacaoLaravel<AdminUsuario>> {
+  const resposta = await api.get<PaginacaoLaravel<AdminUsuario>>('/admin/usuarios', {
+    params: montarParams(filtros),
+  })
+  return resposta.data
+}
+
+export async function buscarAdminUsuario(id: number): Promise<AdminUsuarioDetalhe> {
+  const resposta = await api.get<AdminUsuarioDetalhe>(`/admin/usuarios/${id}`)
+  return resposta.data
+}
+
+export async function atualizarAdminUsuario(
+  id: number,
+  payload: AtualizarUsuarioPayload,
+): Promise<AdminUsuario> {
+  const resposta = await api.patch<{ usuario: AdminUsuario }>(`/admin/usuarios/${id}`, payload)
+  return resposta.data.usuario
+}
+
+export async function excluirAdminUsuario(id: number): Promise<void> {
+  await api.delete(`/admin/usuarios/${id}`)
 }
 
 // --- B2B Admin ---

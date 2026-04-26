@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\AdminAiUsoController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
 use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
+use App\Http\Controllers\Api\Admin\AdminUsuarioController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\BibliotecaController;
@@ -123,6 +124,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // Testes de prompt IA
     Route::post('ai/testar-prompt', [AdminAiTestController::class, 'testar'])
         ->middleware('throttle:20,1');
+
+    // Gestão de usuários
+    Route::get('/usuarios', [AdminUsuarioController::class, 'index']);
+    Route::get('/usuarios/{usuario}', [AdminUsuarioController::class, 'show']);
+    Route::patch('/usuarios/{usuario}', [AdminUsuarioController::class, 'update']);
+    Route::delete('/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy']);
 
     // Gestão de licenças B2B
     Route::get('/b2b/empresas', [AdminB2BController::class, 'index']);

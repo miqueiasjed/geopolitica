@@ -17,9 +17,9 @@ class IdentificarTenantMiddleware
         // Remover o domínio base para obter o subdomínio
         $subdominio = str_replace('.' . $dominioBase, '', $host);
 
-        // Se é o domínio raiz ou www, não é B2B
+        // Domínio raiz ou www não tem tenant — rotas com este middleware requerem subdomínio B2B
         if ($subdominio === $dominioBase || $subdominio === 'www') {
-            return $next($request);
+            abort(404, 'Recurso disponível apenas em subdomínios B2B.');
         }
 
         $empresa = Empresa::where('subdominio', $subdominio)

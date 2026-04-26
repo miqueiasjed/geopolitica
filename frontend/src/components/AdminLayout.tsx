@@ -10,9 +10,11 @@ import {
   ExitIcon,
   ChevronRightIcon,
   GearIcon,
+  IdCardIcon,
 } from '@radix-ui/react-icons'
 
 const itens = [
+  { label: 'Usuários', rota: '/admin/usuarios', icone: IdCardIcon },
   { label: 'Assinantes', rota: '/admin/assinantes', icone: PersonIcon },
   { label: 'Biblioteca', rota: '/admin/biblioteca', icone: BookmarkIcon },
   { label: 'Novo Conteúdo', rota: '/admin/novo-conteudo', icone: PlusCircledIcon },

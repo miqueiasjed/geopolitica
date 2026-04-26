@@ -19,6 +19,7 @@ import { Timeline } from '../pages/Timeline'
 import { RadarEleicoes } from '../pages/RadarEleicoes'
 import { AdminEleicoes } from '../pages/admin/AdminEleicoes'
 import { AdminB2BPage } from '../pages/admin/AdminB2BPage'
+import { AdminUsuarios } from '../pages/admin/AdminUsuarios'
 import { AdminConfiguracoes } from '../pages/admin/AdminConfiguracoes'
 import { UsoPage } from '../pages/admin/ia/UsoPage'
 import { AdminLayout } from '../components/AdminLayout'
@@ -62,6 +63,7 @@ export function AppRouter() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/assinantes" replace />} />
           <Route path="assinantes" element={<AdminAssinantes />} />
+          <Route path="usuarios" element={<AdminUsuarios />} />
           <Route path="webhook-eventos" element={<AdminWebhookEventos />} />
           <Route path="novo-conteudo" element={<AdminNovoConteudo />} />
           <Route path="biblioteca" element={<AdminBiblioteca />} />
