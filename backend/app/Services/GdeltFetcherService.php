@@ -53,6 +53,7 @@ class GdeltFetcherService
         try {
             $resposta = Http::timeout(30)
                 ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; GeopoliticaBot/1.0)'])
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
                 ->get(self::BASE_URL, self::PARAMS);
 
             if ($resposta->failed()) {
