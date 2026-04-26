@@ -7,7 +7,15 @@ use Illuminate\Support\Facades\Log;
 
 class GdeltFetcherService
 {
-    private const ENDPOINT = 'https://api.gdeltproject.org/api/v2/doc/doc?query=conflict%20war%20tension%20military%20sanctions%20attack%20crisis&mode=ArtList&format=json&timespan=24h&maxrecords=250';
+    private const BASE_URL = 'https://api.gdeltproject.org/api/v2/doc/doc';
+
+    private const PARAMS = [
+        'query'      => 'conflict war tension military sanctions attack crisis',
+        'mode'       => 'ArtList',
+        'format'     => 'json',
+        'timespan'   => '24h',
+        'maxrecords' => '250',
+    ];
 
     private const PAISES = [
         'Afghanistan' => 'AF', 'Albania' => 'AL', 'Algeria' => 'DZ', 'Angola' => 'AO',
@@ -43,7 +51,7 @@ class GdeltFetcherService
     public function fetch(): array
     {
         try {
-            $resposta = Http::timeout(30)->get(self::ENDPOINT);
+            $resposta = Http::timeout(30)->get(self::BASE_URL, self::PARAMS);
 
             if ($resposta->failed()) {
                 Log::warning('GdeltFetcherService: resposta com falha da API.', [
@@ -94,6 +102,11 @@ class GdeltFetcherService
         }
 
         if (empty($contagemPorPais)) {
+            Log::warning('GdeltFetcherService: nenhum artigo com sourcecountry.', [
+                'total_artigos' => count($artigos),
+                'exemplo'       => $artigos[0] ?? null,
+            ]);
+
             return [];
         }
 
