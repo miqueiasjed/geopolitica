@@ -15,6 +15,7 @@ class EventResource extends JsonResource
             'resumo' => $this->resumo,
             'analise_ia' => $this->analise_ia,
             'fonte' => $this->fonte,
+            'fonte_url' => $this->fonte_url,
             'regiao' => $this->regiao,
             'impact_score' => $this->impact_score,
             'impact_label' => $this->impact_label,

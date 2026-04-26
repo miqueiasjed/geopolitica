@@ -110,6 +110,10 @@ class AiAnalyzerService
         $impactScore = min(max($impactScore, 1), 10);
         $relevante = (bool) ($analise['relevante'] ?? false);
 
+        if (! empty($analise['titulo'])) {
+            $item['titulo'] = (string) $analise['titulo'];
+        }
+
         return [
             ...$item,
             'relevante' => $relevante,
