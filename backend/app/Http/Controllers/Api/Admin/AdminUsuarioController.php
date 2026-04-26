@@ -46,11 +46,11 @@ class AdminUsuarioController extends Controller
     {
         $dados = $request->validated();
 
-        $user = User::create([
-            'name'     => $dados['name'],
-            'email'    => $dados['email'],
-            'password' => Hash::make($dados['password']),
-        ]);
+        $user           = new User();
+        $user->name     = $dados['name'];
+        $user->email    = $dados['email'];
+        $user->password = Hash::make($dados['password']);
+        $user->save();
 
         $user->assignRole($dados['role']);
         $user->load('roles');
