@@ -16,6 +16,9 @@ import type {
   AdminPerfilPais,
   CriarPerfilPaisPayload,
   AtualizarPerfilPaisPayload,
+  AdminSource,
+  CriarSourcePayload,
+  AtualizarSourcePayload,
 } from '../types/admin'
 import type { TipoConteudo, PlanoMinimo, Conteudo } from '../types/biblioteca'
 import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
@@ -44,6 +47,7 @@ export const adminKeys = {
   usuario: (id: number) => [...adminKeys.all, 'usuarios', id] as const,
   crises: () => [...adminKeys.all, 'crises'] as const,
   paises: () => [...adminKeys.all, 'paises'] as const,
+  sources: () => [...adminKeys.all, 'sources'] as const,
 }
 
 function montarParams<T extends object>(filtros: T) {
@@ -190,4 +194,25 @@ export async function atualizarPais(codigo: string, payload: AtualizarPerfilPais
 
 export async function excluirPais(codigo: string): Promise<void> {
   await api.delete(`/admin/paises/${codigo}`)
+}
+
+// --- Fontes RSS Admin ---
+
+export async function buscarAdminSources(): Promise<AdminSource[]> {
+  const resposta = await api.get<{ data: AdminSource[] }>('/admin/sources')
+  return resposta.data.data
+}
+
+export async function criarSource(payload: CriarSourcePayload): Promise<AdminSource> {
+  const resposta = await api.post<{ data: AdminSource }>('/admin/sources', payload)
+  return resposta.data.data
+}
+
+export async function atualizarSource(id: number, payload: AtualizarSourcePayload): Promise<AdminSource> {
+  const resposta = await api.patch<{ data: AdminSource }>(`/admin/sources/${id}`, payload)
+  return resposta.data.data
+}
+
+export async function excluirSource(id: number): Promise<void> {
+  await api.delete(`/admin/sources/${id}`)
 }

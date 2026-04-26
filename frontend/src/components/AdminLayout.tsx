@@ -13,6 +13,7 @@ import {
   IdCardIcon,
   ClockIcon,
   GlobeIcon as PaisesIcon,
+  MixIcon,
 } from '@radix-ui/react-icons'
 
 const itens = [
@@ -23,6 +24,7 @@ const itens = [
   { label: 'Eleições', rota: '/admin/eleicoes', icone: GlobeIcon },
   { label: 'Linha do Tempo', rota: '/admin/crises', icone: ClockIcon },
   { label: 'Países Base', rota: '/admin/paises', icone: PaisesIcon },
+  { label: 'Fontes RSS', rota: '/admin/fontes', icone: MixIcon },
   { label: 'B2B / Empresas', rota: '/admin/b2b', icone: FileTextIcon },
   { label: 'Webhook Eventos', rota: '/admin/webhook-eventos', icone: ActivityLogIcon },
   { label: 'Configurações', rota: '/admin/configuracoes', icone: GearIcon },

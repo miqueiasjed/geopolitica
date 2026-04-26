@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\Admin\AdminUsuarioController;
 use App\Http\Controllers\Api\Admin\AdminCriseHistoricaController;
 use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
+use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\BibliotecaController;
@@ -145,6 +146,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/paises', [AdminPerfilPaisController::class, 'store']);
     Route::patch('/paises/{codigo}', [AdminPerfilPaisController::class, 'update']);
     Route::delete('/paises/{codigo}', [AdminPerfilPaisController::class, 'destroy']);
+
+    // Gestão de fontes RSS
+    Route::get('/sources', [AdminSourceController::class, 'index']);
+    Route::post('/sources', [AdminSourceController::class, 'store']);
+    Route::patch('/sources/{source}', [AdminSourceController::class, 'update']);
+    Route::delete('/sources/{source}', [AdminSourceController::class, 'destroy']);
 
     // Gestão de licenças B2B
     Route::get('/b2b/empresas', [AdminB2BController::class, 'index']);

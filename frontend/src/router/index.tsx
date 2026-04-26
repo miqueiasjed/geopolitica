@@ -24,6 +24,7 @@ import { AdminConfiguracoes } from '../pages/admin/AdminConfiguracoes'
 import { UsoPage } from '../pages/admin/ia/UsoPage'
 import { AdminLayout } from '../components/AdminLayout'
 import { AdminCrises } from '../pages/admin/AdminCrises'
+import { AdminFontes } from '../pages/admin/AdminFontes'
 import { AdminPaises } from '../pages/admin/AdminPaises'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
@@ -71,6 +72,7 @@ export function AppRouter() {
           <Route path="biblioteca" element={<AdminBiblioteca />} />
           <Route path="eleicoes" element={<AdminEleicoes />} />
           <Route path="crises" element={<AdminCrises />} />
+          <Route path="fontes" element={<AdminFontes />} />
           <Route path="paises" element={<AdminPaises />} />
           <Route path="b2b" element={<AdminB2BPage />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />

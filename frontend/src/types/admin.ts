@@ -171,3 +171,31 @@ export interface AtualizarPerfilPaisPayload {
   indicadores_relevantes: string[]
   termos_busca: string[]
 }
+
+// --- Fontes RSS ---
+
+export type CategoriaSource = 'geopolitica' | 'economia' | 'defesa' | 'mercados'
+
+export interface AdminSource {
+  id: number
+  nome: string
+  rss_url: string
+  categoria: CategoriaSource
+  ativo: boolean
+  ultima_coleta_em: string | null
+  created_at: string
+}
+
+export interface CriarSourcePayload {
+  nome: string
+  rss_url: string
+  categoria: CategoriaSource
+  ativo: boolean
+}
+
+export interface AtualizarSourcePayload {
+  nome?: string
+  rss_url?: string
+  categoria?: CategoriaSource
+  ativo?: boolean
+}
