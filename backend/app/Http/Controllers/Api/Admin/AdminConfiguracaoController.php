@@ -36,6 +36,12 @@ class AdminConfiguracaoController extends Controller
             $defaults[$chaveConfig] = config("ai.prompts.{$chaveAi}");
         }
 
+        $defaults['alerta_threshold_critico'] = (string) config('app.alerta_threshold_critico', 10);
+        $defaults['alerta_threshold_alto']    = (string) config('app.alerta_threshold_alto', 7);
+        $defaults['convergencia_janela_horas'] = (string) config('app.convergencia_janela_horas', 72);
+        $defaults['limite_chat_essencial']    = (string) config('app.limite_chat_essencial', 5);
+        $defaults['limite_chat_pro']          = (string) config('app.limite_chat_pro', 20);
+
         return response()->json(['data' => $defaults]);
     }
 

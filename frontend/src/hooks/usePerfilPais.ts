@@ -22,6 +22,11 @@ export function usePerfilPais(codigoPais: string) {
     queryFn: () => fetchPerfilPais(codigoPais),
     enabled: !!codigoPais,
     staleTime: 30 * 60 * 1000,
+    refetchInterval: (query) => {
+      const perfil = query.state.data
+      if (!perfil || !perfil.gerado_em) return 4000
+      return false
+    },
   })
 
   return {
