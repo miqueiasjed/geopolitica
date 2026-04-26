@@ -51,7 +51,9 @@ class GdeltFetcherService
     public function fetch(): array
     {
         try {
-            $resposta = Http::timeout(30)->get(self::BASE_URL, self::PARAMS);
+            $resposta = Http::timeout(30)
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; GeopoliticaBot/1.0)'])
+                ->get(self::BASE_URL, self::PARAMS);
 
             if ($resposta->failed()) {
                 Log::warning('GdeltFetcherService: resposta com falha da API.', [
