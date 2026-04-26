@@ -49,9 +49,18 @@ class AiAnalyzerService
         );
     }
 
+    private function extrairJson(string $texto): string
+    {
+        if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/i', $texto, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return trim($texto);
+    }
+
     private function parsearResposta(string $conteudo, int $quantidadeEsperada): array
     {
-        $json = json_decode($conteudo, true);
+        $json = json_decode($this->extrairJson($conteudo), true);
 
         if (! is_array($json)) {
             return array_fill(0, $quantidadeEsperada, $this->analiseNaoRelevante());

@@ -19,6 +19,15 @@ class DetectorSinaisService
             ->each(fn (Collection $lote) => $this->analisarLote($lote));
     }
 
+    private function extrairJson(string $texto): string
+    {
+        if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/i', $texto, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return trim($texto);
+    }
+
     private function analisarLote(Collection $eventos): void
     {
         try {
@@ -42,7 +51,7 @@ class DetectorSinaisService
                 temperature: 0.0,
             );
 
-            $sinais = json_decode($texto, true);
+            $sinais = json_decode($this->extrairJson($texto), true);
 
             if (! is_array($sinais)) {
                 Log::warning('DetectorSinaisService: resposta da IA não é um JSON array válido.', [

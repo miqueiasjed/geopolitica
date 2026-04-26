@@ -68,6 +68,15 @@ class AnalisadorConvergenciaService
         $this->gerarAlerta($regiao, $nivel, $sinais, (int) $pesoTotal);
     }
 
+    private function extrairJson(string $texto): string
+    {
+        if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/i', $texto, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return trim($texto);
+    }
+
     private function gerarAlerta(string $regiao, string $nivel, Collection $sinais, int $pesoTotal): void
     {
         $tiposUnicos = $sinais->pluck('tipo_padrao')->unique();
@@ -93,7 +102,7 @@ class AnalisadorConvergenciaService
                 maxTokens: 512,
             );
 
-            $dados = json_decode($texto, true);
+            $dados = json_decode($this->extrairJson($texto), true);
 
             if (is_array($dados) && isset($dados['titulo'], $dados['analise'])) {
                 $titulo  = (string) $dados['titulo'];
