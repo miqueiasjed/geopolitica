@@ -7,13 +7,39 @@ use Illuminate\Support\Facades\Log;
 
 class GdeltFetcherService
 {
-    private const ENDPOINT = 'https://api.gdeltproject.org/api/v2/summary/summary?d=web&t=summary&k=&ts=custom&sdt=&edt=&svt=zoom&stab=1&mode=pointdata&fmt=json';
+    private const ENDPOINT = 'https://api.gdeltproject.org/api/v2/doc/doc?query=conflict%20war%20tension%20military%20sanctions%20attack%20crisis&mode=ArtList&format=json&timespan=24h&maxrecords=250';
 
-    /**
-     * Busca eventos da GDELT API v2 e retorna array normalizado por país.
-     *
-     * @return array<int, array{codigo_pais: string, nome_pais: string, total_eventos: int, tom_medio: float, intensidade_gdelt: float, atualizado_em: string}>
-     */
+    private const PAISES = [
+        'Afghanistan' => 'AF', 'Albania' => 'AL', 'Algeria' => 'DZ', 'Angola' => 'AO',
+        'Argentina' => 'AR', 'Armenia' => 'AM', 'Australia' => 'AU', 'Austria' => 'AT',
+        'Azerbaijan' => 'AZ', 'Bahrain' => 'BH', 'Bangladesh' => 'BD', 'Belarus' => 'BY',
+        'Belgium' => 'BE', 'Bolivia' => 'BO', 'Bosnia and Herzegovina' => 'BA', 'Brazil' => 'BR',
+        'Bulgaria' => 'BG', 'Cambodia' => 'KH', 'Cameroon' => 'CM', 'Canada' => 'CA',
+        'Chile' => 'CL', 'China' => 'CN', 'Colombia' => 'CO', 'Congo' => 'CG',
+        'Croatia' => 'HR', 'Cuba' => 'CU', 'Czech Republic' => 'CZ', 'Denmark' => 'DK',
+        'Ecuador' => 'EC', 'Egypt' => 'EG', 'Ethiopia' => 'ET', 'Finland' => 'FI',
+        'France' => 'FR', 'Georgia' => 'GE', 'Germany' => 'DE', 'Ghana' => 'GH',
+        'Greece' => 'GR', 'Guatemala' => 'GT', 'Haiti' => 'HT', 'Honduras' => 'HN',
+        'Hungary' => 'HU', 'India' => 'IN', 'Indonesia' => 'ID', 'Iran' => 'IR',
+        'Iraq' => 'IQ', 'Ireland' => 'IE', 'Israel' => 'IL', 'Italy' => 'IT',
+        'Japan' => 'JP', 'Jordan' => 'JO', 'Kazakhstan' => 'KZ', 'Kenya' => 'KE',
+        'Kosovo' => 'XK', 'Kuwait' => 'KW', 'Kyrgyzstan' => 'KG', 'Lebanon' => 'LB',
+        'Libya' => 'LY', 'Malaysia' => 'MY', 'Mali' => 'ML', 'Mexico' => 'MX',
+        'Moldova' => 'MD', 'Morocco' => 'MA', 'Mozambique' => 'MZ', 'Myanmar' => 'MM',
+        'Netherlands' => 'NL', 'Nicaragua' => 'NI', 'Niger' => 'NE', 'Nigeria' => 'NG',
+        'North Korea' => 'KP', 'Norway' => 'NO', 'Pakistan' => 'PK', 'Palestine' => 'PS',
+        'Panama' => 'PA', 'Peru' => 'PE', 'Philippines' => 'PH', 'Poland' => 'PL',
+        'Portugal' => 'PT', 'Qatar' => 'QA', 'Romania' => 'RO', 'Russia' => 'RU',
+        'Saudi Arabia' => 'SA', 'Senegal' => 'SN', 'Serbia' => 'RS', 'Somalia' => 'SO',
+        'South Africa' => 'ZA', 'South Korea' => 'KR', 'South Sudan' => 'SS', 'Spain' => 'ES',
+        'Sri Lanka' => 'LK', 'Sudan' => 'SD', 'Sweden' => 'SE', 'Switzerland' => 'CH',
+        'Syria' => 'SY', 'Taiwan' => 'TW', 'Tajikistan' => 'TJ', 'Thailand' => 'TH',
+        'Tunisia' => 'TN', 'Turkey' => 'TR', 'Turkmenistan' => 'TM', 'Uganda' => 'UG',
+        'Ukraine' => 'UA', 'United Arab Emirates' => 'AE', 'United Kingdom' => 'GB',
+        'United States' => 'US', 'Uzbekistan' => 'UZ', 'Venezuela' => 'VE', 'Vietnam' => 'VN',
+        'Yemen' => 'YE', 'Zimbabwe' => 'ZW',
+    ];
+
     public function fetch(): array
     {
         try {
@@ -45,62 +71,71 @@ class GdeltFetcherService
         }
     }
 
-    /**
-     * Normaliza a resposta bruta da GDELT para o formato do GdeltCache.
-     */
     private function normalizar(array $dados): array
     {
-        $registros = [];
-        $agora     = now()->toDateTimeString();
+        $artigos = $dados['articles'] ?? [];
 
-        // A GDELT pointdata retorna um array de pontos com campos variados.
-        // Tentamos extrair os campos conhecidos de cada entrada.
-        $pontos = $dados['pointdata'] ?? $dados['data'] ?? $dados ?? [];
-
-        if (! is_array($pontos)) {
-            Log::warning('GdeltFetcherService: formato de resposta desconhecido.', [
+        if (empty($artigos)) {
+            Log::warning('GdeltFetcherService: nenhum artigo retornado pela API.', [
                 'chaves' => array_keys($dados),
             ]);
 
             return [];
         }
 
-        foreach ($pontos as $ponto) {
-            if (! is_array($ponto)) {
+        // Agrega artigos por país de origem
+        $contagemPorPais = [];
+        foreach ($artigos as $artigo) {
+            $pais = $artigo['sourcecountry'] ?? null;
+            if (empty($pais)) {
+                continue;
+            }
+            $contagemPorPais[$pais] = ($contagemPorPais[$pais] ?? 0) + 1;
+        }
+
+        if (empty($contagemPorPais)) {
+            return [];
+        }
+
+        $maxContagem = max(array_values($contagemPorPais));
+        $agora       = now()->toDateTimeString();
+        $registros   = [];
+
+        foreach ($contagemPorPais as $nomePais => $total) {
+            $codigoPais = self::PAISES[$nomePais] ?? null;
+
+            if (! $codigoPais) {
                 continue;
             }
 
-            $codigoPais = $ponto['countrycode'] ?? $ponto['country'] ?? $ponto['geo_countrycode'] ?? null;
-            $nomePais   = $ponto['countryname'] ?? $ponto['name'] ?? $ponto['geo_fullname'] ?? $codigoPais;
-            $totalEventos = (int) ($ponto['count'] ?? $ponto['numarts'] ?? $ponto['eventcount'] ?? 0);
-            $tomMedio     = (float) ($ponto['tone'] ?? $ponto['avgtone'] ?? $ponto['tonemean'] ?? 0.0);
-
-            if (empty($codigoPais)) {
-                continue;
-            }
-
-            $intensidade = $this->calcularIntensidade($tomMedio);
+            $intensidade = $this->calcularIntensidade($total, $maxContagem);
 
             $registros[] = [
-                'codigo_pais'      => strtoupper(trim($codigoPais)),
-                'nome_pais'        => $nomePais ?? strtoupper(trim($codigoPais)),
-                'total_eventos'    => $totalEventos,
-                'tom_medio'        => $tomMedio,
+                'codigo_pais'       => $codigoPais,
+                'nome_pais'         => $nomePais,
+                'total_eventos'     => $total,
+                'tom_medio'         => 0.0,
                 'intensidade_gdelt' => $intensidade,
-                'atualizado_em'    => $agora,
+                'atualizado_em'     => $agora,
             ];
         }
+
+        Log::info('GdeltFetcherService: normalização concluída.', [
+            'total_artigos'  => count($artigos),
+            'paises_mapeados' => count($registros),
+            'paises_sem_mapa' => count($contagemPorPais) - count($registros),
+        ]);
 
         return $registros;
     }
 
-    /**
-     * Normaliza o tom médio para escala de intensidade 1–10.
-     * Fórmula: round(((tom * -1) + 100) / 20) + 1, clampado entre 1 e 10.
-     */
-    private function calcularIntensidade(float $tom): float
+    private function calcularIntensidade(int $total, int $maxTotal): float
     {
-        $intensidade = round((($tom * -1) + 100) / 20) + 1;
+        if ($maxTotal === 0) {
+            return 1.0;
+        }
+
+        $intensidade = round(($total / $maxTotal) * 9) + 1;
 
         return (float) max(1, min(10, $intensidade));
     }
