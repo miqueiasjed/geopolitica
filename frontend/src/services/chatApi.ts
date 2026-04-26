@@ -7,6 +7,11 @@ export async function buscarHistorico(): Promise<ChatHistorico> {
   return resposta.data
 }
 
+function xsrfToken(): string {
+  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/)
+  return match ? decodeURIComponent(match[1]) : ''
+}
+
 export async function* enviarPergunta(
   pergunta: string,
   token?: string,
@@ -19,6 +24,7 @@ export async function* enviarPergunta(
       'Content-Type': 'application/json',
       Authorization: authToken ? `Bearer ${authToken}` : '',
       Accept: 'text/event-stream',
+      'X-XSRF-TOKEN': xsrfToken(),
     },
     body: JSON.stringify({ pergunta }),
   })
