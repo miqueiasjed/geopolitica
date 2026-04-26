@@ -23,6 +23,8 @@ import { AdminUsuarios } from '../pages/admin/AdminUsuarios'
 import { AdminConfiguracoes } from '../pages/admin/AdminConfiguracoes'
 import { UsoPage } from '../pages/admin/ia/UsoPage'
 import { AdminLayout } from '../components/AdminLayout'
+import { AdminCrises } from '../pages/admin/AdminCrises'
+import { AdminPaises } from '../pages/admin/AdminPaises'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
 import { PerfilPaisPage } from '../pages/PerfilPaisPage'
@@ -68,6 +70,8 @@ export function AppRouter() {
           <Route path="novo-conteudo" element={<AdminNovoConteudo />} />
           <Route path="biblioteca" element={<AdminBiblioteca />} />
           <Route path="eleicoes" element={<AdminEleicoes />} />
+          <Route path="crises" element={<AdminCrises />} />
+          <Route path="paises" element={<AdminPaises />} />
           <Route path="b2b" element={<AdminB2BPage />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
           <Route path="ia/uso" element={<UsoPage />} />

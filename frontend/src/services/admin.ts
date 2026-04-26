@@ -11,6 +11,11 @@ import type {
   AtualizarUsuarioPayload,
   CriarUsuarioPayload,
   PaginacaoLaravel,
+  AdminCriseHistorica,
+  CriarCrisePayload,
+  AdminPerfilPais,
+  CriarPerfilPaisPayload,
+  AtualizarPerfilPaisPayload,
 } from '../types/admin'
 import type { TipoConteudo, PlanoMinimo, Conteudo } from '../types/biblioteca'
 import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
@@ -37,6 +42,8 @@ export const adminKeys = {
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
   usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
   usuario: (id: number) => [...adminKeys.all, 'usuarios', id] as const,
+  crises: () => [...adminKeys.all, 'crises'] as const,
+  paises: () => [...adminKeys.all, 'paises'] as const,
 }
 
 function montarParams<T extends object>(filtros: T) {
@@ -141,4 +148,46 @@ export async function criarLicencaB2B(payload: CriarLicencaPayload): Promise<Emp
 export async function renovarLicencaB2B(id: number, payload: RenovarLicencaPayload): Promise<EmpresaB2B> {
   const resposta = await api.post<EmpresaB2B>(`/admin/b2b/empresas/${id}/renovar`, payload)
   return resposta.data
+}
+
+// --- Crises Históricas Admin ---
+
+export async function buscarAdminCrises(): Promise<AdminCriseHistorica[]> {
+  const resposta = await api.get<{ data: AdminCriseHistorica[] }>('/admin/crises')
+  return resposta.data.data
+}
+
+export async function criarCrise(payload: CriarCrisePayload): Promise<AdminCriseHistorica> {
+  const resposta = await api.post<{ data: AdminCriseHistorica }>('/admin/crises', payload)
+  return resposta.data.data
+}
+
+export async function atualizarCrise(id: number, payload: CriarCrisePayload): Promise<AdminCriseHistorica> {
+  const resposta = await api.patch<{ data: AdminCriseHistorica }>(`/admin/crises/${id}`, payload)
+  return resposta.data.data
+}
+
+export async function excluirCrise(id: number): Promise<void> {
+  await api.delete(`/admin/crises/${id}`)
+}
+
+// --- Países Base Admin ---
+
+export async function buscarAdminPaises(): Promise<AdminPerfilPais[]> {
+  const resposta = await api.get<{ data: AdminPerfilPais[] }>('/admin/paises')
+  return resposta.data.data
+}
+
+export async function criarPais(payload: CriarPerfilPaisPayload): Promise<AdminPerfilPais> {
+  const resposta = await api.post<{ data: AdminPerfilPais }>('/admin/paises', payload)
+  return resposta.data.data
+}
+
+export async function atualizarPais(codigo: string, payload: AtualizarPerfilPaisPayload): Promise<AdminPerfilPais> {
+  const resposta = await api.patch<{ data: AdminPerfilPais }>(`/admin/paises/${codigo}`, payload)
+  return resposta.data.data
+}
+
+export async function excluirPais(codigo: string): Promise<void> {
+  await api.delete(`/admin/paises/${codigo}`)
 }

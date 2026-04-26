@@ -11,6 +11,8 @@ import {
   ChevronRightIcon,
   GearIcon,
   IdCardIcon,
+  ClockIcon,
+  GlobeIcon as PaisesIcon,
 } from '@radix-ui/react-icons'
 
 const itens = [
@@ -19,6 +21,8 @@ const itens = [
   { label: 'Biblioteca', rota: '/admin/biblioteca', icone: BookmarkIcon },
   { label: 'Novo Conteúdo', rota: '/admin/novo-conteudo', icone: PlusCircledIcon },
   { label: 'Eleições', rota: '/admin/eleicoes', icone: GlobeIcon },
+  { label: 'Linha do Tempo', rota: '/admin/crises', icone: ClockIcon },
+  { label: 'Países Base', rota: '/admin/paises', icone: PaisesIcon },
   { label: 'B2B / Empresas', rota: '/admin/b2b', icone: FileTextIcon },
   { label: 'Webhook Eventos', rota: '/admin/webhook-eventos', icone: ActivityLogIcon },
   { label: 'Configurações', rota: '/admin/configuracoes', icone: GearIcon },

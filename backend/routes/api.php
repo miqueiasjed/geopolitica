@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\Admin\AdminB2BController;
 use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\Admin\AdminUsuarioController;
+use App\Http\Controllers\Api\Admin\AdminCriseHistoricaController;
+use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\BibliotecaController;
@@ -131,6 +133,18 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/usuarios/{usuario}', [AdminUsuarioController::class, 'show']);
     Route::patch('/usuarios/{usuario}', [AdminUsuarioController::class, 'update']);
     Route::delete('/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy']);
+
+    // Gestão de crises históricas (Linha do Tempo)
+    Route::get('/crises', [AdminCriseHistoricaController::class, 'index']);
+    Route::post('/crises', [AdminCriseHistoricaController::class, 'store']);
+    Route::patch('/crises/{id}', [AdminCriseHistoricaController::class, 'update']);
+    Route::delete('/crises/{id}', [AdminCriseHistoricaController::class, 'destroy']);
+
+    // Gestão de países base (Meus Países)
+    Route::get('/paises', [AdminPerfilPaisController::class, 'index']);
+    Route::post('/paises', [AdminPerfilPaisController::class, 'store']);
+    Route::patch('/paises/{codigo}', [AdminPerfilPaisController::class, 'update']);
+    Route::delete('/paises/{codigo}', [AdminPerfilPaisController::class, 'destroy']);
 
     // Gestão de licenças B2B
     Route::get('/b2b/empresas', [AdminB2BController::class, 'index']);

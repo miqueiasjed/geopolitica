@@ -97,3 +97,77 @@ export interface CriarUsuarioPayload {
   password: string
   role: RoleUsuario
 }
+
+// --- Crises Históricas ---
+
+export interface MetricaItem {
+  label: string
+  valor: string
+}
+
+export interface AdminCriseHistorica {
+  id: number
+  titulo: string
+  slug: string
+  ano: number
+  data_inicio: string
+  data_fim: string | null
+  contexto_geopolitico: string
+  impacto_global: string
+  impacto_brasil: string
+  metricas_globais: MetricaItem[]
+  metricas_brasil: MetricaItem[]
+  categorias: string[]
+  content_slug: string | null
+  em_andamento: boolean
+}
+
+export interface CriarCrisePayload {
+  titulo: string
+  slug: string
+  ano: number
+  data_inicio: string
+  data_fim: string | null
+  contexto_geopolitico: string
+  impacto_global: string
+  impacto_brasil: string
+  metricas_globais: MetricaItem[]
+  metricas_brasil: MetricaItem[]
+  categorias: string[]
+  content_slug: string | null
+}
+
+// --- Países Base ---
+
+export interface AdminPerfilPais {
+  codigo_pais: string
+  nome_pt: string
+  bandeira_emoji: string | null
+  regiao_geopolitica: string | null
+  contexto_geopolitico: string | null
+  analise_lideranca: string | null
+  indicadores_relevantes: string[]
+  termos_busca: string[]
+  gerado_em: string | null
+}
+
+export interface CriarPerfilPaisPayload {
+  codigo_pais: string
+  nome_pt: string
+  bandeira_emoji: string | null
+  regiao_geopolitica: string | null
+  contexto_geopolitico: string | null
+  analise_lideranca: string | null
+  indicadores_relevantes: string[]
+  termos_busca: string[]
+}
+
+export interface AtualizarPerfilPaisPayload {
+  nome_pt: string
+  bandeira_emoji: string | null
+  regiao_geopolitica: string | null
+  contexto_geopolitico: string | null
+  analise_lideranca: string | null
+  indicadores_relevantes: string[]
+  termos_busca: string[]
+}

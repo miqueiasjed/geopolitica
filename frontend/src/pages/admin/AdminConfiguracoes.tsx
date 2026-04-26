@@ -61,9 +61,10 @@ interface CampoProps {
   onChange: (chave: string, valor: string) => void
   defaultValor?: string
   salvoSucesso?: boolean
+  estaExibindoPadrao?: boolean
 }
 
-function Campo({ config, valor, onChange, defaultValor, salvoSucesso }: CampoProps) {
+function Campo({ config, valor, onChange, defaultValor, salvoSucesso, estaExibindoPadrao }: CampoProps) {
   const [visivel, setVisivel] = useState(false)
   const [restaurado, setRestaurado] = useState(false)
 
@@ -204,6 +205,11 @@ function Campo({ config, valor, onChange, defaultValor, salvoSucesso }: CampoPro
             ↑ Restaurado. Clique em Salvar para confirmar.
           </p>
         )}
+        {estaExibindoPadrao && !restaurado && (
+          <p className="text-[11px] text-amber-500/70">
+            Valor padrão — edite para personalizar
+          </p>
+        )}
 
         {config.grupo === 'prompts' && (
           <PromptTestPanel
@@ -245,6 +251,11 @@ function Campo({ config, valor, onChange, defaultValor, salvoSucesso }: CampoPro
           </button>
         )}
       </div>
+      {estaExibindoPadrao && (
+        <p className="text-[11px] text-amber-500/70">
+          Valor padrão — edite para personalizar
+        </p>
+      )}
     </div>
   )
 }
@@ -260,9 +271,10 @@ interface GrupoCardProps {
   salvando: boolean
   salvoSucesso: boolean
   defaults?: Record<string, string>
+  chavesPreenchidasPorDefault: Set<string>
 }
 
-function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salvoSucesso, defaults }: GrupoCardProps) {
+function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salvoSucesso, defaults, chavesPreenchidasPorDefault }: GrupoCardProps) {
   const pendentes = configs.filter((c) => !c.configurado).length
 
   // Detecta provider ativo para o banner informativo no grupo IA
@@ -331,7 +343,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
         <div className="p-5 space-y-6">
           {/* Provider selector */}
           {configs.filter((c) => c.chave === 'ia_provider').map((config) => (
-            <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} />
+            <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} estaExibindoPadrao={chavesPreenchidasPorDefault.has(config.chave)} />
           ))}
 
           {/* Claude */}
@@ -341,7 +353,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {configs.filter((c) => c.chave.startsWith('claude_')).map((config) => (
-                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} />
+                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} estaExibindoPadrao={chavesPreenchidasPorDefault.has(config.chave)} />
               ))}
             </div>
           </div>
@@ -353,7 +365,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {configs.filter((c) => c.chave.startsWith('openai_')).map((config) => (
-                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} />
+                <Campo key={config.chave} config={config} valor={valores[config.chave] ?? ''} onChange={onChange} defaultValor={defaults?.[config.chave]} salvoSucesso={salvoSucesso} estaExibindoPadrao={chavesPreenchidasPorDefault.has(config.chave)} />
               ))}
             </div>
           </div>
@@ -369,6 +381,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
               onChange={onChange}
               defaultValor={defaults?.[config.chave]}
               salvoSucesso={salvoSucesso}
+              estaExibindoPadrao={chavesPreenchidasPorDefault.has(config.chave)}
             />
           ))}
         </div>
@@ -382,6 +395,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
 export function AdminConfiguracoes() {
   const queryClient = useQueryClient()
   const [valores, setValores] = useState<Record<string, string>>({})
+  const [chavesPreenchidasPorDefault, setChavesPreenchidasPorDefault] = useState<Set<string>>(new Set())
   const [grupoSalvando, setGrupoSalvando] = useState<GrupoConfiguracao | null>(null)
   const [gruposSalvos, setGruposSalvos] = useState<Set<GrupoConfiguracao>>(new Set())
   const [erro, setErro] = useState<string | null>(null)
@@ -398,6 +412,25 @@ export function AdminConfiguracoes() {
     staleTime: Infinity,
   })
 
+  // Pré-preenche campos não configurados e não sensíveis com o valor padrão
+  useEffect(() => {
+    if (!grupos || !defaults) return
+    const novasChaves = new Set<string>()
+    setValores((prev) => {
+      const next = { ...prev }
+      for (const configs of Object.values(grupos)) {
+        for (const config of configs) {
+          if (!config.configurado && !config.sensivel && defaults[config.chave] && next[config.chave] === undefined) {
+            next[config.chave] = defaults[config.chave]
+            novasChaves.add(config.chave)
+          }
+        }
+      }
+      return next
+    })
+    setChavesPreenchidasPorDefault((prev) => new Set([...prev, ...novasChaves]))
+  }, [grupos, defaults])
+
   const mutation = useMutation({
     mutationFn: salvarConfiguracoes,
     onSuccess: (novosDados) => {
@@ -411,6 +444,12 @@ export function AdminConfiguracoes() {
 
   function handleChange(chave: string, valor: string) {
     setValores((prev) => ({ ...prev, [chave]: valor }))
+    setChavesPreenchidasPorDefault((prev) => {
+      if (!prev.has(chave)) return prev
+      const novo = new Set(prev)
+      novo.delete(chave)
+      return novo
+    })
     const config = Object.values(grupos ?? {})
       .flat()
       .find((c) => c.chave === chave)
@@ -431,7 +470,8 @@ export function AdminConfiguracoes() {
 
     for (const config of configsDoGrupo) {
       const val = valores[config.chave]
-      if (val !== undefined) {
+      // Não envia se o valor foi apenas pré-preenchido pelo padrão sem edição do usuário
+      if (val !== undefined && !chavesPreenchidasPorDefault.has(config.chave)) {
         dadosGrupo[config.chave] = val
       }
     }
@@ -534,6 +574,7 @@ export function AdminConfiguracoes() {
               salvando={grupoSalvando === grupo}
               salvoSucesso={gruposSalvos.has(grupo)}
               defaults={defaults}
+              chavesPreenchidasPorDefault={chavesPreenchidasPorDefault}
             />
           ))}
         </div>
