@@ -127,6 +127,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     // Gestão de usuários
     Route::get('/usuarios', [AdminUsuarioController::class, 'index']);
+    Route::post('/usuarios', [AdminUsuarioController::class, 'store']);
     Route::get('/usuarios/{usuario}', [AdminUsuarioController::class, 'show']);
     Route::patch('/usuarios/{usuario}', [AdminUsuarioController::class, 'update']);
     Route::delete('/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy']);

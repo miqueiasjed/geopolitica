@@ -9,6 +9,7 @@ import type {
   AdminUsuarioDetalhe,
   AdminUsuariosFiltros,
   AtualizarUsuarioPayload,
+  CriarUsuarioPayload,
   PaginacaoLaravel,
 } from '../types/admin'
 import type { TipoConteudo, PlanoMinimo, Conteudo } from '../types/biblioteca'
@@ -93,6 +94,11 @@ export async function despublicarConteudo(id: number): Promise<void> {
 }
 
 // --- Usuários Admin ---
+
+export async function criarAdminUsuario(payload: CriarUsuarioPayload): Promise<AdminUsuario> {
+  const resposta = await api.post<{ usuario: AdminUsuario }>('/admin/usuarios', payload)
+  return resposta.data.usuario
+}
 
 export async function buscarAdminUsuarios(
   filtros: AdminUsuariosFiltros,

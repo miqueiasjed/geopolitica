@@ -90,3 +90,10 @@ export interface AtualizarUsuarioPayload {
   email?: string
   role?: RoleUsuario
 }
+
+export interface CriarUsuarioPayload {
+  name: string
+  email: string
+  password: string
+  role: RoleUsuario
+}

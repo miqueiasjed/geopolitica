@@ -20,6 +20,7 @@ import {
   ChevronRightIcon,
   MagnifyingGlassIcon,
   Pencil1Icon,
+  PlusIcon,
   ResetIcon,
   TrashIcon,
 } from '@radix-ui/react-icons'
@@ -29,9 +30,10 @@ import {
   atualizarAdminUsuario,
   buscarAdminUsuario,
   buscarAdminUsuarios,
+  criarAdminUsuario,
   excluirAdminUsuario,
 } from '../../services/admin'
-import type { AdminUsuario, AtualizarUsuarioPayload, RoleUsuario } from '../../types/admin'
+import type { AdminUsuario, AtualizarUsuarioPayload, CriarUsuarioPayload, RoleUsuario } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
 
@@ -64,6 +66,138 @@ function badgeColorDaRole(role: string | null) {
 
 function labelDaRole(role: string | null) {
   return ROLES.find((r) => r.valor === role)?.label ?? role ?? '—'
+}
+
+function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
+  const queryClient = useQueryClient()
+  const [nome, setNome] = useState('')
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
+  const [role, setRole] = useState<RoleUsuario>('assinante_essencial')
+  const [erro, setErro] = useState('')
+
+  function resetar() {
+    setNome('')
+    setEmail('')
+    setSenha('')
+    setRole('assinante_essencial')
+    setErro('')
+  }
+
+  const mutacao = useMutation({
+    mutationFn: (payload: CriarUsuarioPayload) => criarAdminUsuario(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.all })
+      resetar()
+      onFechar()
+    },
+    onError: (err: { response?: { data?: { errors?: Record<string, string[]>; message?: string } } }) => {
+      const erros = err.response?.data?.errors
+      if (erros) {
+        setErro(Object.values(erros).flat().join(' '))
+      } else {
+        setErro(err.response?.data?.message ?? 'Erro ao criar usuário.')
+      }
+    },
+  })
+
+  function salvar() {
+    setErro('')
+    mutacao.mutate({ name: nome, email, password: senha, role })
+  }
+
+  return (
+    <Dialog.Root
+      open={aberto}
+      onOpenChange={(v) => {
+        if (!v) {
+          resetar()
+          onFechar()
+        }
+      }}
+    >
+      <Dialog.Content maxWidth="480px">
+        <Dialog.Title>Novo usuário</Dialog.Title>
+        <Dialog.Description size="2" mb="4" className="text-zinc-400">
+          Crie um usuário manualmente e atribua um perfil de acesso.
+        </Dialog.Description>
+
+        <Flex direction="column" gap="4">
+          <label className="space-y-1.5">
+            <Text size="2" weight="medium">
+              Nome
+            </Text>
+            <TextField.Root
+              size="3"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Nome completo"
+            />
+          </label>
+
+          <label className="space-y-1.5">
+            <Text size="2" weight="medium">
+              E-mail
+            </Text>
+            <TextField.Root
+              size="3"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@dominio.com"
+            />
+          </label>
+
+          <label className="space-y-1.5">
+            <Text size="2" weight="medium">
+              Senha
+            </Text>
+            <TextField.Root
+              size="3"
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="Mínimo 8 caracteres"
+            />
+          </label>
+
+          <label className="space-y-1.5">
+            <Text size="2" weight="medium">
+              Perfil (role)
+            </Text>
+            <Select.Root value={role} onValueChange={(v) => setRole(v as RoleUsuario)}>
+              <Select.Trigger className="w-full" />
+              <Select.Content>
+                {ROLES.map((r) => (
+                  <Select.Item key={r.valor} value={r.valor}>
+                    {r.label}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </label>
+
+          {erro && (
+            <Text size="2" color="ruby">
+              {erro}
+            </Text>
+          )}
+        </Flex>
+
+        <Flex gap="3" mt="5" justify="end">
+          <Dialog.Close>
+            <Button variant="soft" color="gray">
+              Cancelar
+            </Button>
+          </Dialog.Close>
+          <Button onClick={salvar} disabled={mutacao.isPending}>
+            {mutacao.isPending ? <Spinner size="1" /> : null}
+            Criar usuário
+          </Button>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
+  )
 }
 
 function ModalEdicao({
@@ -292,6 +426,7 @@ export function AdminUsuarios() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
+  const [criando, setCriando] = useState(false)
   const [usuarioEditando, setUsuarioEditando] = useState<AdminUsuario | null>(null)
   const [usuarioExcluindo, setUsuarioExcluindo] = useState<AdminUsuario | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
@@ -330,9 +465,15 @@ export function AdminUsuarios() {
             </Text>
           </Box>
 
-          <Badge size="3" color="cyan" variant="soft">
-            {total} registros
-          </Badge>
+          <Flex gap="3" align="center">
+            <Badge size="3" color="cyan" variant="soft">
+              {total} registros
+            </Badge>
+            <Button size="2" onClick={() => setCriando(true)}>
+              <PlusIcon />
+              Novo usuário
+            </Button>
+          </Flex>
         </Flex>
 
         <Card size="4" className="border border-cyan-400/10 bg-slate-950/80 backdrop-blur">
@@ -502,6 +643,8 @@ export function AdminUsuarios() {
           </Flex>
         </Card>
       </div>
+
+      <ModalCriacao aberto={criando} onFechar={() => setCriando(false)} />
 
       {usuarioEditando && (
         <ModalEdicao

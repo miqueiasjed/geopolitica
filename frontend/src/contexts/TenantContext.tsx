@@ -24,15 +24,22 @@ const TenantContext = createContext<TenantContextValue>({
 
 function detectarSubdominio(): string | null {
   const hostname = window.location.hostname
-  const partes = hostname.split('.')
 
-  // Aceita subdomínio quando há pelo menos 3 partes (sub.dominio.tld) ou
-  // quando não é localhost nem www
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return null
   }
 
-  if (partes.length >= 3 && partes[0] !== 'www') {
+  const partes = hostname.split('.')
+
+  // ccTLDs de segundo nível (.com.br, .net.br, etc.) fazem o domínio raiz ter 3 segmentos.
+  // Nesses casos precisamos de 4+ partes para ter subdomínio real.
+  const ccTLDs2Nivel = ['com', 'net', 'org', 'edu', 'gov', 'mil', 'art', 'esp', 'rec', 'tur', 'adv', 'arq', 'ato', 'bio', 'bmd', 'cim', 'cng', 'cnt', 'coop', 'ecn', 'eco', 'eng', 'etc', 'eti', 'far', 'fnd', 'fot', 'fst', 'g12', 'ggf', 'imb', 'ind', 'inf', 'jor', 'jus', 'leg', 'lel', 'mat', 'med', 'mus', 'not', 'ntr', 'odo', 'ppg', 'pro', 'psc', 'psi', 'qsl', 'radio', 'slg', 'srv', 'taxi', 'teo', 'tmp', 'trd', 'tur', 'tv', 'vet', 'zlg']
+  const tld = partes[partes.length - 1]
+  const sld = partes[partes.length - 2]
+  const ehCcTLD2Nivel = tld === 'br' && ccTLDs2Nivel.includes(sld)
+  const minimoPartes = ehCcTLD2Nivel ? 4 : 3
+
+  if (partes.length >= minimoPartes && partes[0] !== 'www') {
     return partes[0]
   }
 

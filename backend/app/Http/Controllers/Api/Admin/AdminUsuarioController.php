@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AtualizarUsuarioRequest;
+use App\Http\Requests\CriarUsuarioRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUsuarioController extends Controller
 {
@@ -39,6 +40,25 @@ class AdminUsuarioController extends Controller
             'current_page' => $usuarios->currentPage(),
             'last_page'    => $usuarios->lastPage(),
         ]);
+    }
+
+    public function store(CriarUsuarioRequest $request): JsonResponse
+    {
+        $dados = $request->validated();
+
+        $user = User::create([
+            'name'     => $dados['name'],
+            'email'    => $dados['email'],
+            'password' => Hash::make($dados['password']),
+        ]);
+
+        $user->assignRole($dados['role']);
+        $user->load('roles');
+
+        return response()->json([
+            'message' => 'Usuário criado com sucesso.',
+            'usuario' => $this->serializar($user),
+        ], 201);
     }
 
     public function show(int $usuario): JsonResponse
