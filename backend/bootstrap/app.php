@@ -20,7 +20,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
-        $middleware->redirectGuestsTo(null);
         $middleware->alias([
             'assinante.ativo'    => \App\Http\Middleware\EnsureAssinanteAtivo::class,
             'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
