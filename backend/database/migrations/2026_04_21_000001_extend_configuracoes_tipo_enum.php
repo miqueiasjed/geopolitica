@@ -1,17 +1,26 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE configuracoes MODIFY COLUMN tipo ENUM('texto','senha','numero','select','textarea') NOT NULL DEFAULT 'texto'");
+        Schema::table('configuracoes', function (Blueprint $table) {
+            $table->enum('tipo', ['texto', 'senha', 'numero', 'select', 'textarea'])
+                ->default('texto')
+                ->change();
+        });
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE configuracoes MODIFY COLUMN tipo ENUM('texto','senha','numero') NOT NULL DEFAULT 'texto'");
+        Schema::table('configuracoes', function (Blueprint $table) {
+            $table->enum('tipo', ['texto', 'senha', 'numero'])
+                ->default('texto')
+                ->change();
+        });
     }
 };
