@@ -18,16 +18,41 @@ class FeedUpdaterService
 
     public function atualizar(): array
     {
-        $itensColetados = Source::query()
-            ->ativos()
-            ->get()
+        $fontes = Source::query()->ativos()->get();
+
+        Log::channel('pipeline')->info('[FeedUpdater] Fontes ativas encontradas.', [
+            'total_fontes' => $fontes->count(),
+            'fontes' => $fontes->pluck('nome', 'id')->toArray(),
+        ]);
+
+        if ($fontes->isEmpty()) {
+            Log::channel('pipeline')->warning('[FeedUpdater] Nenhuma fonte ativa cadastrada. Nada a coletar.');
+        }
+
+        $itensColetados = $fontes
             ->flatMap(fn (Source $source) => $this->rssFetcherService->fetchSource($source))
             ->values();
+
+        Log::channel('pipeline')->info('[FeedUpdater] Coleta RSS concluída.', [
+            'total_itens_coletados' => $itensColetados->count(),
+        ]);
+
+        if ($itensColetados->isEmpty()) {
+            Log::channel('pipeline')->warning('[FeedUpdater] Nenhum item novo coletado do RSS. Possíveis causas: fontes sem itens recentes, todos já existem no banco, ou erro de rede.');
+
+            return ['coletados' => 0, 'novos' => 0, 'salvos' => 0];
+        }
 
         $itensAnalisados = $itensColetados
             ->chunk(5)
             ->flatMap(fn (Collection $lote) => $this->aiAnalyzerService->analisar($lote->all()))
             ->values();
+
+        Log::channel('pipeline')->info('[FeedUpdater] Análise IA concluída.', [
+            'total_analisados' => $itensAnalisados->count(),
+            'relevantes' => $itensAnalisados->where('relevante', true)->count(),
+            'nao_relevantes' => $itensAnalisados->where('relevante', false)->count(),
+        ]);
 
         $salvos = 0;
 
@@ -53,6 +78,11 @@ class FeedUpdaterService
                     'fonte_url' => $item['fonte_url'] ?? null,
                     'erro' => $exception->getMessage(),
                 ]);
+                Log::channel('pipeline')->error('[FeedUpdater] Falha ao persistir evento.', [
+                    'fonte_url' => $item['fonte_url'] ?? null,
+                    'titulo' => $item['titulo'] ?? null,
+                    'erro' => $exception->getMessage(),
+                ]);
             }
         }
 
@@ -61,6 +91,8 @@ class FeedUpdaterService
             'novos' => $itensAnalisados->count(),
             'salvos' => $salvos,
         ];
+
+        Log::channel('pipeline')->info('[FeedUpdater] Persistência concluída.', $resultado);
 
         if ($resultado['salvos'] < $resultado['novos']) {
             Log::warning('Nem todos os eventos analisados foram persistidos.', $resultado);

@@ -30,6 +30,7 @@ export function useFeed(filters: FeedFilters) {
     queryFn: ({ pageParam }) => fetchFeed({ cursor: pageParam, filters }),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.links.next_cursor ?? null,
+    staleTime: 5 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
     refetchIntervalInBackground: true,
   })

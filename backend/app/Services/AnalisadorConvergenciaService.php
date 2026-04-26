@@ -17,11 +17,22 @@ class AnalisadorConvergenciaService
 
         $sinais = SinalPadrao::where('analisado_em', '>=', now()->subHours($janela))->get();
 
+        Log::channel('pipeline')->info('[Convergencia] Sinais encontrados na janela de análise.', [
+            'janela_horas' => $janela,
+            'total_sinais' => $sinais->count(),
+        ]);
+
         if ($sinais->isEmpty()) {
+            Log::channel('pipeline')->info('[Convergencia] Nenhum sinal na janela — sem alertas para gerar.');
+
             return;
         }
 
         $sinaisPorRegiao = $sinais->groupBy('regiao');
+
+        Log::channel('pipeline')->info('[Convergencia] Distribuição de sinais por região.', [
+            'regioes' => $sinaisPorRegiao->map(fn ($s) => $s->count())->toArray(),
+        ]);
 
         foreach ($sinaisPorRegiao as $regiao => $sinaisDaRegiao) {
             if (! $regiao) {
@@ -36,7 +47,17 @@ class AnalisadorConvergenciaService
     {
         $tiposUnicos = $sinais->pluck('tipo_padrao')->unique();
 
+        Log::channel('pipeline')->info('[Convergencia] Verificando região.', [
+            'regiao' => $regiao,
+            'total_sinais' => $sinais->count(),
+            'tipos_unicos' => $tiposUnicos->values()->all(),
+        ]);
+
         if ($tiposUnicos->count() < 2) {
+            Log::channel('pipeline')->info('[Convergencia] Região sem convergência (menos de 2 tipos distintos).', [
+                'regiao' => $regiao,
+            ]);
+
             return;
         }
 
@@ -53,6 +74,13 @@ class AnalisadorConvergenciaService
             default                       => null,
         };
 
+        Log::channel('pipeline')->info('[Convergencia] Peso calculado para região.', [
+            'regiao' => $regiao,
+            'peso_total' => $pesoTotal,
+            'nivel_detectado' => $nivel ?? 'abaixo_do_limiar',
+            'limiares' => ['critical' => $limiarCritical, 'high' => $limiarHigh, 'medium' => $limiarMedium],
+        ]);
+
         if ($nivel === null) {
             return;
         }
@@ -62,8 +90,19 @@ class AnalisadorConvergenciaService
             ->exists();
 
         if ($jaExiste) {
+            Log::channel('pipeline')->info('[Convergencia] Alerta já existe nas últimas 48h — ignorando.', [
+                'regiao' => $regiao,
+                'nivel' => $nivel,
+            ]);
+
             return;
         }
+
+        Log::channel('pipeline')->info('[Convergencia] Gerando novo alerta.', [
+            'regiao' => $regiao,
+            'nivel' => $nivel,
+            'peso_total' => $pesoTotal,
+        ]);
 
         $this->gerarAlerta($regiao, $nivel, $sinais, (int) $pesoTotal);
     }

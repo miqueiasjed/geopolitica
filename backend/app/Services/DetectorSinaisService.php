@@ -12,11 +12,30 @@ class DetectorSinaisService
 {
     public function detectar(): void
     {
-        Event::ultimas48h()
+        $eventos = Event::ultimas48h()
             ->whereNotIn('id', SinalPadrao::select('event_id'))
-            ->get()
-            ->chunk(5)
-            ->each(fn (Collection $lote) => $this->analisarLote($lote));
+            ->get();
+
+        Log::channel('pipeline')->info('[DetectorSinais] Eventos encontrados para análise.', [
+            'total_eventos_nao_analisados' => $eventos->count(),
+        ]);
+
+        if ($eventos->isEmpty()) {
+            Log::channel('pipeline')->info('[DetectorSinais] Nenhum evento pendente de detecção de sinais.');
+
+            return;
+        }
+
+        $sinaisAntes = SinalPadrao::count();
+
+        $eventos->chunk(5)->each(fn (Collection $lote) => $this->analisarLote($lote));
+
+        $sinaisCriados = SinalPadrao::count() - $sinaisAntes;
+
+        Log::channel('pipeline')->info('[DetectorSinais] Detecção concluída.', [
+            'eventos_processados' => $eventos->count(),
+            'sinais_criados' => $sinaisCriados,
+        ]);
     }
 
     private function extrairJson(string $texto): string
@@ -30,6 +49,10 @@ class DetectorSinaisService
 
     private function analisarLote(Collection $eventos): void
     {
+        Log::channel('pipeline')->info('[DetectorSinais] Analisando lote via IA.', [
+            'event_ids' => $eventos->pluck('id')->all(),
+        ]);
+
         try {
             $dadosEventos = $eventos->map(fn (Event $evento) => [
                 'id'         => $evento->id,
@@ -57,9 +80,14 @@ class DetectorSinaisService
                 Log::warning('DetectorSinaisService: resposta da IA não é um JSON array válido.', [
                     'resposta' => $texto,
                 ]);
+                Log::channel('pipeline')->warning('[DetectorSinais] Resposta da IA inválida (não é JSON array).', [
+                    'resposta_bruta' => mb_substr($texto, 0, 300),
+                ]);
 
                 return;
             }
+
+            $criados = 0;
 
             foreach ($sinais as $sinal) {
                 if (! is_array($sinal)) {
@@ -83,10 +111,22 @@ class DetectorSinaisService
                     'confianca'   => $sinal['confianca'] ?? 0,
                     'analisado_em' => now(),
                 ]);
+
+                $criados++;
             }
+
+            Log::channel('pipeline')->info('[DetectorSinais] Sinais criados no lote.', [
+                'sinais_na_resposta_ia' => count($sinais),
+                'sinais_criados' => $criados,
+            ]);
         } catch (\Throwable $erro) {
             Log::warning('DetectorSinaisService: falha ao analisar lote de eventos.', [
                 'erro'       => $erro->getMessage(),
+                'evento_ids' => $eventos->pluck('id')->all(),
+            ]);
+            Log::channel('pipeline')->error('[DetectorSinais] ERRO ao analisar lote.', [
+                'erro' => $erro->getMessage(),
+                'classe_erro' => get_class($erro),
                 'evento_ids' => $eventos->pluck('id')->all(),
             ]);
         }

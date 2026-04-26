@@ -22,7 +22,21 @@ class ProcessFeedUpdateJob implements ShouldQueue
 
     public function handle(FeedUpdaterService $feedUpdaterService): void
     {
+        $inicio = now();
+
+        Log::channel('pipeline')->info('[Feed] ===== INICIANDO ProcessFeedUpdateJob =====', [
+            'hora_inicio' => $inicio->toDateTimeString(),
+        ]);
+
         $resultado = $feedUpdaterService->atualizar();
+
+        $duracao = $inicio->diffInSeconds(now());
+
+        Log::channel('pipeline')->info('[Feed] ===== CONCLUÍDO ProcessFeedUpdateJob =====', [
+            ...$resultado,
+            'duracao_segundos' => $duracao,
+            'hora_fim' => now()->toDateTimeString(),
+        ]);
 
         Log::info('Atualização do feed processada.', $resultado);
     }

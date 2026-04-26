@@ -118,6 +118,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'pipeline' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/pipeline.log'),
+            'level' => 'debug',
+            'replace_placeholders' => true,
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

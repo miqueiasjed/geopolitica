@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\AnalisadorConvergenciaService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 
 class AnalisarConvergenciaJob implements ShouldQueue
 {
@@ -21,6 +22,16 @@ class AnalisarConvergenciaJob implements ShouldQueue
 
     public function handle(AnalisadorConvergenciaService $servico): void
     {
+        $inicio = now();
+        Log::channel('pipeline')->info('[AnalisarConvergencia] ===== INICIANDO AnalisarConvergenciaJob =====', [
+            'hora_inicio' => $inicio->toDateTimeString(),
+        ]);
+
         $servico->analisar();
+
+        Log::channel('pipeline')->info('[AnalisarConvergencia] ===== CONCLUÍDO AnalisarConvergenciaJob =====', [
+            'duracao_segundos' => $inicio->diffInSeconds(now()),
+            'hora_fim' => now()->toDateTimeString(),
+        ]);
     }
 }

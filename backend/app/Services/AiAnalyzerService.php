@@ -17,22 +17,52 @@ class AiAnalyzerService
             return [];
         }
 
+        $temApiKey = AiProviderFactory::hasApiKey();
+        $provider = config('ai.provider', 'claude');
+
+        Log::channel('pipeline')->info('[AiAnalyzer] Iniciando análise de lote.', [
+            'total_itens' => count($itens),
+            'provider' => $provider,
+            'tem_api_key' => $temApiKey,
+            'modo' => $temApiKey ? 'IA_REAL' : 'FALLBACK_LOCAL',
+        ]);
+
         try {
-            if (! AiProviderFactory::hasApiKey()) {
+            if (! $temApiKey) {
+                Log::channel('pipeline')->warning('[AiAnalyzer] API key ausente — usando análise heurística local (sem IA).', [
+                    'provider' => $provider,
+                    'config_key' => $provider === 'openai' ? 'ai.openai.api_key' : 'claude.api_key',
+                ]);
+
                 return array_map(fn (array $item) => $this->analisarLocalmente($item), $itens);
             }
 
             $conteudo = $this->solicitarAnalise($itens);
             $analises = $this->parsearResposta($conteudo, count($itens));
 
-            return array_map(
+            $resultado = array_map(
                 fn (array $item, array $analise) => $this->enriquecerItem($item, $analise),
                 $itens,
                 $analises,
             );
+
+            $relevantes = count(array_filter($resultado, fn ($r) => $r['relevante'] ?? false));
+
+            Log::channel('pipeline')->info('[AiAnalyzer] Análise IA concluída.', [
+                'total_itens' => count($resultado),
+                'relevantes' => $relevantes,
+                'nao_relevantes' => count($resultado) - $relevantes,
+            ]);
+
+            return $resultado;
         } catch (\Throwable $throwable) {
             Log::warning('Falha ao analisar feed com Claude. Aplicando fallback local.', [
                 'erro' => $throwable->getMessage(),
+            ]);
+            Log::channel('pipeline')->error('[AiAnalyzer] ERRO na chamada IA — usando fallback local.', [
+                'erro' => $throwable->getMessage(),
+                'classe_erro' => get_class($throwable),
+                'provider' => $provider,
             ]);
 
             return array_map(fn (array $item) => $this->analisarLocalmente($item), $itens);

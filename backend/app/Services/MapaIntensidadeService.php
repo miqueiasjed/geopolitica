@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MapaIntensidadeService
 {
@@ -17,11 +18,28 @@ class MapaIntensidadeService
      */
     public function obter(): array
     {
-        return Cache::remember(
+        $emCache = Cache::has(self::CHAVE_CACHE);
+
+        $dados = Cache::remember(
             self::CHAVE_CACHE,
             now()->addMinutes(self::TTL_MINUTOS),
-            fn () => ['paises' => DB::table('mapa_intensidade')->get()->toArray()]
+            function () {
+                $paises = DB::table('mapa_intensidade')->get();
+                Log::channel('pipeline')->info('[MapaIntensidade] Dados buscados do banco.', [
+                    'total_paises' => $paises->count(),
+                ]);
+
+                return ['paises' => $paises->toArray()];
+            }
         );
+
+        if ($emCache) {
+            Log::channel('pipeline')->info('[MapaIntensidade] Dados servidos do cache Redis.', [
+                'total_paises' => count($dados['paises'] ?? []),
+            ]);
+        }
+
+        return $dados;
     }
 
     /**
