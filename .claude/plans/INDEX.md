@@ -31,7 +31,7 @@
 | 17 | [Admin IA v2: Modo de Teste de Prompt (F4)](17.md) | ✅ | 16 | 5 |
 | 18 | [Admin IA v2: Painel de Uso da IA (F3)](18.md) | ✅ | 15, 17 | 7 |
 | 19 | [Add-ons: Banco de Dados e Serviço Central](19.md) | ✅ | 3, 7 | 5 |
-| 20 | [Webhook Lastlink e E-mail de Boas-vindas do Add-on](20.md) | ⏳ | 19 | 4 |
+| 20 | [Webhook Lastlink e E-mail de Boas-vindas do Add-on](20.md) | ✅ | 19 | 4 |
 | 21 | [Monitor Eleitoral e Monitor de Guerra (Frontend + Backend)](21.md) | ⏳ | 19, 20, 13, 4, 5, 7, 8 | 6 |
 
 ## Ordem de execução recomendada
@@ -85,5 +85,5 @@
 | Admin IA v2 – F4 | Plano 17 | ✅ |
 | Admin IA v2 – F3 | Plano 18 | ✅ |
 | M13 – Add-ons (banco + serviço) | Plano 19 | ✅ |
-| M13 – Webhook Lastlink | Plano 20 | ⏳ |
+| M13 – Webhook Lastlink | Plano 20 | ✅ |
 | M13 – Monitor Eleitoral + Guerra | Plano 21 | ⏳ |

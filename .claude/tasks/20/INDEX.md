@@ -11,10 +11,10 @@
 
 | # | Título | Tipo | Status | Complexidade |
 |---|--------|------|--------|--------------|
-| 20.1 | WebhookLastlinkController, FormRequest e rota | backend-endpoint | ⏳ | baixa |
-| 20.2 | LastlinkHandlerService: registrarEvento e handleCompra | backend-logica | ⏳ | média |
-| 20.3 | LastlinkHandlerService: handleCancelamento + AddonBoasVindasMail | backend-logica | ⏳ | média |
-| 20.4 | Testes de feature: Webhook Lastlink | teste | ⏳ | média |
+| 20.1 | WebhookLastlinkController, FormRequest e rota | backend-endpoint | ✅ | baixa |
+| 20.2 | LastlinkHandlerService: registrarEvento e handleCompra | backend-logica | ✅ | média |
+| 20.3 | LastlinkHandlerService: handleCancelamento + AddonBoasVindasMail | backend-logica | ✅ | média |
+| 20.4 | Testes de feature: Webhook Lastlink | teste | ✅ | média |
 
 ## Ordem de execução
 20.1 → 20.2 → 20.3 → 20.4

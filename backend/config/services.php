@@ -26,6 +26,10 @@ return [
         'webhook_token' => env('HOTMART_WEBHOOK_TOKEN'),
     ],
 
+    'lastlink' => [
+        'webhook_token' => env('LASTLINK_WEBHOOK_SECRET'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

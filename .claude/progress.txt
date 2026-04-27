@@ -120,3 +120,13 @@
 - Gotcha 3: User model tinha atributos PHP #[Fillable]/#[Hidden] inexistentes no Laravel 12 — substituídos pelas propriedades $fillable/$hidden padrão.
 - Testes: AddonServiceTest 8/8 passando; HotmartAddonTest 4/4 passando; WebhookHotmartTest 2/2 sem regressão.
 - Bug preexistente (não desta task): FeedTest > unauthenticated returns 401 falha por rota `login` não definida.
+
+2026-04-27 (Plano 20)
+- Plano 20 concluído: Webhook Lastlink e E-mail de Boas-vindas do Add-on.
+- Controller WebhookLastlinkController (sempre retorna 200); FormRequest ReceberWebhookLastlinkRequest (rules vazio — payload Lastlink variável); rota POST /api/webhook/lastlink sem auth.
+- LastlinkHandlerService: registrarEvento() com prefixo LASTLINK_ no event_type; handle() com match nos eventos (APPROVED/COMPLETE/PAID → compra; CANCELLED/REFUNDED/CHARGEBACK → cancelamento); handleCompra() cria conta Essencial se comprador não existe; handleCancelamento() delega ao AddonService.
+- AddonBoasVindasMail: Mailable com dois fluxos — contaNova=true (link de redefinição de senha), contaNova=false (link para /dashboard); template blade mantendo estilo visual dos e-mails do projeto.
+- config/services.php: entrada lastlink.webhook_token mapeando LASTLINK_WEBHOOK_SECRET.
+- Migration: coluna fonte (nullable string) adicionada à tabela webhook_eventos + campo adicionado ao fillable do model WebhookEvento.
+- Gotcha: WebhookEvento não tinha coluna fonte — necessário criar migration adicional e atualizar fillable.
+- Testes: WebhookLastlinkTest 5/5; WebhookHotmartTest 2/2 (sem regressão); AddonServiceTest 8/8.

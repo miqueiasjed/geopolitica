@@ -32,6 +32,7 @@ use App\Http\Controllers\MapaIntensidadeController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RegiaoEventosController;
 use App\Http\Controllers\WebhookHotmartController;
+use App\Http\Controllers\WebhookLastlinkController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -82,6 +83,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 });
 
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
+Route::post('/webhook/lastlink', [WebhookLastlinkController::class, 'receber']);
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('chat')->group(function () {
     Route::post('/perguntar', [ChatController::class, 'perguntar']);

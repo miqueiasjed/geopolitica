@@ -9,6 +9,7 @@ class WebhookEvento extends Model
     protected $table = 'webhook_eventos';
 
     protected $fillable = [
+        'fonte',
         'event_type',
         'hotmart_subscriber_code',
         'email',
