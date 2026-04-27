@@ -106,3 +106,17 @@
 - Frontend: tipos AiUsoResumo/AiUsoHistoricoDia/AiUsoServico/AiUsoData em types/ai.ts; hook useAiUso (staleTime 60s, refetchInterval 120s); UsoPage.tsx com 8 cards de resumo (hoje/mês), banner âmbar de threshold quando custo_mes >= threshold_alerta_usd, tabela por serviço; AiUsoGrafico.tsx com gráfico de barras CSS puro (sem lib de charts, 7 barras sempre completas, altura proporcional ao custo, tooltip nativo, cor azul/verde por provider) e badge de provider ativo com preços de referência; rota /admin/ia/uso registrada no router.
 - Gotcha: ConfiguracaoServiceProvider tinha `catch (\Exception)` que não capturava erros de desserialização do Redis (Throwable); corrigido para `catch (\Throwable)` — bloqueava todos os Artisan commands.
 - Validações: php artisan migrate ✓, ai:limpar-logs ✓, schedule:list confirmado às 03:00, route:list GET /api/admin/ai/uso ✓, npx tsc --noEmit zero erros, npm run build ✓ (1538 módulos).
+
+2026-04-27
+- Plano 19 concluído: Add-ons: Banco de Dados e Serviço Central (M13).
+- Migrations: coluna `addons` JSON nullable em `assinantes` (accessor garante retorno como array); tabela `assinante_addons` (histórico com user_id, addon_key, status, fonte, order_id, product_id, iniciado_em, expira_em, índices em [user_id,status] e [addon_key,status]); coluna `vertical_conteudo` nullable em `conteudos` com índice.
+- Models: `AssinanteAddon` com fillable, scopeAtivo, belongsTo(User), constantes ADDON_KEYS/FONTES; `Assinante` atualizado com cast addons=>array, hasMany(AssinanteAddon), temAddon(), temAcessoVertical() (lógica plano Pro inclui elections; Reservado inclui elections+war).
+- Config: `config/addons.php` mapeando product_ids via env HOTMART_PRODUCT_ELECTIONS, HOTMART_PRODUCT_WAR, LASTLINK_PRODUCT_ELECTIONS, LASTLINK_PRODUCT_WAR.
+- AddonService: ativar() idempotente (não duplica addon_key no array); cancelar() silencioso se addon não existe; resolverAddonKey() estático consulta config.
+- HotmartHandlerService: método resolverTipoCompra() inspeciona 4 caminhos do payload para product_id; handlers de ativação/cancelamento bifurcam addon vs plano.
+- Gate `acessar-vertical` registrado no AppServiceProvider delegando para assinante->temAcessoVertical().
+- Gotcha 1: MySQL 9.x não suporta DEFAULT '[]' em colunas JSON via DDL — coluna criada como nullable + accessor no model como fallback.
+- Gotcha 2: ao criar Assinante com addons via json_encode() nos testes, o cast Eloquent serializava novamente gerando double-encode — passar array nativo diretamente nos fixtures.
+- Gotcha 3: User model tinha atributos PHP #[Fillable]/#[Hidden] inexistentes no Laravel 12 — substituídos pelas propriedades $fillable/$hidden padrão.
+- Testes: AddonServiceTest 8/8 passando; HotmartAddonTest 4/4 passando; WebhookHotmartTest 2/2 sem regressão.
+- Bug preexistente (não desta task): FeedTest > unauthenticated returns 401 falha por rota `login` não definida.

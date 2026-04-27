@@ -64,31 +64,79 @@ class HotmartHandlerService
 
     private function handlePurchaseApproved(array $payload): void
     {
+        $tipo = $this->resolverTipoCompra($payload);
+
+        if ($tipo['tipo'] === 'addon') {
+            $this->ativarAddon($payload, $tipo['addon_key']);
+
+            return;
+        }
+
         $this->ativarAssinatura($payload, enviarBoasVindas: true);
     }
 
     private function handlePurchaseComplete(array $payload): void
     {
+        $tipo = $this->resolverTipoCompra($payload);
+
+        if ($tipo['tipo'] === 'addon') {
+            $this->ativarAddon($payload, $tipo['addon_key']);
+
+            return;
+        }
+
         $this->ativarAssinatura($payload, enviarBoasVindas: true);
     }
 
     private function handlePurchaseCanceled(array $payload): void
     {
+        $tipo = $this->resolverTipoCompra($payload);
+
+        if ($tipo['tipo'] === 'addon') {
+            $this->cancelarAddon($payload, $tipo['addon_key'], 'cancelado');
+
+            return;
+        }
+
         $this->desativarAssinatura($payload, 'cancelado', enviarReembolso: false);
     }
 
     private function handlePurchaseRefunded(array $payload): void
     {
+        $tipo = $this->resolverTipoCompra($payload);
+
+        if ($tipo['tipo'] === 'addon') {
+            $this->cancelarAddon($payload, $tipo['addon_key'], 'reembolsado');
+
+            return;
+        }
+
         $this->desativarAssinatura($payload, 'reembolsado', enviarReembolso: true);
     }
 
     private function handlePurchaseChargeback(array $payload): void
     {
+        $tipo = $this->resolverTipoCompra($payload);
+
+        if ($tipo['tipo'] === 'addon') {
+            $this->cancelarAddon($payload, $tipo['addon_key'], 'cancelado');
+
+            return;
+        }
+
         $this->desativarAssinatura($payload, 'chargeback', enviarReembolso: false);
     }
 
     private function handlePurchaseExpired(array $payload): void
     {
+        $tipo = $this->resolverTipoCompra($payload);
+
+        if ($tipo['tipo'] === 'addon') {
+            $this->cancelarAddon($payload, $tipo['addon_key'], 'expirado');
+
+            return;
+        }
+
         $this->desativarAssinatura($payload, 'expirado', enviarReembolso: false);
     }
 
@@ -115,6 +163,65 @@ class HotmartHandlerService
                 $plano,
             ));
         }
+    }
+
+    private function resolverTipoCompra(array $payload): array
+    {
+        $productId = $this->extrairValor($payload, [
+            'data.purchase.product.id',
+            'data.product.id',
+            'purchase.product.id',
+            'product.id',
+        ]);
+
+        if ($productId) {
+            $addonKey = AddonService::resolverAddonKey($productId, 'hotmart');
+
+            if ($addonKey !== null) {
+                return ['tipo' => 'addon', 'addon_key' => $addonKey];
+            }
+        }
+
+        return ['tipo' => 'plano'];
+    }
+
+    private function ativarAddon(array $payload, string $addonKey): void
+    {
+        $email = $this->extrairEmail($payload);
+
+        if (! $email) {
+            throw new RuntimeException('Nao foi possivel identificar o e-mail do comprador no payload Hotmart.');
+        }
+
+        $usuario = User::query()->where('email', $email)->firstOrFail();
+
+        $orderId = $this->extrairValor($payload, [
+            'data.purchase.order_date',
+            'data.purchase.transaction',
+            'purchase.transaction',
+        ]);
+
+        $productId = $this->extrairValor($payload, [
+            'data.purchase.product.id',
+            'data.product.id',
+            'purchase.product.id',
+            'product.id',
+        ]);
+
+        (new AddonService())->ativar($usuario->id, $addonKey, 'hotmart', $orderId, $productId);
+    }
+
+    private function cancelarAddon(array $payload, string $addonKey, string $motivo): void
+    {
+        $email = $this->extrairEmail($payload);
+
+        if (! $email) {
+            throw new RuntimeException('Nao foi possivel identificar o e-mail do comprador no payload Hotmart.');
+        }
+
+        $usuario = User::query()->where('email', $email)->firstOrFail();
+
+        (new AddonService())->cancelar($usuario->id, $addonKey, $motivo);
     }
 
     private function ativarAssinatura(array $payload, bool $enviarBoasVindas): void

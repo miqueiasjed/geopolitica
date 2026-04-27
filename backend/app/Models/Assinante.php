@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Assinante extends Model
 {
@@ -14,6 +15,7 @@ class Assinante extends Model
         'plano',
         'ativo',
         'status',
+        'addons',
         'hotmart_subscriber_code',
         'assinado_em',
         'expira_em',
@@ -22,9 +24,10 @@ class Assinante extends Model
     protected function casts(): array
     {
         return [
-            'ativo' => 'boolean',
+            'ativo'       => 'boolean',
+            'addons'      => 'array',
             'assinado_em' => 'datetime',
-            'expira_em' => 'datetime',
+            'expira_em'   => 'datetime',
         ];
     }
 
@@ -36,5 +39,35 @@ class Assinante extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assinanteAddons(): HasMany
+    {
+        return $this->hasMany(AssinanteAddon::class, 'user_id', 'user_id');
+    }
+
+    public function temAddon(string $addonKey): bool
+    {
+        return in_array($addonKey, $this->addons ?? [], true);
+    }
+
+    public function getAddonsAttribute($valor): array
+    {
+        if (is_array($valor)) {
+            return $valor;
+        }
+
+        $decodificado = json_decode($valor ?? '[]', true);
+
+        return is_array($decodificado) ? $decodificado : [];
+    }
+
+    public function temAcessoVertical(string $addonKey): bool
+    {
+        return match ($addonKey) {
+            'elections' => in_array($this->plano, ['pro', 'reservado'], true) || $this->temAddon('elections'),
+            'war'       => $this->plano === 'reservado' || $this->temAddon('war'),
+            default     => false,
+        };
     }
 }
