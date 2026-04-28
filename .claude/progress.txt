@@ -158,3 +158,8 @@
 - Integração: ConteudoLeitura.tsx, PerfilPaisPage.tsx e ChatMessage.tsx atualizados com o botão.
 - Gotcha: ChatMessage encontrado em components/chat/ChatMessage.tsx (não em ChatBriefings.tsx diretamente); botão só aparece quando !mensagem.streaming && mensagem.id !== undefined.
 - Validações: npx tsc --noEmit zero erros; npm run build 1550 módulos OK; rota POST api/export-pdf confirmada via artisan route:list.
+- Plano 23 concluído: Relatório Personalizado por IA (M15).
+- Backend: 2 migrations (relatorios_ia com UUID PK + uso_relatorios com unique user_id+month_key), 2 models (RelatorioIa + UsoRelatorio), RelatorioIaService (verificarLimite por plano/mês com fuso SP, coletarContexto nas 4 fontes via FULLTEXT, gerarComStreaming com status generating→completed/failed, incremento uso_relatorios), RelatorioIaController (3 endpoints SSE + JSON), 3 rotas auth:sanctum+assinante.ativo.
+- Frontend: hook useGerarRelatorio (SSE via ReadableStream+TextDecoder, preview concatenado token a token, erroLimite, resetar), página NovoRelatorio.tsx (formulário com 5 sugestões, preview Markdown, ExportPdfButton após conclusão), página RelatoriosIA.tsx (histórico com useQuery, cards com stagger Framer Motion, expansão inline com react-markdown), rotas /dashboard/relatorios e /dashboard/relatorios/novo adicionadas, item "Relatórios" inserido no TopNav.
+- Gotcha: Framer Motion Variants com ease: 'easeOut' como string puro falha no TypeScript — precisa de 'easeOut' as const para satisfazer o tipo Easing.
+- Validações: php artisan migrate OK, php artisan route:list confirmou 3 rotas, npm run build 1553 módulos OK (zero erros TS).

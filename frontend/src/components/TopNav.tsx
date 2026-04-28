@@ -103,6 +103,11 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       isActive: (p) => p === '/dashboard/chat',
       icon: chatIcon,
     },
+    {
+      to: '/dashboard/relatorios',
+      label: 'Relatórios',
+      isActive: (p) => p.startsWith('/dashboard/relatorios'),
+    },
     ...(isB2B && user?.role === 'company_admin'
       ? [
           {

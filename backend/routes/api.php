@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\ExportPdfController;
+use App\Http\Controllers\Api\RelatorioIaController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ChatHistoricoController;
@@ -108,6 +109,12 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::post('/export-pdf', [ExportPdfController::class, 'exportar']);
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::post('/relatorios', [RelatorioIaController::class, 'gerar']);
+    Route::get('/relatorios', [RelatorioIaController::class, 'historico']);
+    Route::get('/relatorios/{id}', [RelatorioIaController::class, 'show']);
 });
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {

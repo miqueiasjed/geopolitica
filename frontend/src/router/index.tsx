@@ -32,6 +32,8 @@ import { PerfilPaisPage } from '../pages/PerfilPaisPage'
 import { ChatBriefings } from '../pages/ChatBriefings'
 import { MonitorEleitoral } from '../pages/dashboard/MonitorEleitoral'
 import { MonitorGuerra } from '../pages/dashboard/MonitorGuerra'
+import { RelatoriosIA } from '../pages/dashboard/RelatoriosIA'
+import { NovoRelatorio } from '../pages/dashboard/NovoRelatorio'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -58,6 +60,8 @@ export function AppRouter() {
           <Route path="/dashboard/monitor-eleitoral" element={<MonitorEleitoral />} />
           <Route path="/dashboard/monitor-guerra" element={<MonitorGuerra />} />
           <Route path="/dashboard/chat" element={<ChatBriefings />} />
+          <Route path="/dashboard/relatorios" element={<RelatoriosIA />} />
+          <Route path="/dashboard/relatorios/novo" element={<NovoRelatorio />} />
           <Route path="/paises" element={<MeusPaisesPage />} />
           <Route path="/paises/:codigo" element={<PerfilPaisPage />} />
           <Route path="/perfil" element={<Perfil />} />

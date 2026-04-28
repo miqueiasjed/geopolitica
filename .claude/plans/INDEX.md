@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-28 (Plano 22 concluído — M14 Exportação para PDF)
+> Última atualização: 2026-04-28 (Plano 23 concluído — M15 Relatório Personalizado por IA)
 
 ## Legenda
 - ✅ Concluído
@@ -34,7 +34,7 @@
 | 20 | [Webhook Lastlink e E-mail de Boas-vindas do Add-on](20.md) | ✅ | 19 | 4 |
 | 21 | [Monitor Eleitoral e Monitor de Guerra (Frontend + Backend)](21.md) | ✅ | 19, 20, 13, 4, 5, 7, 8 | 6 |
 | 22 | [Exportação para PDF (M14)](22.md) | ✅ | 7, 10, 11, 14, 15 | 7 |
-| 23 | [Relatório Personalizado por IA (M15)](23.md) | ⏳ | 7, 11, 12, 4, 14, 22 | 7 |
+| 23 | [Relatório Personalizado por IA (M15)](23.md) | ✅ | 7, 11, 12, 4, 14, 22 | 7 |
 | 24 | [Risk Score de Portfólio (M16)](24.md) | ⏳ | 4, 10, 22, 19, 21 | 9 |
 
 ## Ordem de execução recomendada
@@ -91,5 +91,5 @@
 | M13 – Webhook Lastlink | Plano 20 | ✅ |
 | M13 – Monitor Eleitoral + Guerra | Plano 21 | ✅ |
 | M14 – Exportação para PDF | Plano 22 | ✅ |
-| M15 – Relatório Personalizado por IA | Plano 23 | ⏳ |
+| M15 – Relatório Personalizado por IA | Plano 23 | ✅ |
 | M16 – Risk Score de Portfólio | Plano 24 | ⏳ |
