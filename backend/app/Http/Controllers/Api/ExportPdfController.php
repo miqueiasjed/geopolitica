@@ -18,7 +18,7 @@ class ExportPdfController extends Controller
         // Exceção documentada: validação inline permitida pois o payload é simples
         // e não há lógica de negócio na validação (apenas tipagem/enum de entrada).
         $request->validate([
-            'tipo'         => 'required|string|in:briefing,alerta,pais,chat',
+            'tipo'         => 'required|string|in:briefing,alerta,pais,chat,report,risk_score',
             'id'           => 'required|string',
             'company_slug' => 'nullable|string|max:100',
         ]);

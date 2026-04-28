@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             PaisesInicialSeeder::class,
             DadosProducaoFakeSeeder::class,
             ConfiguracaoSeeder::class,
+            MapaRiscoAtivosSeeder::class,
         ]);
     }
 }

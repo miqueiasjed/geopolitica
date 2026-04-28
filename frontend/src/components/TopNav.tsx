@@ -46,6 +46,9 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const { tenant, isB2B } = useTenant()
   const temAcessoEleitoral = useAddonAccess('elections')
   const temAcessoGuerra = useAddonAccess('war')
+  const temAcessoRiskScore = ['pro', 'reservado', 'admin'].includes(
+    user?.assinante?.plano ?? user?.role ?? '',
+  )
   const [painelAberto, setPainelAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
 
@@ -108,6 +111,15 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       label: 'Relatórios',
       isActive: (p) => p.startsWith('/dashboard/relatorios'),
     },
+    ...(temAcessoRiskScore
+      ? [
+          {
+            to: '/dashboard/risk-score',
+            label: 'Risk Score',
+            isActive: (p: string) => p === '/dashboard/risk-score',
+          },
+        ]
+      : []),
     ...(isB2B && user?.role === 'company_admin'
       ? [
           {

@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\AlertaPreditivo;
+use App\Models\Carteira;
 use App\Models\ChatMensagem;
 use App\Models\Conteudo;
 use App\Models\Empresa;
 use App\Models\PerfilPais;
+use App\Models\RelatorioIa;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -30,11 +32,13 @@ class PdfTemplateService
     private function buscarDados(string $tipo, string $id, int $userId): array
     {
         return match ($tipo) {
-            'briefing' => $this->buscarBriefing($id),
-            'alerta'   => $this->buscarAlerta($id),
-            'pais'     => $this->buscarPais($id),
-            'chat'     => $this->buscarChat($id, $userId),
-            default    => throw new \InvalidArgumentException("Tipo de exportação inválido: {$tipo}"),
+            'briefing'   => $this->buscarBriefing($id),
+            'alerta'     => $this->buscarAlerta($id),
+            'pais'       => $this->buscarPais($id),
+            'chat'       => $this->buscarChat($id, $userId),
+            'report'     => $this->buscarRelatorio($id, $userId),
+            'risk_score' => $this->buscarRiskScore($userId),
+            default      => throw new \InvalidArgumentException("Tipo de exportação inválido: {$tipo}"),
         };
     }
 
@@ -75,6 +79,26 @@ class PdfTemplateService
         }
 
         return ['mensagem' => $mensagem];
+    }
+
+    private function buscarRelatorio(string $id, int $userId): array
+    {
+        $relatorio = RelatorioIa::where('id', $id)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
+        return ['relatorio' => $relatorio];
+    }
+
+    private function buscarRiskScore(int $userId): array
+    {
+        $carteira = Carteira::where('user_id', $userId)->firstOrFail();
+
+        $score = app(\App\Services\RiskScoreService::class)->calcularRiscoPortfolio(
+            $carteira->ativos ?? []
+        );
+
+        return ['carteira' => array_merge($carteira->toArray(), ['ultimo_score' => $score])];
     }
 
     /**
