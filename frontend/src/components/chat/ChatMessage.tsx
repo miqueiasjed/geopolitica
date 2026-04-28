@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import type { ChatMensagem } from '../../types/chat'
+import { ExportPdfButton } from '../ExportPdfButton'
 
 interface ChatMessageProps {
   mensagem: ChatMensagem
@@ -105,6 +106,11 @@ export function ChatMessage({ mensagem }: ChatMessageProps) {
         </div>
         {horario && (
           <span className="font-mono text-[10px] text-zinc-600">{horario}</span>
+        )}
+        {!mensagem.streaming && mensagem.id !== undefined && (
+          <div className="mt-1">
+            <ExportPdfButton tipo="chat" id={String(mensagem.id)} label="Exportar resposta" />
+          </div>
         )}
       </div>
     </div>

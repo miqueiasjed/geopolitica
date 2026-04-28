@@ -4,6 +4,7 @@ import { ArrowLeftIcon, GlobeIcon } from '@radix-ui/react-icons'
 import { usePerfilPais } from '../hooks/usePerfilPais'
 import { useEventosPais } from '../hooks/useEventosPais'
 import { useMeusPaises } from '../hooks/useMeusPaises'
+import { ExportPdfButton } from '../components/ExportPdfButton'
 
 function formatDataRelativa(dataIso: string): string {
   const agora = new Date()
@@ -163,36 +164,39 @@ export function PerfilPaisPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            disabled={isPendente}
-            onClick={handleToggleAcompanhar}
-            className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-              jaAcompanha
-                ? 'border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20'
-                : 'border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882] hover:bg-[#C9B882]/20'
-            }`}
-          >
-            {isPendente ? (
-              <>
-                <svg
-                  className="h-3 w-3 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Aguarde...
-              </>
-            ) : jaAcompanha ? (
-              'Parar de acompanhar'
-            ) : (
-              'Acompanhar'
-            )}
-          </button>
+          <div className="flex flex-shrink-0 flex-col items-end gap-2">
+            <button
+              type="button"
+              disabled={isPendente}
+              onClick={handleToggleAcompanhar}
+              className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                jaAcompanha
+                  ? 'border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                  : 'border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882] hover:bg-[#C9B882]/20'
+              }`}
+            >
+              {isPendente ? (
+                <>
+                  <svg
+                    className="h-3 w-3 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Aguarde...
+                </>
+              ) : jaAcompanha ? (
+                'Parar de acompanhar'
+              ) : (
+                'Acompanhar'
+              )}
+            </button>
+            <ExportPdfButton tipo="pais" id={perfil.codigo_pais} label="Exportar perfil" />
+          </div>
         </div>
       </div>
 

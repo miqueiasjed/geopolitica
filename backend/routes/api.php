@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
 use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\EmpresaController;
+use App\Http\Controllers\Api\ExportPdfController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ChatHistoricoController;
@@ -103,6 +104,10 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/war-feed', [WarFeedController::class, 'index']);
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::post('/export-pdf', [ExportPdfController::class, 'exportar']);
 });
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {

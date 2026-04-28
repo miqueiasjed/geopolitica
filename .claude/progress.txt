@@ -146,3 +146,15 @@
 - Gotcha: imports com alias src/ não configurado no tsconfig do frontend — corrigidos para caminhos relativos.
 - Validações: 15 testes backend passando; npx tsc --noEmit zero erros; npm run build 1549 módulos OK.
 - Todos os 21 planos do projeto concluídos. Módulos M00–M13 implementados.
+
+2026-04-28 — Plano 22 — Exportação para PDF (M14)
+- barryvdh/laravel-dompdf v3.1.2 instalado e configurado (A4, portrait, serif, enable_remote=true).
+- 5 templates Blade criados em resources/views/pdf/: layout.blade.php (header com logo B2B condicional, footer com disclaimer), briefing.blade.php, alerta.blade.php, pais.blade.php, chat.blade.php.
+- PdfTemplateService: busca dados por tipo (briefing/alerta/pais/chat), valida ownership em chat, substitui logo B2B via Empresa.subdominio, gera buffer PDF com DomPDF.
+- Gotcha: LicencaB2B não tem company_slug — o campo correto fica na model Empresa (subdominio=slug, logo_url=logo).
+- Gotcha: PerfilPais usa codigo_pais como PK string (não id numérico) — lookup usa orWhere.
+- ExportPdfController: POST /api/export-pdf protegido por auth:sanctum + assinante.ativo, captura ModelNotFoundException(404), InvalidArgumentException(422), AuthorizationException(403).
+- ExportPdfButton.tsx: componente React com loading state, download via Blob + <a> dinâmico, token via useAuth().
+- Integração: ConteudoLeitura.tsx, PerfilPaisPage.tsx e ChatMessage.tsx atualizados com o botão.
+- Gotcha: ChatMessage encontrado em components/chat/ChatMessage.tsx (não em ChatBriefings.tsx diretamente); botão só aparece quando !mensagem.streaming && mensagem.id !== undefined.
+- Validações: npx tsc --noEmit zero erros; npm run build 1550 módulos OK; rota POST api/export-pdf confirmada via artisan route:list.
