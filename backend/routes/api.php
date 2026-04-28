@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\PaisController;
 use App\Http\Controllers\Api\PaisUsuarioController;
 use App\Http\Controllers\Api\TimelineController;
 use App\Http\Controllers\Api\TimelineDetailController;
+use App\Http\Controllers\Api\WarFeedController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MapaIntensidadeController;
 use App\Http\Controllers\PerfilController;
@@ -98,6 +99,10 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/meus-paises', [PaisUsuarioController::class, 'index']);
     Route::post('/meus-paises', [PaisUsuarioController::class, 'store']);
     Route::delete('/meus-paises/{codigo}', [PaisUsuarioController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/war-feed', [WarFeedController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {

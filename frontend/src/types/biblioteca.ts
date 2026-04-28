@@ -1,5 +1,6 @@
 export type TipoConteudo = 'briefing' | 'mapa' | 'tese'
 export type PlanoMinimo = 'essencial' | 'pro' | 'reservado'
+export type VerticalConteudo = 'elections' | 'war'
 
 export interface ConteudoCard {
   id: number
@@ -16,6 +17,7 @@ export interface ConteudoCard {
 export interface Conteudo extends ConteudoCard {
   corpo: string // HTML
   plano_minimo: PlanoMinimo
+  vertical_conteudo?: VerticalConteudo | null
 }
 
 export interface BibliotecaFiltros {

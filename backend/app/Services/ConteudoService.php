@@ -30,6 +30,10 @@ class ConteudoService
             $query->where('regiao', $regiao);
         }
 
+        if ($vertical = $filtros['vertical'] ?? null) {
+            $query->where('vertical_conteudo', $vertical);
+        }
+
         if ($de = $filtros['de'] ?? null) {
             $query->where('publicado_em', '>=', $de);
         }

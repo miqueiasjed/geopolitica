@@ -130,3 +130,19 @@
 - Migration: coluna fonte (nullable string) adicionada à tabela webhook_eventos + campo adicionado ao fillable do model WebhookEvento.
 - Gotcha: WebhookEvento não tinha coluna fonte — necessário criar migration adicional e atualizar fillable.
 - Testes: WebhookLastlinkTest 5/5; WebhookHotmartTest 2/2 (sem regressão); AddonServiceTest 8/8.
+
+2026-04-27 (Plano 21)
+- Plano 21 concluído: Monitor Eleitoral e Monitor de Guerra (Frontend + Backend). Último plano do Módulo 13.
+- Backend: WarFeedService com filtro JSON_SEARCH em categorias='military' OR impact_label IN ('CRÍTICO','ALTO'), paginação por cursor; WarFeedController fino com Gate acessar-vertical; ConteudoService atualizado com filtro por vertical; BibliotecaFiltroRequest com param vertical; ConteudoCardResource com vertical_conteudo.
+- Frontend types: VerticalConteudo = 'elections'|'war' em biblioteca.ts; addons?: string[] em Assinante (auth.ts); vertical_conteudo em Conteudo; CriarConteudoPayload atualizado.
+- AdminNovoConteudo: campo Select vertical_conteudo (GPI Core / Monitor Eleitoral / Monitor de Guerra) após plano_minimo; enviado como null quando vazio.
+- useAddonAccess: hook que lê plano e addons do AuthContext; retorna true para elections se plano=pro/reservado ou addons inclui elections; true para war se plano=reservado ou addons inclui war.
+- AddonGate: componente paywall centralizado (min-h-60vh), label "ACESSO EXCLUSIVO", título serif, descrição, card de preço borda dourada, CTA abrindo Lastlink em _blank, nota de upgrade de plano.
+- MonitorEleitoral: page com gate useAddonAccess('elections'); reutiliza useEleicoes/EleicaoFilterBar/RadarGrid/EleicaoDetailPanel do RadarEleicoes; seção briefings eleitorais com useQuery GET /conteudos?vertical=elections.
+- MonitorGuerra: page com gate useAddonAccess('war'); useWarFeed (useInfiniteQuery /war-feed?cursor&limit=20); EventCard reutilizado do Feed; seção briefings de guerra com useQuery GET /conteudos?vertical=war.
+- Rotas: /dashboard/monitor-eleitoral e /dashboard/monitor-guerra adicionadas ao router dentro de RotaProtegida+DashboardLayout.
+- TopNav: itens condicionais Monitor Eleitoral (LightningBoltIcon) e Monitor de Guerra (Crosshair2Icon) via useAddonAccess.
+- Gotcha: tabela real chama-se events (não eventos) com campos relevante/categorias/publicado_em — não is_active/categories/published_at.
+- Gotcha: imports com alias src/ não configurado no tsconfig do frontend — corrigidos para caminhos relativos.
+- Validações: 15 testes backend passando; npx tsc --noEmit zero erros; npm run build 1549 módulos OK.
+- Todos os 21 planos do projeto concluídos. Módulos M00–M13 implementados.

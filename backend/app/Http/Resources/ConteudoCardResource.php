@@ -17,8 +17,9 @@ class ConteudoCardResource extends JsonResource
             'resumo'        => $this->resumo,
             'regiao'        => $this->regiao,
             'tags'          => $this->tags ?? [],
-            'tese_manchete' => $this->tese_manchete,
-            'publicado_em'  => $this->publicado_em?->toIso8601String(),
+            'tese_manchete'     => $this->tese_manchete,
+            'vertical_conteudo' => $this->vertical_conteudo,
+            'publicado_em'      => $this->publicado_em?->toIso8601String(),
         ];
     }
 }

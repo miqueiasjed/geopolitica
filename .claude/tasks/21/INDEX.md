@@ -11,12 +11,12 @@
 
 | # | Título | Tipo | Status | Complexidade |
 |---|--------|------|--------|--------------|
-| 21.1 | Backend: endpoint GET /api/war-feed e filtro vertical em conteudos | backend-endpoint | ⏳ | média |
-| 21.2 | Admin: campo vertical_conteudo no formulário de conteúdo | frontend-componente | ⏳ | baixa |
-| 21.3 | Hook useAddonAccess e componente AddonGate | frontend-componente | ⏳ | baixa |
-| 21.4 | Página MonitorEleitoral | frontend-pagina | ⏳ | média |
-| 21.5 | Página MonitorGuerra | frontend-pagina | ⏳ | média |
-| 21.6 | Navegação condicional e rotas protegidas | frontend-componente | ⏳ | baixa |
+| 21.1 | Backend: endpoint GET /api/war-feed e filtro vertical em conteudos | backend-endpoint | ✅ | média |
+| 21.2 | Admin: campo vertical_conteudo no formulário de conteúdo | frontend-componente | ✅ | baixa |
+| 21.3 | Hook useAddonAccess e componente AddonGate | frontend-componente | ✅ | baixa |
+| 21.4 | Página MonitorEleitoral | frontend-pagina | ✅ | média |
+| 21.5 | Página MonitorGuerra | frontend-pagina | ✅ | média |
+| 21.6 | Navegação condicional e rotas protegidas | frontend-componente | ✅ | baixa |
 
 ## Ordem de execução
 21.1 → 21.2 → 21.3 → 21.4 → 21.5 → 21.6

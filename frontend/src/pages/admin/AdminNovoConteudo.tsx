@@ -18,7 +18,7 @@ import {
 import { ChevronLeftIcon } from '@radix-ui/react-icons'
 import { AdminEditor } from '../../components/biblioteca/AdminEditor'
 import { criarConteudo } from '../../services/admin'
-import type { TipoConteudo, PlanoMinimo } from '../../types/biblioteca'
+import type { TipoConteudo, PlanoMinimo, VerticalConteudo } from '../../types/biblioteca'
 
 interface FormErros {
   titulo?: string
@@ -36,6 +36,7 @@ export function AdminNovoConteudo() {
   const [tags, setTags] = useState('')
   const [resumo, setResumo] = useState('')
   const [planoMinimo, setPlanoMinimo] = useState<PlanoMinimo>('essencial')
+  const [verticalConteudo, setVerticalConteudo] = useState<VerticalConteudo | ''>('')
   const [corpo, setCorpo] = useState('')
   const [publicado, setPublicado] = useState(false)
   const [erros, setErros] = useState<FormErros>({})
@@ -84,6 +85,7 @@ export function AdminNovoConteudo() {
       tags: tagsArray.length > 0 ? tagsArray : undefined,
       resumo: resumo.trim() || undefined,
       plano_minimo: planoMinimo,
+      vertical_conteudo: verticalConteudo || null,
       corpo,
       publicado,
     })
@@ -246,6 +248,24 @@ export function AdminNovoConteudo() {
                     <Select.Item value="essencial">Essencial</Select.Item>
                     <Select.Item value="pro">Pro</Select.Item>
                     <Select.Item value="reservado">Reservado</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+              </label>
+
+              {/* Vertical de conteúdo */}
+              <label className="space-y-2">
+                <Text size="2" weight="medium">
+                  Vertical de conteúdo
+                </Text>
+                <Select.Root
+                  value={verticalConteudo}
+                  onValueChange={(valor) => setVerticalConteudo(valor as VerticalConteudo | '')}
+                >
+                  <Select.Trigger className="w-full" />
+                  <Select.Content>
+                    <Select.Item value="">GPI Core (sem vertical)</Select.Item>
+                    <Select.Item value="elections">Monitor Eleitoral</Select.Item>
+                    <Select.Item value="war">Monitor de Guerra</Select.Item>
                   </Select.Content>
                 </Select.Root>
               </label>

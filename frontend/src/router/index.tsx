@@ -30,6 +30,8 @@ import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
 import { PerfilPaisPage } from '../pages/PerfilPaisPage'
 import { ChatBriefings } from '../pages/ChatBriefings'
+import { MonitorEleitoral } from '../pages/dashboard/MonitorEleitoral'
+import { MonitorGuerra } from '../pages/dashboard/MonitorGuerra'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -53,6 +55,8 @@ export function AppRouter() {
           <Route path="/dashboard/biblioteca/:slug" element={<ConteudoLeitura />} />
           <Route path="/dashboard/timeline" element={<Timeline />} />
           <Route path="/dashboard/eleicoes" element={<RadarEleicoes />} />
+          <Route path="/dashboard/monitor-eleitoral" element={<MonitorEleitoral />} />
+          <Route path="/dashboard/monitor-guerra" element={<MonitorGuerra />} />
           <Route path="/dashboard/chat" element={<ChatBriefings />} />
           <Route path="/paises" element={<MeusPaisesPage />} />
           <Route path="/paises/:codigo" element={<PerfilPaisPage />} />

@@ -19,8 +19,9 @@ class BibliotecaFiltroRequest extends FormRequest
             'regiao' => ['nullable', 'string', 'max:100'],
             'de'     => ['nullable', 'date'],
             'ate'    => ['nullable', 'date', 'after_or_equal:de'],
-            'cursor' => ['nullable', 'integer', 'min:1'],
-            'limite' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'cursor'   => ['nullable', 'integer', 'min:1'],
+            'limite'   => ['nullable', 'integer', 'min:1', 'max:50'],
+            'vertical' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

@@ -1,4 +1,4 @@
-import { Cross2Icon, ExitIcon, GlobeIcon, HamburgerMenuIcon } from '@radix-ui/react-icons'
+import { Cross2Icon, Crosshair2Icon, ExitIcon, GlobeIcon, HamburgerMenuIcon, LightningBoltIcon } from '@radix-ui/react-icons'
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -6,6 +6,7 @@ import { AlertaBadge } from './alertas/AlertaBadge'
 import { AlertaPanel } from './alertas/AlertaPanel'
 import { useAuth } from '../hooks/useAuth'
 import { useTenant } from '../contexts/TenantContext'
+import { useAddonAccess } from '../hooks/useAddonAccess'
 
 interface TopNavProps {
   lastUpdatedLabel: string
@@ -43,6 +44,8 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
   const { tenant, isB2B } = useTenant()
+  const temAcessoEleitoral = useAddonAccess('elections')
+  const temAcessoGuerra = useAddonAccess('war')
   const [painelAberto, setPainelAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
 
@@ -68,6 +71,26 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       label: '📅 Radar de Eleições',
       isActive: (p) => p === '/dashboard/eleicoes',
     },
+    ...(temAcessoEleitoral
+      ? [
+          {
+            to: '/dashboard/monitor-eleitoral',
+            label: 'Monitor Eleitoral',
+            isActive: (p: string) => p === '/dashboard/monitor-eleitoral',
+            icon: <LightningBoltIcon className="h-3 w-3" />,
+          },
+        ]
+      : []),
+    ...(temAcessoGuerra
+      ? [
+          {
+            to: '/dashboard/monitor-guerra',
+            label: 'Monitor de Guerra',
+            isActive: (p: string) => p === '/dashboard/monitor-guerra',
+            icon: <Crosshair2Icon className="h-3 w-3" />,
+          },
+        ]
+      : []),
     {
       to: '/paises',
       label: 'Meus Países',

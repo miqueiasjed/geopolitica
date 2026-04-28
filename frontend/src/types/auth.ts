@@ -3,6 +3,7 @@ export interface Assinante {
   plano: string
   ativo: boolean
   status: string
+  addons?: string[]
   hotmart_subscriber_code?: string | null
   assinado_em?: string | null
   expira_em?: string | null
