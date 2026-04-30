@@ -37,6 +37,8 @@ import { MonitorGuerra } from '../pages/dashboard/MonitorGuerra'
 import { RelatoriosIA } from '../pages/dashboard/RelatoriosIA'
 import { NovoRelatorio } from '../pages/dashboard/NovoRelatorio'
 import { RiskScore } from '../pages/dashboard/RiskScore'
+import { Suporte } from '../pages/dashboard/Suporte'
+import { AdminSuporte } from '../pages/admin/AdminSuporte'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -67,6 +69,7 @@ export function AppRouter() {
           <Route path="/dashboard/relatorios" element={<RelatoriosIA />} />
           <Route path="/dashboard/relatorios/novo" element={<NovoRelatorio />} />
           <Route path="/dashboard/risk-score" element={<RiskScore />} />
+          <Route path="/dashboard/suporte" element={<Suporte />} />
           <Route path="/paises" element={<MeusPaisesPage />} />
           <Route path="/paises/:codigo" element={<PerfilPaisPage />} />
           <Route path="/perfil" element={<Perfil />} />
@@ -91,6 +94,7 @@ export function AppRouter() {
           <Route path="planos" element={<AdminPlanos />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
           <Route path="ia/uso" element={<UsoPage />} />
+          <Route path="suporte" element={<AdminSuporte />} />
         </Route>
       </Route>
     </Routes>

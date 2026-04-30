@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminAiTestController;
+use App\Http\Controllers\Api\Admin\AdminSuporteController;
 use App\Http\Controllers\Api\Admin\AdminPlanoController;
 use App\Http\Controllers\Api\Admin\AdminAiUsoController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
 use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\Admin\ImportarAssinantesController;
+use App\Http\Controllers\Api\SuporteController;
 use App\Http\Controllers\Api\CarteiraRiscoController;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\ExportPdfController;
@@ -131,6 +133,13 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::post('/carteira', [CarteiraRiscoController::class, 'calcular']);
 });
 
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('suporte')->group(function () {
+    Route::get('/tickets', [SuporteController::class, 'index']);
+    Route::post('/tickets', [SuporteController::class, 'store']);
+    Route::get('/tickets/{id}', [SuporteController::class, 'show']);
+    Route::post('/tickets/{id}/responder', [SuporteController::class, 'responder']);
+});
+
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
     Route::post('/assinantes/importar', [ImportarAssinantesController::class, 'store']);
@@ -189,6 +198,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/b2b/empresas', [AdminB2BController::class, 'store']);
     Route::patch('/b2b/empresas/{id}', [AdminB2BController::class, 'update']);
     Route::post('/b2b/empresas/{id}/renovar', [AdminB2BController::class, 'renovar']);
+
+    // Suporte
+    Route::get('/suporte/tickets', [AdminSuporteController::class, 'index']);
+    Route::get('/suporte/tickets/nao-lidos', [AdminSuporteController::class, 'naoLidos']);
+    Route::get('/suporte/tickets/{id}', [AdminSuporteController::class, 'show']);
+    Route::post('/suporte/tickets/{id}/responder', [AdminSuporteController::class, 'responder']);
+    Route::patch('/suporte/tickets/{id}/fechar', [AdminSuporteController::class, 'fechar']);
 
     // Gestão de planos e recursos
     Route::get('/planos', [AdminPlanoController::class, 'index']);

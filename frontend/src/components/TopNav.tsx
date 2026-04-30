@@ -12,6 +12,7 @@ import {
   LightningBoltIcon,
   LockClosedIcon,
   PersonIcon,
+  QuestionMarkCircledIcon,
   ReaderIcon,
 } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion'
@@ -158,6 +159,13 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
           },
         ]
       : []),
+    {
+      to: '/dashboard/suporte',
+      label: 'Suporte',
+      eyebrow: 'Ajuda',
+      isActive: (p: string) => p === '/dashboard/suporte',
+      icon: <QuestionMarkCircledIcon />,
+    },
   ]
 
   const brandEl = isB2B && tenant ? (
