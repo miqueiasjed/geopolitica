@@ -3,6 +3,7 @@ import { DashboardLayout } from '../components/DashboardLayout'
 import { RotaProtegida } from '../components/RotaProtegida'
 import { useAuth } from '../hooks/useAuth'
 import { Feed } from '../pages/Feed'
+import { EventDetail } from '../pages/EventDetail'
 import { Mapa } from '../pages/Mapa'
 import { EsqueciSenha } from '../pages/EsqueciSenha'
 import { Login } from '../pages/Login'
@@ -54,6 +55,7 @@ export function AppRouter() {
       <Route element={<RotaProtegida />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/feed" element={<Feed />} />
+          <Route path="/dashboard/feed/:id" element={<EventDetail />} />
           <Route path="/dashboard/mapa" element={<Mapa />} />
           <Route path="/dashboard/biblioteca" element={<Biblioteca />} />
           <Route path="/dashboard/biblioteca/:slug" element={<ConteudoLeitura />} />

@@ -20,6 +20,11 @@ export interface FeedFilters {
   label?: ImpactLabel
 }
 
+export interface Editorial {
+  headline: string
+  legenda: string
+}
+
 export interface FeedPage {
   data: Event[]
   links: {

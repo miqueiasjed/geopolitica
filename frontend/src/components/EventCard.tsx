@@ -1,5 +1,6 @@
 import { GlobeIcon } from '@radix-ui/react-icons'
 import { motion, useReducedMotion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { ImpactBadge } from './ImpactBadge'
 import type { Event, ImpactLabel } from '../types/feed'
 import { formatDistanceToNow } from '../utils/relativeTime'
@@ -25,6 +26,7 @@ function formatPublishedAt(date: string | null) {
 
 export function EventCard({ event }: EventCardProps) {
   const prefersReducedMotion = useReducedMotion()
+  const navigate = useNavigate()
   const publishedAt = formatPublishedAt(event.publicado_em)
 
   return (
@@ -32,7 +34,8 @@ export function EventCard({ event }: EventCardProps) {
       initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut' }}
-      className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#BFFF3C]/30 sm:p-5"
+      onClick={() => navigate(`/dashboard/feed/${event.id}`)}
+      className="cursor-pointer rounded-2xl border border-[#1e1e20] bg-[#111113] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#BFFF3C]/30 sm:p-5"
     >
       <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-4">
@@ -49,21 +52,9 @@ export function EventCard({ event }: EventCardProps) {
               <span className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">{publishedAt}</span>
             </div>
 
-            {event.fonte_url ? (
-              <a
-                href={event.fonte_url}
-                target="_blank"
-                rel="noreferrer"
-                title={event.titulo}
-                className="line-clamp-2 text-lg font-medium text-white transition-colors hover:text-[#BFFF3C]"
-              >
-                {event.titulo}
-              </a>
-            ) : (
-              <h2 title={event.titulo} className="line-clamp-2 text-lg font-medium text-white">
-                {event.titulo}
-              </h2>
-            )}
+            <h2 title={event.titulo} className="line-clamp-2 text-lg font-medium text-white">
+              {event.titulo}
+            </h2>
           </div>
         </div>
 

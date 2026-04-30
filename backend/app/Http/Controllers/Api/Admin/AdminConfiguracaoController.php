@@ -29,6 +29,7 @@ class AdminConfiguracaoController extends Controller
             'prompt_convergencia_sistema' => 'convergencia_sistema',
             'prompt_perfil_contexto'      => 'perfil_contexto',
             'prompt_perfil_lideranca'     => 'perfil_lideranca',
+            'prompt_editorial_sistema'    => 'editorial_sistema',
         ];
 
         $defaults = [];

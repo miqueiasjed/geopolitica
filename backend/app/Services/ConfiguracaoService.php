@@ -31,6 +31,7 @@ class ConfiguracaoService
         'prompt_convergencia_sistema' => 'ai.prompts.convergencia_sistema',
         'prompt_perfil_contexto'      => 'ai.prompts.perfil_contexto',
         'prompt_perfil_lideranca'     => 'ai.prompts.perfil_lideranca',
+        'prompt_editorial_sistema'    => 'ai.prompts.editorial_sistema',
         // E-mail
         'resend_api_key'              => 'services.resend.key',
         'resend_from_email'           => 'mail.from.address',
@@ -396,6 +397,18 @@ class ConfiguracaoService
                 'trigger'  => 'Ação admin (gerar perfil)',
                 'saida'    => 'Texto livre',
                 'variaveis'=> ['{{pais}}'],
+            ],
+            [
+                'chave'    => 'prompt_editorial_sistema',
+                'label'    => 'Editorial — @danuzioneto',
+                'descricao'=> 'Prompt para geração de HEADLINE + LEGENDA no padrão editorial da página. Sem variáveis — o evento é enviado como mensagem do usuário.',
+                'grupo'    => 'prompts',
+                'tipo'     => 'textarea',
+                'sensivel' => false,
+                'tela'     => 'Feed de Tensões (detalhe do evento)',
+                'trigger'  => 'Ação do usuário (gerar editorial)',
+                'saida'    => 'Texto: HEADLINE + LEGENDA',
+                'variaveis'=> [],
             ],
         ];
     }
