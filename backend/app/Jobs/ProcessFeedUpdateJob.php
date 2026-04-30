@@ -15,7 +15,7 @@ class ProcessFeedUpdateJob implements ShouldQueue
 
     public int $timeout = 300;
 
-    public function __construct()
+    public function __construct(public readonly string $tier = 'A')
     {
         $this->onQueue('default');
     }
@@ -25,15 +25,17 @@ class ProcessFeedUpdateJob implements ShouldQueue
         $inicio = now();
 
         Log::channel('pipeline')->info('[Feed] ===== INICIANDO ProcessFeedUpdateJob =====', [
+            'tier' => $this->tier,
             'hora_inicio' => $inicio->toDateTimeString(),
         ]);
 
-        $resultado = $feedUpdaterService->atualizar();
+        $resultado = $feedUpdaterService->atualizar($this->tier);
 
         $duracao = $inicio->diffInSeconds(now());
 
         Log::channel('pipeline')->info('[Feed] ===== CONCLUÍDO ProcessFeedUpdateJob =====', [
             ...$resultado,
+            'tier' => $this->tier,
             'duracao_segundos' => $duracao,
             'hora_fim' => now()->toDateTimeString(),
         ]);

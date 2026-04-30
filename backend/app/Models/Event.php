@@ -20,6 +20,7 @@ class Event extends Model
         'regiao',
         'impact_score',
         'impact_label',
+        'brazil_impact_score',
         'categorias',
         'relevante',
         'publicado_em',

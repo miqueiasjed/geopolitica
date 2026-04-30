@@ -22,6 +22,7 @@ class AdminSourceController extends Controller
             'nome'      => ['required', 'string', 'max:255'],
             'rss_url'   => ['required', 'url', 'max:500', 'unique:sources,rss_url'],
             'categoria' => ['required', 'in:geopolitica,economia,defesa,mercados'],
+            'tier'      => ['sometimes', 'in:A,B'],
             'ativo'     => ['boolean'],
         ]);
 
@@ -36,6 +37,7 @@ class AdminSourceController extends Controller
             'nome'      => ['sometimes', 'string', 'max:255'],
             'rss_url'   => ['sometimes', 'url', 'max:500', 'unique:sources,rss_url,' . $source->id],
             'categoria' => ['sometimes', 'in:geopolitica,economia,defesa,mercados'],
+            'tier'      => ['sometimes', 'in:A,B'],
             'ativo'     => ['sometimes', 'boolean'],
         ]);
 

@@ -181,12 +181,14 @@ export interface AtualizarPerfilPaisPayload {
 // --- Fontes RSS ---
 
 export type CategoriaSource = 'geopolitica' | 'economia' | 'defesa' | 'mercados'
+export type TierSource = 'A' | 'B'
 
 export interface AdminSource {
   id: number
   nome: string
   rss_url: string
   categoria: CategoriaSource
+  tier: TierSource
   ativo: boolean
   ultima_coleta_em: string | null
   created_at: string
@@ -196,6 +198,7 @@ export interface CriarSourcePayload {
   nome: string
   rss_url: string
   categoria: CategoriaSource
+  tier: TierSource
   ativo: boolean
 }
 
@@ -203,5 +206,6 @@ export interface AtualizarSourcePayload {
   nome?: string
   rss_url?: string
   categoria?: CategoriaSource
+  tier?: TierSource
   ativo?: boolean
 }

@@ -9,6 +9,26 @@ class AiAnalyzerService
 {
     private const TAMANHO_MAXIMO_LOTE = 5;
 
+    private const BRAZIL_HIGH_IMPACT_TERMS = [
+        // Commodities exportadas pelo Brasil
+        'soja', 'soybean', 'minério', 'iron ore', 'petróleo', 'crude oil',
+        'café', 'coffee', 'açúcar', 'sugar', 'carne', 'beef', 'frango', 'poultry',
+        'fertilizante', 'fertilizer', 'potássio', 'potash', 'ureia', 'urea',
+        // Parceiros comerciais diretos
+        'china', 'estados unidos', 'argentina', 'união europeia', 'alemanha',
+        'brics', 'mercosul', 'omc', 'wto',
+        // Rotas logísticas críticas
+        'estreito de ormuz', 'strait of hormuz', 'canal do panamá', 'panama canal',
+        'cabo da boa esperança', 'cape of good hope', 'mar vermelho', 'red sea',
+        // Indicadores financeiros
+        'fed', 'federal reserve', 'dólar', 'dollar', 'taxa de juros', 'interest rate',
+        'câmbio', 'exchange rate', 'mercados emergentes', 'emerging markets',
+        // Energia
+        'opep', 'opec', 'gás natural', 'natural gas', 'petrobras', 'pré-sal',
+        // Segurança regional
+        'venezuela', 'colômbia', 'bolívia', 'peru', 'narcotráfico', 'drug trafficking',
+    ];
+
     public function analisar(array $itens): array
     {
         $itens = array_values(array_slice($itens, 0, self::TAMANHO_MAXIMO_LOTE));
@@ -110,6 +130,10 @@ class AiAnalyzerService
         $impactScore = min(max($impactScore, 1), 10);
         $relevante = (bool) ($analise['relevante'] ?? false);
 
+        $brazilScore = (int) ($analise['brazil_impact_score'] ?? 5);
+        $brazilScore = min(max($brazilScore, 1), 10);
+        $brazilScore = $this->ajustarBrazilScore($brazilScore, $item);
+
         if (! empty($analise['titulo'])) {
             $item['titulo'] = (string) $analise['titulo'];
         }
@@ -121,12 +145,26 @@ class AiAnalyzerService
             'impact_label' => $relevante
                 ? $this->mapearImpactLabel($impactScore)
                 : 'MONITORAR',
+            'brazil_impact_score' => $brazilScore,
             'analise_ia' => $relevante
                 ? (string) ($analise['analise_ia'] ?? '')
                 : (string) ($analise['analise_ia'] ?? 'Item sem relevância geopolítica material para investidores brasileiros.'),
             'regiao' => $analise['regiao'] ?? null,
             'categorias' => array_values(array_filter((array) ($analise['categorias'] ?? []))),
         ];
+    }
+
+    private function ajustarBrazilScore(int $score, array $item): int
+    {
+        $texto = mb_strtolower(($item['titulo'] ?? '') . ' ' . ($item['resumo'] ?? ''));
+
+        foreach (self::BRAZIL_HIGH_IMPACT_TERMS as $termo) {
+            if (str_contains($texto, mb_strtolower($termo))) {
+                return min(10, $score + 2);
+            }
+        }
+
+        return $score;
     }
 
     private function analisarLocalmente(array $item): array
@@ -183,6 +221,7 @@ class AiAnalyzerService
         return $this->enriquecerItem($item, [
             'relevante' => $relevante,
             'impact_score' => $score,
+            'brazil_impact_score' => 5,
             'analise_ia' => $relevante
                 ? 'Análise gerada localmente por fallback heurístico enquanto a integração externa não estava disponível.'
                 : 'Item sem relevância geopolítica material para investidores brasileiros.',

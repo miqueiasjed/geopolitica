@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ContentCache;
 use App\Models\Event;
 use App\Models\Source;
 use Illuminate\Database\QueryException;
@@ -16,9 +17,13 @@ class FeedUpdaterService
         private readonly EditorialService $editorialService,
     ) {}
 
-    public function atualizar(): array
+    public function atualizar(string $tier = 'A'): array
     {
-        $fontes = Source::query()->ativos()->get();
+        if ($tier === 'B') {
+            return $this->atualizarTierB();
+        }
+
+        $fontes = Source::query()->ativos()->tier($tier)->get();
 
         Log::channel('pipeline')->info('[FeedUpdater] Fontes ativas encontradas.', [
             'total_fontes' => $fontes->count(),
@@ -67,6 +72,7 @@ class FeedUpdaterService
                     'regiao' => $item['regiao'] ?? null,
                     'impact_score' => $item['impact_score'] ?? 1,
                     'impact_label' => $item['impact_label'] ?? 'MONITORAR',
+                    'brazil_impact_score' => $item['brazil_impact_score'] ?? 5,
                     'categorias' => $item['categorias'] ?? [],
                     'relevante' => $item['relevante'] ?? false,
                     'publicado_em' => $item['publicado_em'],
@@ -101,6 +107,59 @@ class FeedUpdaterService
         if ($resultado['salvos'] < $resultado['novos']) {
             Log::warning('Nem todos os eventos analisados foram persistidos.', $resultado);
         }
+
+        return $resultado;
+    }
+
+    private function atualizarTierB(): array
+    {
+        $fontes = Source::query()->ativos()->tier('B')->get();
+
+        Log::channel('pipeline')->info('[FeedUpdater] Tier B — Fontes ativas encontradas.', [
+            'total_fontes' => $fontes->count(),
+        ]);
+
+        if ($fontes->isEmpty()) {
+            return ['coletados' => 0, 'novos' => 0, 'salvos' => 0];
+        }
+
+        $itensColetados = $fontes
+            ->flatMap(fn (Source $source) => $this->rssFetcherService->fetchSource($source))
+            ->values();
+
+        $urlsExistentes = ContentCache::query()
+            ->whereIn('url', $itensColetados->pluck('fonte_url'))
+            ->pluck('url')
+            ->all();
+
+        $novos = $itensColetados->reject(
+            fn (array $item) => in_array($item['fonte_url'], $urlsExistentes, true)
+        );
+
+        $salvos = 0;
+
+        foreach ($novos as $item) {
+            try {
+                ContentCache::query()->create([
+                    'fonte'        => $item['fonte'],
+                    'url'          => $item['fonte_url'],
+                    'titulo'       => $item['titulo'],
+                    'excerpt'      => $item['resumo'] ?? null,
+                    'publicado_em' => $item['publicado_em'],
+                ]);
+                $salvos++;
+            } catch (QueryException) {
+                // URL já existe — ignorar
+            }
+        }
+
+        $resultado = [
+            'coletados' => $itensColetados->count(),
+            'novos' => $novos->count(),
+            'salvos' => $salvos,
+        ];
+
+        Log::channel('pipeline')->info('[FeedUpdater] Tier B — Persistência concluída.', $resultado);
 
         return $resultado;
     }

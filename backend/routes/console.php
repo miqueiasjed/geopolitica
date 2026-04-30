@@ -14,9 +14,14 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// M01 – atualização de feeds: roda no minuto :00
-Schedule::job(new ProcessFeedUpdateJob)
+// M01 – Tier A (notícias): coleta a cada hora
+Schedule::job(new ProcessFeedUpdateJob(tier: 'A'))
     ->hourly()
+    ->withoutOverlapping();
+
+// M01 – Tier B (think tanks): coleta às 6h e 18h BRT (9h e 21h UTC)
+Schedule::job(new ProcessFeedUpdateJob(tier: 'B'))
+    ->twiceDaily(9, 21)
     ->withoutOverlapping();
 
 // M09 – detecção de sinais: roda no minuto :00 (após feed)

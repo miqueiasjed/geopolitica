@@ -51,7 +51,10 @@ class RssFetcherService
                 ->pluck('fonte_url')
                 ->all();
 
-            $source->forceFill(['ultima_coleta_em' => now()])->save();
+            $source->forceFill([
+                'ultima_coleta_em' => now(),
+                'last_successful_fetch' => now(),
+            ])->save();
 
             $novos = $itensColetados
                 ->reject(fn (array $item) => in_array($item['fonte_url'], $urlsExistentes, true))

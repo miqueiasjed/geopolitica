@@ -18,6 +18,7 @@ class FeedConsultaService
             ->when($filtros['categoria'] ?? null, fn ($query, $categoria) => $query->whereJsonContains('categorias', $categoria))
             ->when($filtros['regiao'] ?? null, fn ($query, $regiao) => $query->porRegiao($regiao))
             ->when($filtros['label'] ?? null, fn ($query, $label) => $query->where('impact_label', $label))
+            ->orderByDesc('brazil_impact_score')
             ->orderByDesc('publicado_em')
             ->orderByDesc('id')
             ->cursorPaginate(

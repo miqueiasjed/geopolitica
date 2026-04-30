@@ -4,9 +4,15 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   buscarAdminSources, criarSource, atualizarSource, excluirSource, adminKeys,
 } from '../../services/admin'
-import type { AdminSource, CategoriaSource } from '../../types/admin'
+import type { AdminSource, CategoriaSource, TierSource } from '../../types/admin'
 
 const CATEGORIAS: CategoriaSource[] = ['geopolitica', 'economia', 'defesa', 'mercados']
+const TIERS: TierSource[] = ['A', 'B']
+
+const TIER_DESCRICAO: Record<TierSource, string> = {
+  A: 'A — horária',
+  B: 'B — 2× por dia',
+}
 
 const CATEGORIA_CORES: Record<CategoriaSource, string> = {
   geopolitica: 'border-blue-500/40 bg-blue-500/10 text-blue-300',
@@ -19,10 +25,11 @@ interface FormState {
   nome: string
   rss_url: string
   categoria: CategoriaSource
+  tier: TierSource
   ativo: boolean
 }
 
-const FORM_VAZIO: FormState = { nome: '', rss_url: '', categoria: 'geopolitica', ativo: true }
+const FORM_VAZIO: FormState = { nome: '', rss_url: '', categoria: 'geopolitica', tier: 'A', ativo: true }
 
 interface ModalState {
   aberto: boolean
@@ -33,6 +40,18 @@ function BadgeCategoria({ categoria }: { categoria: CategoriaSource }) {
   return (
     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-mono text-xs uppercase tracking-[0.12em] ${CATEGORIA_CORES[categoria]}`}>
       {categoria}
+    </span>
+  )
+}
+
+function BadgeTier({ tier }: { tier: TierSource }) {
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] ${
+      tier === 'A'
+        ? 'border-violet-500/40 bg-violet-500/10 text-violet-300'
+        : 'border-sky-500/40 bg-sky-500/10 text-sky-300'
+    }`}>
+      Tier {tier}
     </span>
   )
 }
@@ -99,7 +118,7 @@ export function AdminFontes() {
   }
 
   function abrirModalEdicao(source: AdminSource) {
-    setForm({ nome: source.nome, rss_url: source.rss_url, categoria: source.categoria, ativo: source.ativo })
+    setForm({ nome: source.nome, rss_url: source.rss_url, categoria: source.categoria, tier: source.tier ?? 'A', ativo: source.ativo })
     setErro(null)
     setModal({ aberto: true, source })
   }
@@ -174,6 +193,7 @@ export function AdminFontes() {
                   <tr className="border-b border-zinc-800">
                     <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Nome</th>
                     <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Categoria</th>
+                    <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Tier</th>
                     <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Status</th>
                     <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Última coleta</th>
                     <th className="px-4 py-3 text-right font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Ações</th>
@@ -190,6 +210,9 @@ export function AdminFontes() {
                       </td>
                       <td className="px-4 py-3">
                         <BadgeCategoria categoria={source.categoria} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <BadgeTier tier={source.tier ?? 'A'} />
                       </td>
                       <td className="px-4 py-3">
                         <button
@@ -277,17 +300,31 @@ export function AdminFontes() {
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Categoria</label>
-                    <select
-                      value={form.categoria}
-                      onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value as CategoriaSource }))}
-                      className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-[#C9B882]/60 focus:outline-none"
-                    >
-                      {CATEGORIAS.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Categoria</label>
+                      <select
+                        value={form.categoria}
+                        onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value as CategoriaSource }))}
+                        className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-[#C9B882]/60 focus:outline-none"
+                      >
+                        {CATEGORIAS.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Tier de coleta</label>
+                      <select
+                        value={form.tier}
+                        onChange={(e) => setForm((f) => ({ ...f, tier: e.target.value as TierSource }))}
+                        className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-[#C9B882]/60 focus:outline-none"
+                      >
+                        {TIERS.map((t) => (
+                          <option key={t} value={t}>{TIER_DESCRICAO[t]}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-3">

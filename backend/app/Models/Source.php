@@ -10,8 +10,10 @@ class Source extends Model
         'nome',
         'rss_url',
         'categoria',
+        'tier',
         'ativo',
         'ultima_coleta_em',
+        'last_successful_fetch',
     ];
 
     protected function casts(): array
@@ -19,11 +21,17 @@ class Source extends Model
         return [
             'ativo' => 'boolean',
             'ultima_coleta_em' => 'datetime',
+            'last_successful_fetch' => 'datetime',
         ];
     }
 
     public function scopeAtivos($query)
     {
         return $query->where('ativo', true);
+    }
+
+    public function scopeTier($query, string $tier)
+    {
+        return $query->where('tier', $tier);
     }
 }
