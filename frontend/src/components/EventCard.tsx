@@ -32,7 +32,7 @@ export function EventCard({ event }: EventCardProps) {
       initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut' }}
-      className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#C9B882]/30 sm:p-5"
+      className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#BFFF3C]/30 sm:p-5"
     >
       <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-4">
@@ -55,7 +55,7 @@ export function EventCard({ event }: EventCardProps) {
                 target="_blank"
                 rel="noreferrer"
                 title={event.titulo}
-                className="line-clamp-2 text-lg font-medium text-white transition-colors hover:text-[#C9B882]"
+                className="line-clamp-2 text-lg font-medium text-white transition-colors hover:text-[#BFFF3C]"
               >
                 {event.titulo}
               </a>
@@ -91,7 +91,7 @@ export function EventCard({ event }: EventCardProps) {
         {event.categorias.map((categoria) => (
           <span
             key={categoria}
-            className="rounded-full border border-[#C9B882]/20 bg-[#C9B882]/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#C9B882]"
+            className="rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#BFFF3C]"
           >
             {categoria}
           </span>

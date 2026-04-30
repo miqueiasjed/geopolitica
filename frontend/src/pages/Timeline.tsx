@@ -32,18 +32,18 @@ export function Timeline() {
     >
       {/* Título */}
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">linha do tempo</p>
-        <h1 className="text-2xl font-bold text-[#E8E4DC] sm:text-3xl">Linha do Tempo de Crises</h1>
+        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">linha do tempo</p>
+        <h1 className="text-2xl font-bold text-[#F7F7F2] sm:text-3xl">Linha do Tempo de Crises</h1>
         <p className="text-[#6B7280] text-sm mt-1">Crises geopolíticas históricas e eventos ativos</p>
       </div>
 
       {/* Legenda */}
       <div className="flex flex-wrap gap-4">
-        <span className="flex items-center gap-2 text-sm text-[#C9B882]">
-          <span className="w-3 h-3 rounded-sm bg-[#C9B882]" /> Crises Históricas
+        <span className="flex items-center gap-2 text-sm text-[#BFFF3C]">
+          <span className="w-3 h-3 rounded-sm bg-[#BFFF3C]" /> Crises Históricas
         </span>
-        <span className="flex items-center gap-2 text-sm text-[#E8E4DC]">
-          <span className="w-3 h-3 rounded-sm bg-[#E8E4DC]" /> Eventos Ativos
+        <span className="flex items-center gap-2 text-sm text-[#F7F7F2]">
+          <span className="w-3 h-3 rounded-sm bg-[#F7F7F2]" /> Eventos Ativos
         </span>
       </div>
 
@@ -51,7 +51,7 @@ export function Timeline() {
       <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div className="flex min-w-max gap-3">
         <select
-          className="bg-[#1C1F26] border border-[#2D3240] text-[#E8E4DC] rounded px-3 py-1.5 text-sm"
+          className="bg-[#1C1F26] border border-[#2D3240] text-[#F7F7F2] rounded px-3 py-1.5 text-sm"
           value={filtros.categoria ?? ''}
           onChange={(e) =>
             setFiltros((f) => ({
@@ -76,7 +76,7 @@ export function Timeline() {
         <input
           type="number"
           placeholder="Ano início"
-          className="bg-[#1C1F26] border border-[#2D3240] text-[#E8E4DC] rounded px-3 py-1.5 text-sm w-28"
+          className="bg-[#1C1F26] border border-[#2D3240] text-[#F7F7F2] rounded px-3 py-1.5 text-sm w-28"
           value={filtros.periodo_inicio ?? ''}
           onChange={(e) =>
             setFiltros((f) => ({
@@ -88,7 +88,7 @@ export function Timeline() {
         <input
           type="number"
           placeholder="Ano fim"
-          className="bg-[#1C1F26] border border-[#2D3240] text-[#E8E4DC] rounded px-3 py-1.5 text-sm w-28"
+          className="bg-[#1C1F26] border border-[#2D3240] text-[#F7F7F2] rounded px-3 py-1.5 text-sm w-28"
           value={filtros.periodo_fim ?? ''}
           onChange={(e) =>
             setFiltros((f) => ({

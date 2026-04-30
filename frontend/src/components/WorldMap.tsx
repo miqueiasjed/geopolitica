@@ -88,7 +88,7 @@ export function WorldMap({ paises, onPaisClick }: WorldMapProps) {
   }, [paises])()
 
   function getCountryColor(geoId: string, isHovered: boolean): string {
-    if (isHovered) return '#C9B882'
+    if (isHovered) return '#BFFF3C'
     const pais = intensidadeByN3[geoId]
     if (!pais) return '#2a2a2a'
     return colorScale(pais.intensidade_final)
@@ -168,7 +168,7 @@ export function WorldMap({ paises, onPaisClick }: WorldMapProps) {
                 <div className="flex flex-col gap-1">
                   <span className="font-semibold">{tooltipInfo.nome}</span>
                   {tooltipInfo.intensidade !== null ? (
-                    <span className="text-xs text-[#C9B882]">
+                    <span className="text-xs text-[#BFFF3C]">
                       Intensidade: {tooltipInfo.intensidade}/10
                     </span>
                   ) : (

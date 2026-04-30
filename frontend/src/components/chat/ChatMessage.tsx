@@ -42,7 +42,7 @@ function AvatarUser() {
 function AvatarAssistente() {
   return (
     <div
-      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-[#C9B882]/30 bg-[#1C1F26] text-[#C9B882]"
+      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-[#BFFF3C]/30 bg-[#1C1F26] text-[#BFFF3C]"
       aria-hidden="true"
     >
       <svg
@@ -87,15 +87,15 @@ export function ChatMessage({ mensagem }: ChatMessageProps) {
     <div className="flex items-end gap-2">
       <AvatarAssistente />
       <div className="flex max-w-[80%] flex-col gap-1">
-        <div className="rounded-2xl rounded-bl-sm border border-[#C9B882]/30 bg-[#1C1F26] px-4 py-2.5 text-sm text-zinc-200">
+        <div className="rounded-2xl rounded-bl-sm border border-[#BFFF3C]/30 bg-[#1C1F26] px-4 py-2.5 text-sm text-zinc-200">
           {mensagem.conteudo || mensagem.streaming ? (
-            <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-[#0a0a0b] prose-pre:border prose-pre:border-zinc-700 prose-code:text-[#C9B882] prose-code:before:content-none prose-code:after:content-none">
+            <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-[#0a0a0b] prose-pre:border prose-pre:border-zinc-700 prose-code:text-[#BFFF3C] prose-code:before:content-none prose-code:after:content-none">
               {mensagem.conteudo ? (
                 <ReactMarkdown>{mensagem.conteudo}</ReactMarkdown>
               ) : null}
               {mensagem.streaming && (
                 <span
-                  className="inline-block animate-pulse text-[#C9B882]"
+                  className="inline-block animate-pulse text-[#BFFF3C]"
                   aria-label="Digitando..."
                 >
                   ▋

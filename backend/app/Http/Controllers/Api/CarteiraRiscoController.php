@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CalcularCarteiraRequest;
 use App\Models\Carteira;
+use App\Services\PlanoService;
 use App\Services\RiskScoreService;
 use Illuminate\Http\JsonResponse;
 
 class CarteiraRiscoController extends Controller
 {
-    public function __construct(private readonly RiskScoreService $riskScoreService)
-    {
+    public function __construct(
+        private readonly RiskScoreService $riskScoreService,
+        private readonly PlanoService $planoService,
+    ) {
     }
 
     public function buscar(): JsonResponse
@@ -36,9 +39,16 @@ class CarteiraRiscoController extends Controller
 
     private function verificarAcessoRiskScore(): void
     {
-        $plano = auth()->user()->assinante?->plano;
+        $usuario = auth()->user();
 
-        if (! in_array($plano, ['pro', 'reservado', 'admin'], true)) {
+        if ($usuario->hasRole('admin')) {
+            return;
+        }
+
+        $slugPlano = $usuario->assinante?->plano ?? 'essencial';
+        $temAcesso = $this->planoService->recursoBoolean($slugPlano, 'risk_score');
+
+        if (! $temAcesso) {
             abort(403, 'Risk Score disponível apenas para planos Pro e Reservado.');
         }
     }

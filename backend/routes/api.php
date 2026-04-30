@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminAiTestController;
+use App\Http\Controllers\Api\Admin\AdminPlanoController;
 use App\Http\Controllers\Api\Admin\AdminAiUsoController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
 use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
@@ -183,6 +184,11 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/b2b/empresas', [AdminB2BController::class, 'store']);
     Route::patch('/b2b/empresas/{id}', [AdminB2BController::class, 'update']);
     Route::post('/b2b/empresas/{id}/renovar', [AdminB2BController::class, 'renovar']);
+
+    // Gestão de planos e recursos
+    Route::get('/planos', [AdminPlanoController::class, 'index']);
+    Route::put('/planos/{plano}', [AdminPlanoController::class, 'update']);
+    Route::put('/planos/{plano}/recursos/{chave}', [AdminPlanoController::class, 'atualizarRecurso']);
 });
 
 // Rota pública: informações do tenant atual

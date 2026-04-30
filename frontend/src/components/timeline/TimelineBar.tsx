@@ -45,13 +45,13 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
       <div className="flex gap-2 mb-3">
         <button
           onClick={scrollAnterior}
-          className="px-3 py-1 text-sm bg-[#2D3240] text-[#C9B882] rounded hover:bg-[#363C4E] transition-colors"
+          className="px-3 py-1 text-sm bg-[#2D3240] text-[#BFFF3C] rounded hover:bg-[#363C4E] transition-colors"
         >
           ← Anterior
         </button>
         <button
           onClick={scrollProximo}
-          className="px-3 py-1 text-sm bg-[#2D3240] text-[#C9B882] rounded hover:bg-[#363C4E] transition-colors"
+          className="px-3 py-1 text-sm bg-[#2D3240] text-[#BFFF3C] rounded hover:bg-[#363C4E] transition-colors"
         >
           Próximo →
         </button>
@@ -72,7 +72,7 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
             y={30}
             width={SVG_WIDTH}
             height={90}
-            fill="rgba(201,184,130,0.05)"
+            fill="rgba(191,255,60,0.05)"
           />
 
           {/* Faixa inferior — sutil branco */}
@@ -89,7 +89,7 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
             x={8}
             y={25}
             fontSize={10}
-            fill="#C9B882"
+            fill="#BFFF3C"
             letterSpacing={1}
             fontFamily="monospace"
           >
@@ -101,7 +101,7 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
             x={8}
             y={120}
             fontSize={10}
-            fill="#E8E4DC"
+            fill="#F7F7F2"
             letterSpacing={1}
             fontFamily="monospace"
           >
@@ -152,7 +152,7 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
             y1={20}
             x2={posicaoX(anoAtual)}
             y2={200}
-            stroke="#C9B882"
+            stroke="#BFFF3C"
             strokeWidth={1.5}
           />
 

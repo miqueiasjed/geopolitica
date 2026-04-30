@@ -89,7 +89,7 @@ export function ChatBriefings() {
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                   <div
                     className={`h-full rounded-full transition-all ${
-                      limiteAtingido ? 'bg-red-500' : 'bg-[#C9B882]'
+                      limiteAtingido ? 'bg-red-500' : 'bg-[#BFFF3C]'
                     }`}
                     style={{
                       width: `${Math.min((perguntaCount / limite) * 100, 100)}%`,
@@ -121,7 +121,7 @@ export function ChatBriefings() {
                       }
                     }}
                     disabled={isLoading || limiteAtingido}
-                    className="w-full rounded-lg border border-zinc-800 bg-transparent px-3 py-2 text-left text-xs text-zinc-400 transition-colors hover:border-[#C9B882]/20 hover:bg-[#C9B882]/5 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="w-full rounded-lg border border-zinc-800 bg-transparent px-3 py-2 text-left text-xs text-zinc-400 transition-colors hover:border-[#BFFF3C]/20 hover:bg-[#BFFF3C]/5 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {sugestao}
                   </button>
@@ -137,15 +137,15 @@ export function ChatBriefings() {
             </h2>
             <ul className="flex flex-col gap-2">
               <li className="flex items-start gap-2 text-xs text-zinc-600">
-                <span className="text-[#C9B882]/50">›</span>
+                <span className="text-[#BFFF3C]/50">›</span>
                 Pergunte sobre países específicos, eventos ou tendências
               </li>
               <li className="flex items-start gap-2 text-xs text-zinc-600">
-                <span className="text-[#C9B882]/50">›</span>
+                <span className="text-[#BFFF3C]/50">›</span>
                 Use Ctrl+Enter para enviar sua mensagem
               </li>
               <li className="flex items-start gap-2 text-xs text-zinc-600">
-                <span className="text-[#C9B882]/50">›</span>
+                <span className="text-[#BFFF3C]/50">›</span>
                 O histórico do dia é salvo automaticamente
               </li>
             </ul>

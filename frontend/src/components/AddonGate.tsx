@@ -29,7 +29,7 @@ export function AddonGate({ addonKey }: AddonGateProps) {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-6 py-16">
       <div className="flex max-w-md flex-col items-center gap-6 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/60">
+        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/60">
           acesso exclusivo
         </p>
 
@@ -37,16 +37,16 @@ export function AddonGate({ addonKey }: AddonGateProps) {
 
         <p className="text-sm leading-6 text-zinc-400">{info.descricao}</p>
 
-        <div className="w-full rounded-xl border border-[#C9B882]/30 bg-zinc-900/60 px-6 py-5">
+        <div className="w-full rounded-xl border border-[#BFFF3C]/30 bg-zinc-900/60 px-6 py-5">
           <p className="text-xs uppercase tracking-widest text-zinc-500">Acesso anual</p>
-          <p className="mt-1 text-2xl font-bold text-[#C9B882]">{info.preco}</p>
+          <p className="mt-1 text-2xl font-bold text-[#BFFF3C]">{info.preco}</p>
         </div>
 
         <a
           href={info.ctaUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex w-full items-center justify-center rounded-lg bg-[#C9B882] px-6 py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9B882]"
+          className="inline-flex w-full items-center justify-center rounded-lg bg-[#BFFF3C] px-6 py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BFFF3C]"
         >
           {info.ctaLabel}
         </a>

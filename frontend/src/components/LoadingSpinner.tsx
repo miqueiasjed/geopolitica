@@ -12,7 +12,7 @@ export function LoadingSpinner({ size = 'md' }: LoadingSpinnerProps) {
   return (
     <span
       aria-label="Carregando"
-      className={`inline-block animate-spin rounded-full border-[#C9B882]/20 border-t-[#C9B882] ${sizeClasses[size]}`}
+      className={`inline-block animate-spin rounded-full border-[#BFFF3C]/20 border-t-[#BFFF3C] ${sizeClasses[size]}`}
     />
   )
 }

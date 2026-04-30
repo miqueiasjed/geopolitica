@@ -35,7 +35,7 @@ export function AlertaBadge({ onTogglePanel }: AlertaBadgeProps) {
       type="button"
       onClick={onTogglePanel}
       aria-label={ariaLabel}
-      className="relative inline-flex items-center justify-center rounded-full p-2 text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9B882]/50"
+      className="relative inline-flex items-center justify-center rounded-full p-2 text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]/50"
     >
       {/* Ícone de sino */}
       <svg

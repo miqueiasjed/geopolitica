@@ -26,11 +26,11 @@ export function RadarGrid({ eleicoes, onEleicaoClick }: RadarGridProps) {
             <div
               key={mes}
               className={`border-b border-zinc-800 px-2 py-2 text-center font-mono text-xs uppercase tracking-[0.16em] ${
-                eAtual ? 'text-[#C9B882]' : 'text-zinc-500'
+                eAtual ? 'text-[#BFFF3C]' : 'text-zinc-500'
               } ${index > 0 ? 'border-l border-zinc-800' : ''}`}
               style={
                 eAtual
-                  ? { borderBottom: '2px solid #C9B882' }
+                  ? { borderBottom: '2px solid #BFFF3C' }
                   : undefined
               }
             >
@@ -50,7 +50,7 @@ export function RadarGrid({ eleicoes, onEleicaoClick }: RadarGridProps) {
               } ${eAtual ? 'border-l border-r' : ''}`}
               style={
                 eAtual
-                  ? { borderLeftColor: '#C9B882', borderRightColor: '#C9B882', borderLeftWidth: index > 0 ? '1px' : '0', borderRightWidth: '1px' }
+                  ? { borderLeftColor: '#BFFF3C', borderRightColor: '#BFFF3C', borderLeftWidth: index > 0 ? '1px' : '0', borderRightWidth: '1px' }
                   : undefined
               }
             >

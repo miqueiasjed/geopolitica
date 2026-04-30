@@ -39,7 +39,7 @@ export function NovoRelatorio() {
     >
       {/* Cabeçalho */}
       <div className="space-y-1">
-        <p className="font-mono text-[10px] uppercase tracking-widest text-[#C9B882]/70">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-[#BFFF3C]/70">
           Geopolítica para Investidores
         </p>
         <h1 className="font-serif text-xl font-semibold text-white">
@@ -63,7 +63,7 @@ export function NovoRelatorio() {
             value={topico}
             onChange={(e) => setTopico(e.target.value)}
             placeholder="Ex: Impacto da tensão EUA-China nos mercados emergentes"
-            className="w-full rounded-lg border border-zinc-800 bg-[#111113] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#C9B882]/40 focus:outline-none focus:ring-1 focus:ring-[#C9B882]/20 transition-colors"
+            className="w-full rounded-lg border border-zinc-800 bg-[#111113] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#BFFF3C]/40 focus:outline-none focus:ring-1 focus:ring-[#BFFF3C]/20 transition-colors"
             disabled={gerando}
             aria-label="Tema do relatório"
           />
@@ -81,7 +81,7 @@ export function NovoRelatorio() {
                 type="button"
                 onClick={() => setTopico(sugestao)}
                 disabled={gerando}
-                className="rounded-full border border-zinc-800 bg-transparent px-3 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:border-[#C9B882]/30 hover:bg-[#C9B882]/5 hover:text-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-full border border-zinc-800 bg-transparent px-3 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:border-[#BFFF3C]/30 hover:bg-[#BFFF3C]/5 hover:text-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {sugestao}
               </button>
@@ -104,7 +104,7 @@ export function NovoRelatorio() {
             onChange={(e) => setEscopo(e.target.value)}
             rows={2}
             placeholder="Ex: Foco no impacto para exportadores de soja. Horizonte de 90 dias."
-            className="w-full resize-none rounded-lg border border-zinc-800 bg-[#111113] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#C9B882]/40 focus:outline-none focus:ring-1 focus:ring-[#C9B882]/20 transition-colors"
+            className="w-full resize-none rounded-lg border border-zinc-800 bg-[#111113] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#BFFF3C]/40 focus:outline-none focus:ring-1 focus:ring-[#BFFF3C]/20 transition-colors"
             disabled={gerando}
             aria-label="Escopo adicional"
           />
@@ -115,13 +115,13 @@ export function NovoRelatorio() {
           type="button"
           onClick={() => void gerar()}
           disabled={desabilitado}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#C9B882]/40 bg-[#C9B882]/10 px-6 py-3 font-mono text-sm uppercase tracking-widest text-[#C9B882] transition-all hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#BFFF3C]/40 bg-[#BFFF3C]/10 px-6 py-3 font-mono text-sm uppercase tracking-widest text-[#BFFF3C] transition-all hover:bg-[#BFFF3C]/20 disabled:cursor-not-allowed disabled:opacity-40"
           aria-busy={gerando}
         >
           {gerando ? (
             <>
               <span
-                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#C9B882]/30 border-t-[#C9B882]"
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#BFFF3C]/30 border-t-[#BFFF3C]"
                 aria-hidden="true"
               />
               Gerando relatório…
@@ -160,7 +160,7 @@ export function NovoRelatorio() {
             className="space-y-4"
           >
             <div className="rounded-xl border border-white/8 bg-[#0f1117] p-6">
-              <div className="prose prose-invert max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-li:text-zinc-300 prose-a:text-[#C9B882]">
+              <div className="prose prose-invert max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-li:text-zinc-300 prose-a:text-[#BFFF3C]">
                 <ReactMarkdown>{preview}</ReactMarkdown>
               </div>
             </div>

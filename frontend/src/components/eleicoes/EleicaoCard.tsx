@@ -58,7 +58,7 @@ export function EleicaoCard({ eleicao, onClick }: EleicaoCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
       whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-      className="relative w-full rounded-xl border border-zinc-800 bg-[#111113] p-3 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9B882]"
+      className="relative w-full rounded-xl border border-zinc-800 bg-[#111113] p-3 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]"
       style={
         {
           '--relevancia-cor': cor,

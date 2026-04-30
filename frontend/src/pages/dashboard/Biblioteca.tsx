@@ -28,7 +28,7 @@ function SkeletonCard() {
 function Spinner() {
   return (
     <div className="flex justify-center py-6" aria-label="Carregando mais conteúdos">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-[#C9B882]" />
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-[#BFFF3C]" />
     </div>
   )
 }
@@ -82,7 +82,7 @@ export function Biblioteca() {
     >
       {/* Cabeçalho */}
       <div className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
+        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">
           biblioteca
         </p>
         <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">

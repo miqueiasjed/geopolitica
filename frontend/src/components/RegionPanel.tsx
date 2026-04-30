@@ -49,7 +49,7 @@ function EventoItem({ event }: { event: EventoPais }) {
   return (
     <motion.article
       variants={itemVariants}
-      className="rounded-xl border border-[#1e1e20] bg-[#111113] p-4 transition-colors hover:border-[#C9B882]/30"
+      className="rounded-xl border border-[#1e1e20] bg-[#111113] p-4 transition-colors hover:border-[#BFFF3C]/30"
     >
       <div className="flex items-start gap-3">
         <div className="flex flex-col items-start gap-2 min-w-0 flex-1">
@@ -77,7 +77,7 @@ function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center py-12">
       <div
-        className="h-8 w-8 animate-spin rounded-full border-2 border-[#C9B882]/20 border-t-[#C9B882]"
+        className="h-8 w-8 animate-spin rounded-full border-2 border-[#BFFF3C]/20 border-t-[#BFFF3C]"
         role="status"
         aria-label="Carregando eventos"
       />
@@ -139,7 +139,7 @@ function PanelContent({ regiao, nome }: { regiao: string; nome: string | null })
               {regiao}
             </span>
             {perfil?.regiao_geopolitica && (
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#C9B882]/70">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#BFFF3C]/70">
                 {perfil.regiao_geopolitica}
               </span>
             )}
@@ -172,7 +172,7 @@ function PanelContent({ regiao, nome }: { regiao: string; nome: string | null })
               animate="visible"
               className="rounded-xl border border-[#1e1e20] bg-[#111113] p-4"
             >
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#C9B882]/70">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#BFFF3C]/70">
                 contexto geopolítico
               </p>
               {perfil?.contexto_geopolitico ? (
@@ -190,7 +190,7 @@ function PanelContent({ regiao, nome }: { regiao: string; nome: string | null })
               animate="visible"
               className="rounded-xl border border-[#1e1e20] bg-[#111113] p-4"
             >
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#C9B882]/70">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#BFFF3C]/70">
                 liderança atual
               </p>
               {perfil?.analise_lideranca ? (
@@ -209,14 +209,14 @@ function PanelContent({ regiao, nome }: { regiao: string; nome: string | null })
                 animate="visible"
                 className="rounded-xl border border-[#1e1e20] bg-[#111113] p-4"
               >
-                <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#C9B882]/70">
+                <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[#BFFF3C]/70">
                   indicadores relevantes
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {indicadoresRelevantes.map((indicador) => (
                     <span
                       key={indicador}
-                      className="inline-flex items-center rounded-full border border-[#C9B882]/20 bg-[#C9B882]/8 px-2.5 py-1 font-mono text-[10px] text-[#C9B882]"
+                      className="inline-flex items-center rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-2.5 py-1 font-mono text-[10px] text-[#BFFF3C]"
                     >
                       {indicador}
                     </span>
@@ -227,7 +227,7 @@ function PanelContent({ regiao, nome }: { regiao: string; nome: string | null })
 
             <Link
               to={`/paises/${regiao}`}
-              className="inline-flex items-center gap-2 rounded-full border border-[#C9B882]/20 bg-[#C9B882]/8 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#C9B882] transition-colors hover:border-[#C9B882]/40 hover:bg-[#C9B882]/15"
+              className="inline-flex items-center gap-2 rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#BFFF3C] transition-colors hover:border-[#BFFF3C]/40 hover:bg-[#BFFF3C]/15"
             >
               Perfil completo
               <ArrowRightIcon aria-hidden="true" />
@@ -321,7 +321,7 @@ export function RegionPanel({ regiao, nome, onClose }: RegionPanelProps) {
               type="button"
               onClick={onClose}
               aria-label="Fechar painel"
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/8 text-zinc-400 transition-colors hover:border-[#C9B882]/30 hover:text-[#C9B882]"
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/8 text-zinc-400 transition-colors hover:border-[#BFFF3C]/30 hover:text-[#BFFF3C]"
             >
               <Cross2Icon />
             </button>

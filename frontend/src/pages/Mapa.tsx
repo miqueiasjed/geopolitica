@@ -14,7 +14,7 @@ function MapaLoadingSkeleton() {
   return (
     <div className="flex h-full items-center justify-center">
       <div
-        className="h-10 w-10 animate-spin rounded-full border-2 border-[#C9B882]/20 border-t-[#C9B882]"
+        className="h-10 w-10 animate-spin rounded-full border-2 border-[#BFFF3C]/20 border-t-[#BFFF3C]"
         role="status"
         aria-label="Carregando mapa"
       />
@@ -44,7 +44,7 @@ export function Mapa() {
     >
       {/* Header compacto */}
       <div className="flex-shrink-0 border-b border-[#1e1e20] bg-[#0a0a0b]/95 px-6 py-3 backdrop-blur">
-        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
+        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">
           mapa de calor
         </p>
         <h1 className="text-base font-semibold text-white">

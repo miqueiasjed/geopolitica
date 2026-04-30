@@ -47,7 +47,7 @@ export function EventoDetailPanel({ eventoId, eventos, onClose }: EventoDetailPa
                   type="button"
                   onClick={onClose}
                   aria-label="Fechar painel"
-                  className="text-[#6B7280] hover:text-[#E8E4DC] transition-colors text-xl leading-none"
+                  className="text-[#6B7280] hover:text-[#F7F7F2] transition-colors text-xl leading-none"
                 >
                   ✕
                 </button>
@@ -57,10 +57,10 @@ export function EventoDetailPanel({ eventoId, eventos, onClose }: EventoDetailPa
                 <>
                   {/* Header */}
                   <div className="mb-4">
-                    <h2 className="text-xl font-bold text-[#E8E4DC] mb-2">{evento.titulo}</h2>
+                    <h2 className="text-xl font-bold text-[#F7F7F2] mb-2">{evento.titulo}</h2>
 
                     {/* Badge nível de tensão */}
-                    <span className="inline-block px-2 py-0.5 rounded text-xs bg-[#2D3240] text-[#C9B882] mb-2">
+                    <span className="inline-block px-2 py-0.5 rounded text-xs bg-[#2D3240] text-[#BFFF3C] mb-2">
                       {evento.impact_label}
                     </span>
 
@@ -76,7 +76,7 @@ export function EventoDetailPanel({ eventoId, eventos, onClose }: EventoDetailPa
                   <div className="mt-4">
                     <Link
                       to="/dashboard/feed"
-                      className="inline-flex items-center gap-1 text-sm text-[#C9B882] hover:text-[#E8E4DC] transition-colors"
+                      className="inline-flex items-center gap-1 text-sm text-[#BFFF3C] hover:text-[#F7F7F2] transition-colors"
                     >
                       Ver no Feed →
                     </Link>

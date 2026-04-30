@@ -31,7 +31,7 @@ export function CriseMarker({ crise, onClick, posicaoX, larguraPorAno, anoAtual 
         y={70}
         width={larguraBarra}
         height={30}
-        fill="#C9B882"
+        fill="#BFFF3C"
         fillOpacity={0.4}
         rx={3}
       />
@@ -42,7 +42,7 @@ export function CriseMarker({ crise, onClick, posicaoX, larguraPorAno, anoAtual 
         y1={40}
         x2={posicaoX}
         y2={100}
-        stroke="#C9B882"
+        stroke="#BFFF3C"
         strokeWidth={1.5}
       />
 
@@ -51,7 +51,7 @@ export function CriseMarker({ crise, onClick, posicaoX, larguraPorAno, anoAtual 
         cx={posicaoX}
         cy={40}
         r={6}
-        fill="#C9B882"
+        fill="#BFFF3C"
         fillOpacity={1}
       />
     </motion.g>

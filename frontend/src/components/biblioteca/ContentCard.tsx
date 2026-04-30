@@ -19,7 +19,7 @@ const badgeConfig: Record<TipoConteudo, BadgeConfig> = {
   },
   tese: {
     className:
-      'bg-[#C9B882]/20 text-[#C9B882] ring-1 ring-[#C9B882]/40',
+      'bg-[#BFFF3C]/20 text-[#BFFF3C] ring-1 ring-[#BFFF3C]/40',
     label: 'A Tese',
   },
 }
@@ -64,7 +64,7 @@ export function ContentCard({ conteudo, onClick }: ContentCardProps) {
             }
           : undefined
       }
-      className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#C9B882]/30 sm:p-5 cursor-pointer"
+      className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#BFFF3C]/30 sm:p-5 cursor-pointer"
     >
       {/* Badge de tipo */}
       <div className="mb-3">
@@ -94,7 +94,7 @@ export function ContentCard({ conteudo, onClick }: ContentCardProps) {
 
       {/* Manchete da tese */}
       {conteudo.tipo === 'tese' && conteudo.tese_manchete ? (
-        <p className="mb-2 text-sm italic text-[#C9B882]">
+        <p className="mb-2 text-sm italic text-[#BFFF3C]">
           {conteudo.tese_manchete}
         </p>
       ) : null}
@@ -110,7 +110,7 @@ export function ContentCard({ conteudo, onClick }: ContentCardProps) {
           {conteudo.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-[#C9B882]/20 bg-[#C9B882]/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#C9B882]"
+              className="rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#BFFF3C]"
             >
               {tag}
             </span>

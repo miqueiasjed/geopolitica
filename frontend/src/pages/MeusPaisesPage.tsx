@@ -104,7 +104,7 @@ export function MeusPaisesPage() {
     <section className="space-y-8">
       {/* Cabeçalho */}
       <div className="space-y-3">
-        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">acompanhamento</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">acompanhamento</p>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Meus Países</h1>
@@ -115,9 +115,9 @@ export function MeusPaisesPage() {
 
           {/* Badge contador */}
           <div className="flex-shrink-0">
-            <span className="inline-flex items-center rounded-full border border-[#C9B882]/20 bg-[#C9B882]/8 px-4 py-2 font-mono text-sm text-[#C9B882]">
+            <span className="inline-flex items-center rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-4 py-2 font-mono text-sm text-[#BFFF3C]">
               {isLoading ? (
-                <span className="inline-block h-4 w-16 animate-pulse rounded bg-[#C9B882]/20" />
+                <span className="inline-block h-4 w-16 animate-pulse rounded bg-[#BFFF3C]/20" />
               ) : (
                 <>
                   {paises.length} / {limite} países
@@ -135,7 +135,7 @@ export function MeusPaisesPage() {
           <BuscaPais onSelect={handleSelecionar} />
 
           {codigoSelecionado && (
-            <span className="rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-3 py-1 font-mono text-xs text-[#C9B882]">
+            <span className="rounded-full border border-[#BFFF3C]/30 bg-[#BFFF3C]/10 px-3 py-1 font-mono text-xs text-[#BFFF3C]">
               {codigoSelecionado} selecionado
             </span>
           )}
@@ -144,7 +144,7 @@ export function MeusPaisesPage() {
             type="button"
             disabled={!codigoSelecionado || isAdicionando}
             onClick={handleAdicionar}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#C9B882] px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-[#d4c896] disabled:cursor-not-allowed disabled:opacity-40 sm:flex-shrink-0"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#BFFF3C] px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-[#D7FF69] disabled:cursor-not-allowed disabled:opacity-40 sm:flex-shrink-0"
           >
             {isAdicionando ? (
               <>

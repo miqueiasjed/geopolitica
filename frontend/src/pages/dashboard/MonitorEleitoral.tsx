@@ -62,7 +62,7 @@ function BriefingCard({ conteudo, onClick }: { conteudo: ConteudoCard; onClick: 
       }}
       role="button"
       tabIndex={0}
-      className="cursor-pointer rounded-2xl border border-[#1e1e20] bg-[#111113] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#C9B882]/30"
+      className="cursor-pointer rounded-2xl border border-[#1e1e20] bg-[#111113] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#BFFF3C]/30"
     >
       <p className="mb-2 font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
         {formatarData(conteudo.publicado_em)}
@@ -180,7 +180,7 @@ export function MonitorEleitoral() {
     >
       <div className="space-y-1">
         <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">VERTICAIS</p>
-        <h1 className="font-serif text-3xl font-bold text-[#E8E4DC]">Monitor Eleitoral</h1>
+        <h1 className="font-serif text-3xl font-bold text-[#F7F7F2]">Monitor Eleitoral</h1>
         <p className="text-sm text-zinc-500">Eleições globais com impacto para investidores</p>
       </div>
 

@@ -113,7 +113,7 @@ export function PerfilPaisPage() {
         <button
           type="button"
           onClick={() => navigate('/paises')}
-          className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#1e1e20] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-[#C9B882]/30 hover:text-[#C9B882]"
+          className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#1e1e20] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-[#BFFF3C]/30 hover:text-[#BFFF3C]"
         >
           <ArrowLeftIcon />
           Voltar
@@ -137,7 +137,7 @@ export function PerfilPaisPage() {
       <button
         type="button"
         onClick={() => navigate('/paises')}
-        className="inline-flex items-center gap-2 rounded-full border border-[#1e1e20] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-[#C9B882]/30 hover:text-[#C9B882]"
+        className="inline-flex items-center gap-2 rounded-full border border-[#1e1e20] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-[#BFFF3C]/30 hover:text-[#BFFF3C]"
       >
         <ArrowLeftIcon />
         Voltar
@@ -158,7 +158,7 @@ export function PerfilPaisPage() {
             )}
             <div>
               <h1 className="text-2xl font-semibold text-white sm:text-3xl">{perfil.nome_pt}</h1>
-              <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-[#C9B882]/70">
+              <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-[#BFFF3C]/70">
                 {perfil.regiao_geopolitica}
               </p>
             </div>
@@ -172,7 +172,7 @@ export function PerfilPaisPage() {
               className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                 jaAcompanha
                   ? 'border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20'
-                  : 'border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882] hover:bg-[#C9B882]/20'
+                  : 'border-[#BFFF3C]/30 bg-[#BFFF3C]/10 text-[#BFFF3C] hover:bg-[#BFFF3C]/20'
               }`}
             >
               {isPendente ? (
@@ -202,7 +202,7 @@ export function PerfilPaisPage() {
 
       {/* Seção 2 — Contexto Geopolítico */}
       <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-6">
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
+        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">
           contexto geopolítico
         </p>
         {perfil.contexto_geopolitico ? (
@@ -221,7 +221,7 @@ export function PerfilPaisPage() {
 
       {/* Seção 3 — Liderança Atual */}
       <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-6">
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
+        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">
           liderança atual
         </p>
         {perfil.analise_lideranca ? (
@@ -240,14 +240,14 @@ export function PerfilPaisPage() {
       {/* Seção 4 — Indicadores Econômicos (ocultar se vazio) */}
       {indicadoresRelevantes.length > 0 && (
         <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-6">
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">
             indicadores econômicos
           </p>
           <div className="flex flex-wrap gap-2">
             {indicadoresRelevantes.map((indicador) => (
               <span
                 key={indicador}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/20 bg-[#C9B882]/8 px-3 py-1.5 font-mono text-xs text-[#C9B882]"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-3 py-1.5 font-mono text-xs text-[#BFFF3C]"
               >
                 <svg
                   className="h-3 w-3"
@@ -271,7 +271,7 @@ export function PerfilPaisPage() {
 
       {/* Seção 5 — Eventos Recentes */}
       <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-6">
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
+        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">
           eventos recentes
         </p>
 

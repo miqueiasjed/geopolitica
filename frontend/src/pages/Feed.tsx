@@ -51,7 +51,7 @@ export function Feed() {
       <div className="space-y-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-3">
-            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">feed de tensões</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">feed de tensões</p>
             <div className="space-y-2">
               <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                 Eventos geopolíticos com impacto direto para investidores brasileiros.

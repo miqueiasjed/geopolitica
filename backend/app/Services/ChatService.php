@@ -14,33 +14,30 @@ class ChatService
 {
     private const MAX_TOKENS = 1024;
 
-    private const LIMITES_POR_PLANO = [
-        'assinante_essencial' => 5,
-        'assinante_pro'       => 20,
-    ];
-
-    private const PLANOS_SEM_LIMITE = ['assinante_reservado', 'admin'];
-
     private const HISTORICO_MAX_MENSAGENS = 10;
 
-    public function __construct(private ChatRecuperacaoService $recuperacaoService)
-    {
+    public function __construct(
+        private ChatRecuperacaoService $recuperacaoService,
+        private PlanoService $planoService,
+    ) {
     }
 
     public function verificarLimite(User $usuario): void
     {
-        $plano = $usuario->getRoleNames()->first() ?? 'essencial';
-
-        if (in_array($plano, self::PLANOS_SEM_LIMITE, true)) {
+        if ($usuario->hasRole('admin')) {
             return;
         }
 
-        $limite = self::LIMITES_POR_PLANO[$plano] ?? self::LIMITES_POR_PLANO['assinante_essencial'];
+        $slugPlano = $usuario->assinante?->plano ?? 'essencial';
+        $limite    = $this->planoService->limiteInteiro($slugPlano, 'chat_diario_limite');
+
+        if ($limite === null) {
+            return; // ilimitado
+        }
 
         $dataBrasilia = now()->timezone('America/Sao_Paulo')->format('Y-m-d');
         $chaveRedis   = "chat_limite_{$usuario->id}_{$dataBrasilia}";
-
-        $contagem = (int) Redis::get($chaveRedis);
+        $contagem     = (int) Redis::get($chaveRedis);
 
         if ($contagem >= $limite) {
             throw new TooManyRequestsHttpException(

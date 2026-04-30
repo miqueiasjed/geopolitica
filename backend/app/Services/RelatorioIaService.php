@@ -15,24 +15,24 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class RelatorioIaService
 {
-    private const LIMITES_POR_PLANO = [
-        'assinante_essencial' => 2,
-        'assinante_pro'       => 10,
-    ];
-
-    private const PLANOS_SEM_LIMITE = ['assinante_reservado', 'admin'];
-
     private const MAX_TOKENS = 4096;
+
+    public function __construct(private PlanoService $planoService)
+    {
+    }
 
     public function verificarLimite(User $usuario): void
     {
-        $plano = $usuario->getRoleNames()->first() ?? 'essencial';
-
-        if (in_array($plano, self::PLANOS_SEM_LIMITE, true)) {
+        if ($usuario->hasRole('admin')) {
             return;
         }
 
-        $limite = self::LIMITES_POR_PLANO[$plano] ?? self::LIMITES_POR_PLANO['assinante_essencial'];
+        $slugPlano = $usuario->assinante?->plano ?? 'essencial';
+        $limite    = $this->planoService->limiteInteiro($slugPlano, 'relatorio_mensal_limite');
+
+        if ($limite === null) {
+            return; // ilimitado
+        }
 
         $mesAtual = now()->timezone('America/Sao_Paulo')->format('Y-m');
 

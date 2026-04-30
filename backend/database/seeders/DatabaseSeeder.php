@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             RolesSeeder::class,
             RolesB2BSeeder::class,
             AdminSeeder::class,
+            PlanoSeeder::class,
             SourcesSeeder::class,
             IndicadoresSeeder::class,
             ConteudoSeeder::class,

@@ -46,7 +46,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                   type="button"
                   onClick={onClose}
                   aria-label="Fechar painel"
-                  className="text-[#6B7280] hover:text-[#E8E4DC] transition-colors text-xl leading-none"
+                  className="text-[#6B7280] hover:text-[#F7F7F2] transition-colors text-xl leading-none"
                 >
                   ✕
                 </button>
@@ -64,8 +64,8 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                   {/* Header */}
                   <div className="mb-4">
                     <div className="flex items-center gap-3 flex-wrap mb-2">
-                      <h2 className="text-xl font-bold text-[#E8E4DC]">{crise.titulo}</h2>
-                      <span className="text-[#C9B882] font-mono text-base">{crise.ano}</span>
+                      <h2 className="text-xl font-bold text-[#F7F7F2]">{crise.titulo}</h2>
+                      <span className="text-[#BFFF3C] font-mono text-base">{crise.ano}</span>
                     </div>
 
                     {/* Badges categorias */}
@@ -73,7 +73,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                       {crise.categorias.map((cat) => (
                         <span
                           key={cat}
-                          className="px-2 py-0.5 rounded text-xs bg-[#2D3240] text-[#C9B882]"
+                          className="px-2 py-0.5 rounded text-xs bg-[#2D3240] text-[#BFFF3C]"
                         >
                           {cat}
                         </span>
@@ -84,10 +84,10 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                   {/* Seção 1: Contexto Geopolítico */}
                   <hr className="border-[#2D3240] my-4" />
                   <section>
-                    <h3 className="text-[#C9B882] text-sm uppercase tracking-wider mb-2">
+                    <h3 className="text-[#BFFF3C] text-sm uppercase tracking-wider mb-2">
                       Contexto Geopolítico
                     </h3>
-                    <p className="text-[#E8E4DC] text-sm leading-relaxed">
+                    <p className="text-[#F7F7F2] text-sm leading-relaxed">
                       {crise.contexto_geopolitico}
                     </p>
                   </section>
@@ -95,10 +95,10 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                   {/* Seção 2: Impacto Global */}
                   <hr className="border-[#2D3240] my-4" />
                   <section>
-                    <h3 className="text-[#C9B882] text-sm uppercase tracking-wider mb-2">
+                    <h3 className="text-[#BFFF3C] text-sm uppercase tracking-wider mb-2">
                       Impacto Global
                     </h3>
-                    <p className="text-[#E8E4DC] text-sm leading-relaxed mb-3">
+                    <p className="text-[#F7F7F2] text-sm leading-relaxed mb-3">
                       {crise.impacto_global}
                     </p>
                     {crise.metricas_globais.length > 0 && (
@@ -106,7 +106,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                         {crise.metricas_globais.map((m) => (
                           <div key={m.label} className="bg-[#0F1117] rounded p-3">
                             <div className="text-xs text-[#6B7280]">{m.label}</div>
-                            <div className="text-lg font-bold text-[#E8E4DC]">{m.valor}</div>
+                            <div className="text-lg font-bold text-[#F7F7F2]">{m.valor}</div>
                           </div>
                         ))}
                       </div>
@@ -116,10 +116,10 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                   {/* Seção 3: Impacto no Brasil */}
                   <hr className="border-[#2D3240] my-4" />
                   <section>
-                    <h3 className="text-[#C9B882] text-sm uppercase tracking-wider mb-2">
+                    <h3 className="text-[#BFFF3C] text-sm uppercase tracking-wider mb-2">
                       Impacto no Brasil
                     </h3>
-                    <p className="text-[#E8E4DC] text-sm leading-relaxed mb-3">
+                    <p className="text-[#F7F7F2] text-sm leading-relaxed mb-3">
                       {crise.impacto_brasil}
                     </p>
                     {crise.metricas_brasil.length > 0 && (
@@ -127,7 +127,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                         {crise.metricas_brasil.map((m) => (
                           <div key={m.label} className="bg-[#0F1117] rounded p-3">
                             <div className="text-xs text-[#6B7280]">{m.label}</div>
-                            <div className="text-lg font-bold text-[#E8E4DC]">{m.valor}</div>
+                            <div className="text-lg font-bold text-[#F7F7F2]">{m.valor}</div>
                           </div>
                         ))}
                       </div>
@@ -139,7 +139,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                     <div className="mt-6">
                       <Link
                         to={`/dashboard/biblioteca/${crise.content_slug}`}
-                        className="inline-flex items-center gap-1 text-sm text-[#C9B882] hover:text-[#E8E4DC] transition-colors"
+                        className="inline-flex items-center gap-1 text-sm text-[#BFFF3C] hover:text-[#F7F7F2] transition-colors"
                       >
                         Ver na Biblioteca →
                       </Link>

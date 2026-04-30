@@ -53,7 +53,7 @@ export function PlanGate({ tipo }: PlanGateProps) {
 
       <Link
         to="/planos"
-        className="inline-flex items-center rounded-lg bg-[#C9B882] px-5 py-2 text-sm font-semibold text-zinc-900 transition-colors hover:bg-[#d4c896]"
+        className="inline-flex items-center rounded-lg bg-[#BFFF3C] px-5 py-2 text-sm font-semibold text-zinc-900 transition-colors hover:bg-[#D7FF69]"
       >
         Fazer upgrade
       </Link>

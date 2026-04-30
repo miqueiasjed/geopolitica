@@ -91,7 +91,7 @@ export function RelatoriosIA() {
       {/* Cabeçalho */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-[#C9B882]/70">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-[#BFFF3C]/70">
             Inteligência Artificial
           </p>
           <h1 className="font-serif text-xl font-semibold text-white">Relatórios</h1>
@@ -99,7 +99,7 @@ export function RelatoriosIA() {
         <button
           type="button"
           onClick={() => navigate('/dashboard/relatorios/novo')}
-          className="flex-shrink-0 rounded-full border border-[#C9B882]/40 bg-[#C9B882]/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-[#C9B882] transition-all hover:bg-[#C9B882]/20"
+          className="flex-shrink-0 rounded-full border border-[#BFFF3C]/40 bg-[#BFFF3C]/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-[#BFFF3C] transition-all hover:bg-[#BFFF3C]/20"
         >
           Novo relatório →
         </button>
@@ -118,7 +118,7 @@ export function RelatoriosIA() {
           <button
             type="button"
             onClick={() => navigate('/dashboard/relatorios/novo')}
-            className="rounded-full border border-zinc-700 px-5 py-2 font-mono text-xs uppercase tracking-widest text-zinc-400 transition-colors hover:border-[#C9B882]/40 hover:text-[#C9B882]"
+            className="rounded-full border border-zinc-700 px-5 py-2 font-mono text-xs uppercase tracking-widest text-zinc-400 transition-colors hover:border-[#BFFF3C]/40 hover:text-[#BFFF3C]"
           >
             Criar primeiro relatório →
           </button>
@@ -181,10 +181,10 @@ export function RelatoriosIA() {
                   >
                     {carregandoDetalhe ? (
                       <div className="flex justify-center py-8" aria-label="Carregando relatório">
-                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-[#C9B882]" />
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-[#BFFF3C]" />
                       </div>
                     ) : relatorioDetalhe ? (
-                      <div className="prose prose-invert max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-li:text-zinc-300 prose-a:text-[#C9B882]">
+                      <div className="prose prose-invert max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-li:text-zinc-300 prose-a:text-[#BFFF3C]">
                         <ReactMarkdown>{relatorioDetalhe.body}</ReactMarkdown>
                       </div>
                     ) : (

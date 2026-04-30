@@ -35,7 +35,7 @@ export function CardPais({ paisUsuario, isRemovendo, onRemover }: CardPaisProps)
       animate={{ opacity: 1, y: 0 }}
       exit={prefersReducedMotion ? undefined : { opacity: 0, y: -4 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
-      className="group flex flex-col gap-4 rounded-2xl border border-[#1e1e20] bg-[#111113] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#C9B882]/40"
+      className="group flex flex-col gap-4 rounded-2xl border border-[#1e1e20] bg-[#111113] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors hover:border-[#BFFF3C]/40"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ export function CardPais({ paisUsuario, isRemovendo, onRemover }: CardPaisProps)
 
         <Link
           to={`/paises/${codigo_pais}`}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[#C9B882]/20 bg-[#C9B882]/8 px-3 py-1.5 text-xs font-medium text-[#C9B882] transition-colors hover:border-[#C9B882]/40 hover:bg-[#C9B882]/15"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-3 py-1.5 text-xs font-medium text-[#BFFF3C] transition-colors hover:border-[#BFFF3C]/40 hover:bg-[#BFFF3C]/15"
         >
           Acompanhar
         </Link>

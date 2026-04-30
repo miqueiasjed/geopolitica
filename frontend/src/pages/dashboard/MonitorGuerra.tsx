@@ -36,7 +36,7 @@ function SkeletonCard() {
 
 function BriefingCard({ conteudo }: { conteudo: ConteudoCard }) {
   return (
-    <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-5 transition-colors hover:border-[#C9B882]/30">
+    <div className="rounded-2xl border border-[#1e1e20] bg-[#111113] p-5 transition-colors hover:border-[#BFFF3C]/30">
       <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
         {formatDistanceToNow(conteudo.publicado_em)}
       </p>
@@ -101,7 +101,7 @@ export function MonitorGuerra() {
       className="space-y-10"
     >
       <div className="space-y-2">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-[#C9B882]/70">VERTICAIS</p>
+        <p className="font-mono text-[11px] uppercase tracking-widest text-[#BFFF3C]/70">VERTICAIS</p>
         <h1 className="font-serif text-3xl font-bold text-white sm:text-4xl">Monitor de Guerra</h1>
         <p className="max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
           Conflitos e tensões militares com impacto em mercados

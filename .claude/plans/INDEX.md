@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-28 (Plano 24 concluído — M16 Risk Score de Portfólio)
+> Última atualização: 2026-04-29 (Plano 25 criado — M17 Admin Gerenciamento de Planos)
 
 ## Legenda
 - ✅ Concluído
@@ -36,6 +36,7 @@
 | 22 | [Exportação para PDF (M14)](22.md) | ✅ | 7, 10, 11, 14, 15 | 7 |
 | 23 | [Relatório Personalizado por IA (M15)](23.md) | ✅ | 7, 11, 12, 4, 14, 22 | 7 |
 | 24 | [Risk Score de Portfólio (M16)](24.md) | ✅ | 4, 10, 22, 19, 21 | 9 |
+| 25 | [Admin Gerenciamento de Planos e Recursos (M17)](25.md) | 🔄 | 1–24 | 5 |
 
 ## Ordem de execução recomendada
 

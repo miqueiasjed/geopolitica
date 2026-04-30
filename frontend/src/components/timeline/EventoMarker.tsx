@@ -29,7 +29,7 @@ export function EventoMarker({ evento, onClick, posicaoX }: EventoMarkerProps) {
       {/* Losango */}
       <polygon
         points={points}
-        fill="#E8E4DC"
+        fill="#F7F7F2"
       />
     </motion.g>
   )

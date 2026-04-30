@@ -131,7 +131,7 @@ export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
                 type="button"
                 onClick={onClose}
                 aria-label="Fechar painel de alertas"
-                className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9B882]/50"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]/50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

@@ -54,7 +54,7 @@ export function ChatMessages({ mensagens, isLoading }: ChatMessagesProps) {
         className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center"
         aria-label="Nenhuma mensagem ainda"
       >
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#C9B882]/20 bg-[#1C1F26] text-[#C9B882]/50">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#BFFF3C]/20 bg-[#1C1F26] text-[#BFFF3C]/50">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-7 w-7"

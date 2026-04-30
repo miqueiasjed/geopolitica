@@ -14,7 +14,7 @@ import {
   ReaderIcon,
 } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AlertaBadge } from './alertas/AlertaBadge'
@@ -63,10 +63,6 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   )
   const [painelAberto, setPainelAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
-
-  useEffect(() => {
-    setMenuAberto(false)
-  }, [location.pathname])
 
   const navItems: NavItem[] = [
     {
@@ -219,7 +215,12 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       {navItems.map((item) => {
         const active = item.isActive(location.pathname)
         return (
-          <Link key={item.to} to={item.to} className={navLinkClass(active)}>
+          <Link
+            key={item.to}
+            to={item.to}
+            className={navLinkClass(active)}
+            onClick={() => setMenuAberto(false)}
+          >
             <span className={iconClass(active)} aria-hidden="true">
               {item.icon}
             </span>

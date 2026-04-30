@@ -80,7 +80,7 @@ export function BuscaPais({ onSelect }: BuscaPaisProps) {
         onChange={(e) => setTermo(e.target.value)}
         placeholder="Buscar país (mín. 2 caracteres)..."
         aria-label="Buscar país"
-        className="w-full rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-[#C9B882] focus:ring-1 focus:ring-[#C9B882]/40"
+        className="w-full rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-[#BFFF3C] focus:ring-1 focus:ring-[#BFFF3C]/40"
       />
 
       {mostrarDropdown && (

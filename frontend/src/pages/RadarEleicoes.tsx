@@ -75,10 +75,10 @@ export function RadarEleicoes() {
       <div>
         {/* Header */}
         <div className="space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/75">
+          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/75">
             Módulo Geopolítico
           </p>
-          <h1 className="text-3xl font-bold text-[#E8E4DC]">Radar de Eleições</h1>
+          <h1 className="text-3xl font-bold text-[#F7F7F2]">Radar de Eleições</h1>
           <p className="text-sm text-zinc-500">
             Mapeamento de eleições globais e seu impacto nos investimentos
           </p>

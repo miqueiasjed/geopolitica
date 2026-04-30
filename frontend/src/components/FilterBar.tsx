@@ -35,7 +35,7 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
               }
               className={`rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
                 active
-                  ? 'border border-[#C9B882]/30 bg-[#C9B882]/10 text-[#C9B882]'
+                  ? 'border border-[#BFFF3C]/30 bg-[#BFFF3C]/10 text-[#BFFF3C]'
                   : 'border border-transparent text-zinc-500 hover:text-zinc-300'
               }`}
             >

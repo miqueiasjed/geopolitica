@@ -27,7 +27,7 @@ export function EleicaoFilterBar({ filtros, onChange }: EleicaoFilterBarProps) {
       <select
         value={filtros.ano}
         onChange={(e) => onChange({ ...filtros, ano: Number(e.target.value) })}
-        className="rounded border border-zinc-700 bg-zinc-900 px-3 py-1.5 font-mono text-xs text-zinc-300 transition-colors focus:border-[#C9B882] focus:outline-none focus:ring-1 focus:ring-[#C9B882]"
+        className="rounded border border-zinc-700 bg-zinc-900 px-3 py-1.5 font-mono text-xs text-zinc-300 transition-colors focus:border-[#BFFF3C] focus:outline-none focus:ring-1 focus:ring-[#BFFF3C]"
         aria-label="Filtrar por ano"
       >
         {ANOS.map((ano) => (
@@ -58,7 +58,7 @@ export function EleicaoFilterBar({ filtros, onChange }: EleicaoFilterBarProps) {
                 ativa && cor
                   ? { color: cor, borderColor: `${cor}4D`, backgroundColor: `${cor}1A` }
                   : ativa && !cor
-                    ? { color: '#C9B882', borderColor: 'rgba(201,184,130,0.3)', backgroundColor: 'rgba(201,184,130,0.1)' }
+                    ? { color: '#BFFF3C', borderColor: 'rgba(191,255,60,0.3)', backgroundColor: 'rgba(191,255,60,0.1)' }
                     : undefined
               }
             >

@@ -51,7 +51,7 @@ export function ChatInput({ onEnviar, disabled }: ChatInputProps) {
   const excedeLimite = texto.length > LIMITE_CARACTERES
 
   return (
-    <div className="relative flex flex-col gap-2 rounded-xl border border-[#C9B882]/20 bg-[#1C1F26] p-3">
+    <div className="relative flex flex-col gap-2 rounded-xl border border-[#BFFF3C]/20 bg-[#1C1F26] p-3">
       <textarea
         ref={textareaRef}
         value={texto}
@@ -78,7 +78,7 @@ export function ChatInput({ onEnviar, disabled }: ChatInputProps) {
           type="button"
           onClick={handleEnviar}
           disabled={disabled || !texto.trim() || excedeLimite}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#C9B882] px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-[#0a0a0b] transition-all hover:bg-[#D4C99A] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#BFFF3C] px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-[#0a0a0b] transition-all hover:bg-[#D4C99A] disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Enviar mensagem (Ctrl+Enter)"
         >
           {disabled ? (

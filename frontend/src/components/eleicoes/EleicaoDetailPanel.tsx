@@ -111,7 +111,7 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                     type="button"
                     onClick={onClose}
                     aria-label="Fechar painel"
-                    className="text-[#6B7280] transition-colors hover:text-[#E8E4DC] text-xl leading-none"
+                    className="text-[#6B7280] transition-colors hover:text-[#F7F7F2] text-xl leading-none"
                   >
                     ✕
                   </button>
@@ -127,13 +127,13 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                     >
                       {getFlagEmoji(eleicao.codigo_pais)}
                     </span>
-                    <h2 className="text-xl font-bold text-[#E8E4DC]">{eleicao.pais}</h2>
+                    <h2 className="text-xl font-bold text-[#F7F7F2]">{eleicao.pais}</h2>
                     <BadgeRelevancia relevancia={eleicao.relevancia} />
                   </div>
 
                   {/* Data e tipo */}
                   <div className="flex flex-wrap items-center gap-3 mt-2">
-                    <span className="font-mono text-sm text-[#C9B882]">
+                    <span className="font-mono text-sm text-[#BFFF3C]">
                       {formatarDataEleicaoLonga(eleicao.data_eleicao)}
                     </span>
                     <span className="rounded bg-[#2D3240] px-2 py-0.5 font-mono text-xs text-zinc-400">
@@ -147,7 +147,7 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                   <>
                     <hr className="my-4 border-[#2D3240]" />
                     <section>
-                      <h3 className="mb-3 font-mono text-xs uppercase tracking-[0.18em] text-[#C9B882]">
+                      <h3 className="mb-3 font-mono text-xs uppercase tracking-[0.18em] text-[#BFFF3C]">
                         Candidatos Principais
                       </h3>
                       <ul className="space-y-2">
@@ -156,7 +156,7 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                             key={index}
                             className="flex items-center justify-between rounded bg-[#0F1117] px-3 py-2"
                           >
-                            <span className="text-sm text-[#E8E4DC]">{candidato.nome}</span>
+                            <span className="text-sm text-[#F7F7F2]">{candidato.nome}</span>
                             {candidato.partido && (
                               <span className="ml-2 font-mono text-xs text-zinc-500">
                                 {candidato.partido}
@@ -174,10 +174,10 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                   <>
                     <hr className="my-4 border-[#2D3240]" />
                     <section>
-                      <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.18em] text-[#C9B882]">
+                      <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.18em] text-[#BFFF3C]">
                         Contexto Geopolítico
                       </h3>
-                      <p className="text-sm leading-relaxed text-[#E8E4DC]">
+                      <p className="text-sm leading-relaxed text-[#F7F7F2]">
                         {eleicao.contexto_geopolitico}
                       </p>
                     </section>
@@ -189,11 +189,11 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                   <>
                     <hr className="my-4 border-[#2D3240]" />
                     <section>
-                      <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.18em] text-[#C9B882]">
+                      <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.18em] text-[#BFFF3C]">
                         Impacto no Brasil
                       </h3>
-                      <div className="rounded border border-[#C9B882]/20 bg-[#C9B882]/5 p-3">
-                        <p className="text-sm leading-relaxed text-[#E8E4DC]">
+                      <div className="rounded border border-[#BFFF3C]/20 bg-[#BFFF3C]/5 p-3">
+                        <p className="text-sm leading-relaxed text-[#F7F7F2]">
                           {eleicao.impacto_brasil}
                         </p>
                       </div>
@@ -206,7 +206,7 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                   <div className="mt-6">
                     <Link
                       to={`/dashboard/biblioteca/${eleicao.content_slug}`}
-                      className="inline-flex items-center gap-1 text-sm text-[#C9B882] transition-colors hover:text-[#E8E4DC]"
+                      className="inline-flex items-center gap-1 text-sm text-[#BFFF3C] transition-colors hover:text-[#F7F7F2]"
                     >
                       Ver na Biblioteca →
                     </Link>

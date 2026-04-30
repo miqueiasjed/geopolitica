@@ -26,6 +26,7 @@ import { AdminLayout } from '../components/AdminLayout'
 import { AdminCrises } from '../pages/admin/AdminCrises'
 import { AdminFontes } from '../pages/admin/AdminFontes'
 import { AdminPaises } from '../pages/admin/AdminPaises'
+import { AdminPlanos } from '../pages/admin/AdminPlanos'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
 import { PerfilPaisPage } from '../pages/PerfilPaisPage'
@@ -85,6 +86,7 @@ export function AppRouter() {
           <Route path="fontes" element={<AdminFontes />} />
           <Route path="paises" element={<AdminPaises />} />
           <Route path="b2b" element={<AdminB2BPage />} />
+          <Route path="planos" element={<AdminPlanos />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
           <Route path="ia/uso" element={<UsoPage />} />
         </Route>

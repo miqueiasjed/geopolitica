@@ -39,11 +39,11 @@ export function RefetchIndicator({ isFetching, dataUpdatedAt }: RefetchIndicator
             animate={{ opacity: 1, y: 0 }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: 'easeOut' }}
-            className="inline-flex items-center gap-2 rounded-full border border-[#C9B882]/20 bg-[#C9B882]/10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.18em] text-[#C9B882]"
+            className="inline-flex items-center gap-2 rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.18em] text-[#BFFF3C]"
           >
             <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#C9B882] opacity-60" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#C9B882]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#BFFF3C] opacity-60" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#BFFF3C]" />
             </span>
             Atualizando...
           </motion.div>
