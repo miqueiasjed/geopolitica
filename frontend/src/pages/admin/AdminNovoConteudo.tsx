@@ -20,6 +20,8 @@ import { AdminEditor } from '../../components/biblioteca/AdminEditor'
 import { criarConteudo } from '../../services/admin'
 import type { TipoConteudo, PlanoMinimo, VerticalConteudo } from '../../types/biblioteca'
 
+const VALOR_SEM_VERTICAL = 'core'
+
 interface FormErros {
   titulo?: string
   tese_manchete?: string
@@ -36,7 +38,9 @@ export function AdminNovoConteudo() {
   const [tags, setTags] = useState('')
   const [resumo, setResumo] = useState('')
   const [planoMinimo, setPlanoMinimo] = useState<PlanoMinimo>('essencial')
-  const [verticalConteudo, setVerticalConteudo] = useState<VerticalConteudo | ''>('')
+  const [verticalConteudo, setVerticalConteudo] = useState<VerticalConteudo | typeof VALOR_SEM_VERTICAL>(
+    VALOR_SEM_VERTICAL,
+  )
   const [corpo, setCorpo] = useState('')
   const [publicado, setPublicado] = useState(false)
   const [erros, setErros] = useState<FormErros>({})
@@ -85,7 +89,7 @@ export function AdminNovoConteudo() {
       tags: tagsArray.length > 0 ? tagsArray : undefined,
       resumo: resumo.trim() || undefined,
       plano_minimo: planoMinimo,
-      vertical_conteudo: verticalConteudo || null,
+      vertical_conteudo: verticalConteudo === VALOR_SEM_VERTICAL ? null : verticalConteudo,
       corpo,
       publicado,
     })
@@ -259,11 +263,13 @@ export function AdminNovoConteudo() {
                 </Text>
                 <Select.Root
                   value={verticalConteudo}
-                  onValueChange={(valor) => setVerticalConteudo(valor as VerticalConteudo | '')}
+                  onValueChange={(valor) =>
+                    setVerticalConteudo(valor as VerticalConteudo | typeof VALOR_SEM_VERTICAL)
+                  }
                 >
                   <Select.Trigger className="w-full" />
                   <Select.Content>
-                    <Select.Item value="">GPI Core (sem vertical)</Select.Item>
+                    <Select.Item value={VALOR_SEM_VERTICAL}>GPI Core (sem vertical)</Select.Item>
                     <Select.Item value="elections">Monitor Eleitoral</Select.Item>
                     <Select.Item value="war">Monitor de Guerra</Select.Item>
                   </Select.Content>
