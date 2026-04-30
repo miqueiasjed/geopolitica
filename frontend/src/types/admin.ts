@@ -95,6 +95,7 @@ export interface AtualizarUsuarioPayload {
   name?: string
   email?: string
   role?: RoleUsuario
+  expira_em?: string | null
 }
 
 export interface CriarUsuarioPayload {
@@ -102,6 +103,7 @@ export interface CriarUsuarioPayload {
   email: string
   password: string
   role: RoleUsuario
+  expira_em?: string | null
 }
 
 // --- Crises Históricas ---

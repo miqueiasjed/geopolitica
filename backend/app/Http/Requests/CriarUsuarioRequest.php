@@ -18,7 +18,8 @@ class CriarUsuarioRequest extends FormRequest
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:8'],
-            'role'     => ['required', 'string', Rule::in(['admin', 'assinante_essencial', 'assinante_pro', 'assinante_reservado', 'company_admin'])],
+            'role'      => ['required', 'string', Rule::in(['admin', 'assinante_essencial', 'assinante_pro', 'assinante_reservado', 'company_admin'])],
+            'expira_em' => ['nullable', 'date'],
         ];
     }
 

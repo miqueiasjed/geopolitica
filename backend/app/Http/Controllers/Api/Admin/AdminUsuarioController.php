@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AtualizarUsuarioRequest;
 use App\Http\Requests\CriarUsuarioRequest;
+use App\Models\Assinante;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -53,6 +54,19 @@ class AdminUsuarioController extends Controller
         $user->save();
 
         $user->assignRole($dados['role']);
+
+        $plano = $this->planoFromRole($dados['role']);
+        if ($plano !== null) {
+            Assinante::create([
+                'user_id'    => $user->id,
+                'plano'      => $plano,
+                'ativo'      => true,
+                'status'     => 'ativo',
+                'assinado_em' => now(),
+                'expira_em'  => $dados['expira_em'] ?? null,
+            ]);
+        }
+
         $user->load('roles');
 
         return response()->json([
@@ -70,16 +84,37 @@ class AdminUsuarioController extends Controller
 
     public function update(AtualizarUsuarioRequest $request, int $usuario): JsonResponse
     {
-        $user  = User::query()->findOrFail($usuario);
+        $user  = User::query()->with('assinante')->findOrFail($usuario);
         $dados = $request->validated();
 
+        $expiraEmFornecida = array_key_exists('expira_em', $dados);
+        $expiraEm          = $dados['expira_em'] ?? null;
+        unset($dados['expira_em']);
+
+        $novoPlano = null;
         if (isset($dados['role'])) {
             $user->syncRoles([$dados['role']]);
+            $novoPlano = $this->planoFromRole($dados['role']);
             unset($dados['role']);
         }
 
         if (! empty($dados)) {
             $user->update($dados);
+        }
+
+        if ($novoPlano !== null) {
+            Assinante::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'plano'      => $novoPlano,
+                    'ativo'      => true,
+                    'status'     => 'ativo',
+                    'assinado_em' => $user->assinante?->assinado_em ?? now(),
+                    'expira_em'  => $expiraEmFornecida ? $expiraEm : $user->assinante?->expira_em,
+                ]
+            );
+        } elseif ($expiraEmFornecida && $user->assinante) {
+            $user->assinante->update(['expira_em' => $expiraEm]);
         }
 
         $user->load('roles');
@@ -104,6 +139,16 @@ class AdminUsuarioController extends Controller
         $alvo->delete();
 
         return response()->json(['message' => 'Usuário excluído com sucesso.']);
+    }
+
+    private function planoFromRole(string $role): ?string
+    {
+        return match ($role) {
+            'assinante_essencial' => 'essencial',
+            'assinante_pro'       => 'pro',
+            'assinante_reservado' => 'reservado',
+            default               => null,
+        };
     }
 
     private function serializar(User $user, bool $detalhado = false): array

@@ -24,7 +24,7 @@ import {
   ResetIcon,
   TrashIcon,
 } from '@radix-ui/react-icons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   adminKeys,
   atualizarAdminUsuario,
@@ -68,12 +68,15 @@ function labelDaRole(role: string | null) {
   return ROLES.find((r) => r.valor === role)?.label ?? role ?? '—'
 }
 
+const ROLES_ASSINANTE = ['assinante_essencial', 'assinante_pro', 'assinante_reservado']
+
 function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
   const queryClient = useQueryClient()
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [role, setRole] = useState<RoleUsuario>('assinante_essencial')
+  const [expiraEm, setExpiraEm] = useState('')
   const [erro, setErro] = useState('')
 
   function resetar() {
@@ -81,6 +84,7 @@ function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => v
     setEmail('')
     setSenha('')
     setRole('assinante_essencial')
+    setExpiraEm('')
     setErro('')
   }
 
@@ -103,8 +107,14 @@ function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => v
 
   function salvar() {
     setErro('')
-    mutacao.mutate({ name: nome, email, password: senha, role })
+    const payload: CriarUsuarioPayload = { name: nome, email, password: senha, role }
+    if (ROLES_ASSINANTE.includes(role) && expiraEm) {
+      payload.expira_em = expiraEm
+    }
+    mutacao.mutate(payload)
   }
+
+  const ehAssinante = ROLES_ASSINANTE.includes(role)
 
   return (
     <Dialog.Root
@@ -177,6 +187,20 @@ function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => v
             </Select.Root>
           </label>
 
+          {ehAssinante && (
+            <label className="space-y-1.5">
+              <Text size="2" weight="medium">
+                Expiração do plano
+              </Text>
+              <input
+                type="date"
+                value={expiraEm}
+                onChange={(e) => setExpiraEm(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              />
+            </label>
+          )}
+
           {erro && (
             <Text size="2" color="ruby">
               {erro}
@@ -213,6 +237,7 @@ function ModalEdicao({
   const [nome, setNome] = useState(usuario.name)
   const [email, setEmail] = useState(usuario.email)
   const [role, setRole] = useState<RoleUsuario | ''>(usuario.role ?? '')
+  const [expiraEm, setExpiraEm] = useState('')
   const [erro, setErro] = useState('')
 
   const detalheQuery = useQuery({
@@ -220,6 +245,14 @@ function ModalEdicao({
     queryFn: () => buscarAdminUsuario(usuario.id),
     enabled: aberto,
   })
+
+  const detalhe = detalheQuery.data
+
+  useEffect(() => {
+    if (detalhe?.assinante?.expira_em) {
+      setExpiraEm(detalhe.assinante.expira_em.slice(0, 10))
+    }
+  }, [detalhe])
 
   const mutacao = useMutation({
     mutationFn: (payload: AtualizarUsuarioPayload) => atualizarAdminUsuario(usuario.id, payload),
@@ -245,6 +278,14 @@ function ModalEdicao({
     if (email !== usuario.email) payload.email = email
     if (role && role !== usuario.role) payload.role = role as RoleUsuario
 
+    const roleEfetiva = role || usuario.role || ''
+    if (ROLES_ASSINANTE.includes(roleEfetiva)) {
+      const expiraEmInicial = detalhe?.assinante?.expira_em?.slice(0, 10) ?? ''
+      if (expiraEm !== expiraEmInicial) {
+        payload.expira_em = expiraEm || null
+      }
+    }
+
     if (Object.keys(payload).length === 0) {
       onFechar()
       return
@@ -253,7 +294,8 @@ function ModalEdicao({
     mutacao.mutate(payload)
   }
 
-  const detalhe = detalheQuery.data
+  const roleEfetiva = role || usuario.role || ''
+  const ehAssinante = ROLES_ASSINANTE.includes(roleEfetiva)
 
   return (
     <Dialog.Root open={aberto} onOpenChange={(v) => !v && onFechar()}>
@@ -277,7 +319,7 @@ function ModalEdicao({
                       <Text size="1" className="text-zinc-500">
                         Plano
                       </Text>
-                      <Text size="2" weight="medium" className="block">
+                      <Text size="2" weight="medium" className="block capitalize">
                         {detalhe.assinante.plano}
                       </Text>
                     </Box>
@@ -285,7 +327,7 @@ function ModalEdicao({
                       <Text size="1" className="text-zinc-500">
                         Status
                       </Text>
-                      <Text size="2" weight="medium" className="block">
+                      <Text size="2" weight="medium" className="block capitalize">
                         {detalhe.assinante.status}
                       </Text>
                     </Box>
@@ -297,6 +339,16 @@ function ModalEdicao({
                         {detalhe.assinante.ativo ? 'Sim' : 'Não'}
                       </Badge>
                     </Box>
+                    {detalhe.assinante.expira_em && (
+                      <Box>
+                        <Text size="1" className="text-zinc-500">
+                          Expira em
+                        </Text>
+                        <Text size="2" weight="medium" className="block">
+                          {formatarDataCurta(detalhe.assinante.expira_em)}
+                        </Text>
+                      </Box>
+                    )}
                   </Flex>
                 </Card>
               )}
@@ -341,6 +393,20 @@ function ModalEdicao({
                   </Select.Content>
                 </Select.Root>
               </label>
+
+              {ehAssinante && (
+                <label className="space-y-1.5">
+                  <Text size="2" weight="medium">
+                    Expiração do plano
+                  </Text>
+                  <input
+                    type="date"
+                    value={expiraEm}
+                    onChange={(e) => setExpiraEm(e.target.value)}
+                    className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                  />
+                </label>
+              )}
 
               {erro && (
                 <Text size="2" color="ruby">
