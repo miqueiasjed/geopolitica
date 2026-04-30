@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('acessar-vertical', function (\App\Models\User $user, string $addonKey): bool {
+            if ($user->hasRole('admin')) {
+                return true;
+            }
+
             $assinante = $user->assinante;
 
             return $assinante?->temAcessoVertical($addonKey) ?? false;

@@ -4,6 +4,8 @@ import { useEleicoes } from '../hooks/useEleicoes'
 import { EleicaoFilterBar } from '../components/eleicoes/EleicaoFilterBar'
 import { RadarGrid } from '../components/eleicoes/RadarGrid'
 import { EleicaoDetailPanel } from '../components/eleicoes/EleicaoDetailPanel'
+import { AddonGate } from '../components/AddonGate'
+import { useAddonAccess } from '../hooks/useAddonAccess'
 import type { FiltrosEleicao, RelevanciaEleicao } from '../types/eleicao'
 
 const ANO_ATUAL = new Date().getFullYear()
@@ -59,7 +61,7 @@ function ContadoresRelevancia({
   )
 }
 
-export function RadarEleicoes() {
+function RadarEleicoesConteudo() {
   const [filtros, setFiltros] = useState<FiltrosEleicao>({ ano: ANO_ATUAL })
   const [eleicaoIdSelecionada, setEleicaoIdSelecionada] = useState<number | null>(null)
 
@@ -110,4 +112,14 @@ export function RadarEleicoes() {
       />
     </motion.div>
   )
+}
+
+export function RadarEleicoes() {
+  const temAcesso = useAddonAccess('elections')
+
+  if (!temAcesso) {
+    return <AddonGate addonKey="elections" />
+  }
+
+  return <RadarEleicoesConteudo />
 }

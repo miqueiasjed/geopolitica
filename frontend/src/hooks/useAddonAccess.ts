@@ -5,6 +5,8 @@ export function useAddonAccess(addonKey: 'elections' | 'war'): boolean {
 
   if (!user) return false
 
+  if (user.role === 'admin') return true
+
   const plano = user.assinante?.plano ?? ''
   const addons: string[] = user.assinante?.addons ?? []
 

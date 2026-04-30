@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 import api from '../lib/axios'
 import type { Eleicao, FiltrosEleicao } from '../types/eleicao'
 
@@ -23,6 +24,13 @@ export function useEleicoes(filtros: FiltrosEleicao) {
     queryKey: eleicoesKeys.lista(filtros),
     queryFn: () => fetchEleicoes(filtros),
     refetchOnMount: 'always',
+    retry: (failureCount, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        return false
+      }
+
+      return failureCount < 3
+    },
     staleTime: 60 * 60 * 1000,
   })
 
