@@ -87,6 +87,14 @@ export async function buscarAdminWebhookEventos(
   return resposta.data
 }
 
+export async function excluirWebhookEventos(ids: number[]): Promise<{ deleted: number }> {
+  const resposta = await api.delete<{ deleted: number }>('/admin/webhook-eventos', {
+    data: { ids },
+  })
+
+  return resposta.data
+}
+
 export async function criarConteudo(payload: CriarConteudoPayload): Promise<Conteudo> {
   const resposta = await api.post<Conteudo>('/admin/conteudos', payload)
 

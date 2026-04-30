@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  AlertDialog,
   Badge,
   Box,
   Button,
   Card,
   Callout,
+  Checkbox,
   Flex,
   Heading,
   ScrollArea,
@@ -20,9 +22,10 @@ import {
   ChevronRightIcon,
   ExclamationTriangleIcon,
   ResetIcon,
+  TrashIcon,
 } from '@radix-ui/react-icons'
 import { useState } from 'react'
-import { adminKeys, buscarAdminWebhookEventos } from '../../services/admin'
+import { adminKeys, buscarAdminWebhookEventos, excluirWebhookEventos } from '../../services/admin'
 import { formatarDataCurta, formatarJsonPretty } from '../../utils/formatters'
 import type { AdminWebhookEvento } from '../../types/admin'
 
@@ -116,11 +119,14 @@ function DetalheEvento({ evento }: { evento: AdminWebhookEvento }) {
 }
 
 export function AdminWebhookEventos() {
+  const queryClient = useQueryClient()
+
   const [fonte, setFonte] = useState(VALOR_TODOS)
   const [type, setType] = useState(VALOR_TODOS)
   const [processado, setProcessado] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [selecionados, setSelecionados] = useState<Set<number>>(new Set())
 
   const query = useQuery({
     queryKey: adminKeys.webhookEventos({
@@ -139,10 +145,46 @@ export function AdminWebhookEventos() {
     placeholderData: (dadosAnteriores) => dadosAnteriores,
   })
 
+  const mutacaoExcluir = useMutation({
+    mutationFn: excluirWebhookEventos,
+    onSuccess: () => {
+      setSelecionados(new Set())
+      queryClient.invalidateQueries({ queryKey: adminKeys.all })
+    },
+  })
+
   const eventos = query.data?.data ?? []
   const total = query.data?.total ?? 0
   const paginaAtual = query.data?.current_page ?? 1
   const ultimaPagina = query.data?.last_page ?? 1
+
+  const idsDaPagina = eventos.map((e) => e.id)
+  const todosSelecionados = idsDaPagina.length > 0 && idsDaPagina.every((id) => selecionados.has(id))
+  const algunsSelecionados = idsDaPagina.some((id) => selecionados.has(id)) && !todosSelecionados
+
+  function toggleTodos() {
+    setSelecionados((prev) => {
+      const next = new Set(prev)
+      if (todosSelecionados) {
+        idsDaPagina.forEach((id) => next.delete(id))
+      } else {
+        idsDaPagina.forEach((id) => next.add(id))
+      }
+      return next
+    })
+  }
+
+  function toggleEvento(id: number) {
+    setSelecionados((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
 
   function limparFiltros() {
     setFonte(VALOR_TODOS)
@@ -154,6 +196,8 @@ export function AdminWebhookEventos() {
   function toggleExpanded(id: number) {
     setExpandedId((atual) => (atual === id ? null : id))
   }
+
+  const qtdSelecionados = selecionados.size
 
   return (
     <main className="min-h-screen bg-[#0a0a0b] px-6 py-10 text-cyan-50">
@@ -177,90 +221,127 @@ export function AdminWebhookEventos() {
 
         <Card size="4" className="border border-cyan-400/10 bg-slate-950/80 backdrop-blur">
           <Flex direction="column" gap="4">
-            <Flex wrap="wrap" gap="3" align="end">
-              <label className="min-w-[180px] space-y-2">
-                <Text size="2" weight="medium">
-                  Origem
-                </Text>
-                <Select.Root
-                  value={fonte}
-                  onValueChange={(valor) => {
-                    setFonte(valor)
-                    setType(VALOR_TODOS)
-                    setPage(1)
-                  }}
-                >
-                  <Select.Trigger placeholder="Todas as origens" />
-                  <Select.Content>
-                    <Select.Item value={VALOR_TODOS}>Todas as origens</Select.Item>
-                    <Select.Item value="lastlink">Lastlink</Select.Item>
-                    <Select.Item value="hotmart">Hotmart</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-              </label>
+            <Flex wrap="wrap" gap="3" align="end" justify="between">
+              <Flex wrap="wrap" gap="3" align="end">
+                <label className="min-w-[180px] space-y-2">
+                  <Text size="2" weight="medium">
+                    Origem
+                  </Text>
+                  <Select.Root
+                    value={fonte}
+                    onValueChange={(valor) => {
+                      setFonte(valor)
+                      setType(VALOR_TODOS)
+                      setPage(1)
+                    }}
+                  >
+                    <Select.Trigger placeholder="Todas as origens" />
+                    <Select.Content>
+                      <Select.Item value={VALOR_TODOS}>Todas as origens</Select.Item>
+                      <Select.Item value="lastlink">Lastlink</Select.Item>
+                      <Select.Item value="hotmart">Hotmart</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </label>
 
-              <label className="min-w-[240px] space-y-2">
-                <Text size="2" weight="medium">
-                  Tipo do evento
-                </Text>
-                <Select.Root
-                  value={type}
-                  onValueChange={(valor) => {
-                    setType(valor)
-                    setPage(1)
-                  }}
-                >
-                  <Select.Trigger placeholder="Todos os tipos" />
-                  <Select.Content>
-                    <Select.Item value={VALOR_TODOS}>Todos os tipos</Select.Item>
-                    {(fonte === VALOR_TODOS || fonte === 'hotmart') && (
-                      <Select.Group>
-                        <Select.Label>Hotmart</Select.Label>
-                        {TIPOS_HOTMART.map((t) => (
-                          <Select.Item key={t} value={t}>
-                            {t}
-                          </Select.Item>
-                        ))}
-                      </Select.Group>
-                    )}
-                    {(fonte === VALOR_TODOS || fonte === 'lastlink') && (
-                      <Select.Group>
-                        <Select.Label>Lastlink</Select.Label>
-                        {TIPOS_LASTLINK.map((t) => (
-                          <Select.Item key={t} value={t}>
-                            {t}
-                          </Select.Item>
-                        ))}
-                      </Select.Group>
-                    )}
-                  </Select.Content>
-                </Select.Root>
-              </label>
+                <label className="min-w-[240px] space-y-2">
+                  <Text size="2" weight="medium">
+                    Tipo do evento
+                  </Text>
+                  <Select.Root
+                    value={type}
+                    onValueChange={(valor) => {
+                      setType(valor)
+                      setPage(1)
+                    }}
+                  >
+                    <Select.Trigger placeholder="Todos os tipos" />
+                    <Select.Content>
+                      <Select.Item value={VALOR_TODOS}>Todos os tipos</Select.Item>
+                      {(fonte === VALOR_TODOS || fonte === 'hotmart') && (
+                        <Select.Group>
+                          <Select.Label>Hotmart</Select.Label>
+                          {TIPOS_HOTMART.map((t) => (
+                            <Select.Item key={t} value={t}>
+                              {t}
+                            </Select.Item>
+                          ))}
+                        </Select.Group>
+                      )}
+                      {(fonte === VALOR_TODOS || fonte === 'lastlink') && (
+                        <Select.Group>
+                          <Select.Label>Lastlink</Select.Label>
+                          {TIPOS_LASTLINK.map((t) => (
+                            <Select.Item key={t} value={t}>
+                              {t}
+                            </Select.Item>
+                          ))}
+                        </Select.Group>
+                      )}
+                    </Select.Content>
+                  </Select.Root>
+                </label>
 
-              <label className="min-w-[180px] space-y-2">
-                <Text size="2" weight="medium">
-                  Status
-                </Text>
-                <Select.Root
-                  value={processado}
-                  onValueChange={(valor) => {
-                    setProcessado(valor)
-                    setPage(1)
-                  }}
-                >
-                  <Select.Trigger placeholder="Todos os status" />
-                  <Select.Content>
-                    <Select.Item value={VALOR_TODOS}>Todos</Select.Item>
-                    <Select.Item value="true">Processados</Select.Item>
-                    <Select.Item value="false">Pendentes</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-              </label>
+                <label className="min-w-[180px] space-y-2">
+                  <Text size="2" weight="medium">
+                    Status
+                  </Text>
+                  <Select.Root
+                    value={processado}
+                    onValueChange={(valor) => {
+                      setProcessado(valor)
+                      setPage(1)
+                    }}
+                  >
+                    <Select.Trigger placeholder="Todos os status" />
+                    <Select.Content>
+                      <Select.Item value={VALOR_TODOS}>Todos</Select.Item>
+                      <Select.Item value="true">Processados</Select.Item>
+                      <Select.Item value="false">Pendentes</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </label>
 
-              <Button size="3" variant="soft" color="gray" onClick={limparFiltros}>
-                <ResetIcon />
-                Limpar
-              </Button>
+                <Button size="3" variant="soft" color="gray" onClick={limparFiltros}>
+                  <ResetIcon />
+                  Limpar
+                </Button>
+              </Flex>
+
+              {qtdSelecionados > 0 && (
+                <AlertDialog.Root>
+                  <AlertDialog.Trigger>
+                    <Button size="3" color="red" variant="soft">
+                      <TrashIcon />
+                      Excluir {qtdSelecionados} {qtdSelecionados === 1 ? 'evento' : 'eventos'}
+                    </Button>
+                  </AlertDialog.Trigger>
+                  <AlertDialog.Content maxWidth="420px">
+                    <AlertDialog.Title>Excluir eventos</AlertDialog.Title>
+                    <AlertDialog.Description size="2">
+                      Tem certeza que deseja excluir {qtdSelecionados}{' '}
+                      {qtdSelecionados === 1 ? 'evento selecionado' : 'eventos selecionados'}? Essa
+                      ação não pode ser desfeita.
+                    </AlertDialog.Description>
+                    <Flex gap="3" mt="4" justify="end">
+                      <AlertDialog.Cancel>
+                        <Button variant="soft" color="gray">
+                          Cancelar
+                        </Button>
+                      </AlertDialog.Cancel>
+                      <AlertDialog.Action>
+                        <Button
+                          color="red"
+                          loading={mutacaoExcluir.isPending}
+                          onClick={() => mutacaoExcluir.mutate([...selecionados])}
+                        >
+                          Excluir
+                        </Button>
+                      </AlertDialog.Action>
+                    </Flex>
+                  </AlertDialog.Content>
+                </AlertDialog.Root>
+              )}
             </Flex>
 
             <Separator size="4" />
@@ -275,9 +356,16 @@ export function AdminWebhookEventos() {
               </Text>
             ) : (
               <ScrollArea type="auto" scrollbars="horizontal" className="w-full">
-                <Table.Root className="min-w-[980px]">
+                <Table.Root className="min-w-[1020px]">
                   <Table.Header>
                     <Table.Row className="border-b border-cyan-400/10">
+                      <Table.ColumnHeaderCell width="40px">
+                        <Checkbox
+                          checked={todosSelecionados ? true : algunsSelecionados ? 'indeterminate' : false}
+                          onCheckedChange={toggleTodos}
+                          aria-label="Selecionar todos"
+                        />
+                      </Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Origem</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Tipo</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>E-mail</Table.ColumnHeaderCell>
@@ -289,21 +377,22 @@ export function AdminWebhookEventos() {
                     {eventos.length > 0 ? (
                       eventos.flatMap((evento) => {
                         const expandido = expandedId === evento.id
+                        const selecionado = selecionados.has(evento.id)
 
                         return [
                           <Table.Row
                             key={evento.id}
-                            className="cursor-pointer transition-colors hover:bg-cyan-400/5"
-                            aria-expanded={expandido}
-                            tabIndex={0}
-                            onClick={() => toggleExpanded(evento.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault()
-                                toggleExpanded(evento.id)
-                              }
-                            }}
+                            className={`transition-colors hover:bg-cyan-400/5 ${selecionado ? 'bg-cyan-400/5' : ''}`}
                           >
+                            <Table.Cell
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Checkbox
+                                checked={selecionado}
+                                onCheckedChange={() => toggleEvento(evento.id)}
+                                aria-label={`Selecionar evento ${evento.id}`}
+                              />
+                            </Table.Cell>
                             <Table.Cell>
                               <Badge
                                 color={badgeFonte(evento.fonte)}
@@ -314,12 +403,17 @@ export function AdminWebhookEventos() {
                                 {evento.fonte}
                               </Badge>
                             </Table.Cell>
-                            <Table.Cell className="font-medium">
+                            <Table.Cell
+                              className="cursor-pointer"
+                              onClick={() => toggleExpanded(evento.id)}
+                            >
                               <Flex align="center" gap="2">
                                 <ChevronDownIcon
                                   className={`shrink-0 transition-transform ${expandido ? 'rotate-180' : 'rotate-0'}`}
                                 />
-                                <Text size="2">{evento.event_type}</Text>
+                                <Text size="2" weight="medium">
+                                  {evento.event_type}
+                                </Text>
                               </Flex>
                             </Table.Cell>
                             <Table.Cell>
@@ -339,7 +433,7 @@ export function AdminWebhookEventos() {
                           </Table.Row>,
                           expandido ? (
                             <Table.Row key={`${evento.id}-detalhe`} className="bg-cyan-400/5">
-                              <Table.Cell colSpan={5}>
+                              <Table.Cell colSpan={6}>
                                 <DetalheEvento evento={evento} />
                               </Table.Cell>
                             </Table.Row>
@@ -348,7 +442,7 @@ export function AdminWebhookEventos() {
                       })
                     ) : (
                       <Table.Row>
-                        <Table.Cell colSpan={5}>
+                        <Table.Cell colSpan={6}>
                           <Box className="py-10 text-center">
                             <Text size="3" className="text-cyan-100/65">
                               Nenhum evento encontrado com os filtros atuais.
@@ -364,6 +458,9 @@ export function AdminWebhookEventos() {
 
             <Flex justify="between" align="center" wrap="wrap" gap="3">
               <Text size="2" className="text-cyan-100/60">
+                {qtdSelecionados > 0
+                  ? `${qtdSelecionados} selecionado${qtdSelecionados > 1 ? 's' : ''} · `
+                  : ''}
                 Página {paginaAtual} de {ultimaPagina}
               </Text>
 

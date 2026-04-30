@@ -133,6 +133,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
     Route::get('/webhook-eventos', [AdminWebhookController::class, 'index']);
+    Route::delete('/webhook-eventos', [AdminWebhookController::class, 'destroyBulk']);
 
     Route::get('/conteudos', [AdminConteudoController::class, 'index']);
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);
