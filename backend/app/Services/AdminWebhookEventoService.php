@@ -30,6 +30,7 @@ class AdminWebhookEventoService
                 'processado' => $evento->processado,
                 'processado_em' => $evento->processado_em?->toIso8601String(),
                 'erro' => $evento->erro,
+                'log_acao' => $evento->log_acao,
                 'payload' => $evento->payload,
                 'created_at' => $evento->created_at?->toIso8601String(),
             ]);

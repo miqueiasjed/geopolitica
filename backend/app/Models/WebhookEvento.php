@@ -17,6 +17,7 @@ class WebhookEvento extends Model
         'processado',
         'processado_em',
         'erro',
+        'log_acao',
     ];
 
     protected function casts(): array

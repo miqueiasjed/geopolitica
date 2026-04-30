@@ -23,6 +23,17 @@ class LastlinkHandlerService
         'assinante_reservado',
     ];
 
+    private const EVENTOS_IGNORADOS = [
+        'LASTLINK_REFUND_REQUESTED',
+        'LASTLINK_REFUND_PERIOD_OVER',
+        'LASTLINK_SUBSCRIPTION_RENEWAL_PENDING',
+        'LASTLINK_PURCHASE_REQUEST_EXPIRED',
+        'LASTLINK_PURCHASE_REQUEST_CANCELED',
+        'LASTLINK_PURCHASE_REQUEST_CONFIRMED',
+        'LASTLINK_ABANDONED_CART',
+        'LASTLINK_PURCHASE_EXPIRED',
+    ];
+
     public function registrarEvento(array $payload): WebhookEvento
     {
         $eventType = $this->extrairCampo($payload, [
@@ -41,40 +52,75 @@ class LastlinkHandlerService
         ]);
     }
 
+    public function deveIgnorar(array $payload): bool
+    {
+        $eventType = $this->extrairCampo($payload, [
+            'event', 'Event', 'status', 'Status', 'type', 'Type',
+        ]) ?? 'UNKNOWN';
+
+        $tipo = 'LASTLINK_' . strtoupper((string) $eventType);
+
+        return in_array($tipo, self::EVENTOS_IGNORADOS, true);
+    }
+
     public function handle(WebhookEvento $evento): void
     {
         try {
             $tipo = strtoupper($evento->event_type);
 
-            match (true) {
-                in_array($tipo, ['LASTLINK_APPROVED', 'LASTLINK_COMPLETE', 'LASTLINK_PAID',
-                    'LASTLINK_PURCHASE_ORDER_CONFIRMED', 'LASTLINK_ORDER_CONFIRMED'], true)
+            $log = match (true) {
+                in_array($tipo, [
+                    'LASTLINK_APPROVED', 'LASTLINK_COMPLETE', 'LASTLINK_PAID',
+                    'LASTLINK_PURCHASE_ORDER_CONFIRMED', 'LASTLINK_ORDER_CONFIRMED',
+                    'LASTLINK_PRODUCT_ACCESS_STARTED',
+                    'LASTLINK_SUBSCRIPTION_PRODUCT_ACCESS',
+                    'LASTLINK_RECURRENT_PAYMENT',
+                    'LASTLINK_PURCHASE_APPROVED',
+                    'LASTLINK_SWITCH_PLAN',
+                ], true)
                     => $this->handleCompra($evento->payload),
-                in_array($tipo, ['LASTLINK_CANCELLED', 'LASTLINK_CANCELED',
-                    'LASTLINK_PURCHASE_CANCELED', 'LASTLINK_SUBSCRIPTION_CANCELED'], true)
+                in_array($tipo, [
+                    'LASTLINK_CANCELLED', 'LASTLINK_CANCELED',
+                    'LASTLINK_PURCHASE_CANCELED', 'LASTLINK_SUBSCRIPTION_CANCELED',
+                ], true)
                     => $this->handleCancelamento($evento->payload, 'cancelado'),
-                in_array($tipo, ['LASTLINK_REFUNDED', 'LASTLINK_PURCHASE_REFUNDED'], true)
+                in_array($tipo, [
+                    'LASTLINK_REFUNDED', 'LASTLINK_PURCHASE_REFUNDED',
+                    'LASTLINK_PAYMENT_REFUND',
+                ], true)
                     => $this->handleCancelamento($evento->payload, 'reembolsado'),
-                in_array($tipo, ['LASTLINK_CHARGEBACK', 'LASTLINK_PURCHASE_CHARGEBACK'], true)
+                in_array($tipo, [
+                    'LASTLINK_CHARGEBACK', 'LASTLINK_PURCHASE_CHARGEBACK',
+                    'LASTLINK_PAYMENT_CHARGEBACK',
+                ], true)
                     => $this->handleCancelamento($evento->payload, 'reembolsado'),
-                default => null,
+                in_array($tipo, [
+                    'LASTLINK_SUBSCRIPTION_EXPIRED',
+                    'LASTLINK_PRODUCT_ACCESS_ENDED',
+                ], true)
+                    => $this->handleCancelamento($evento->payload, 'expirado'),
+                default => 'Evento sem ação mapeada',
             };
 
             $evento->update([
                 'processado'    => true,
                 'processado_em' => now(),
+                'log_acao'      => $log,
             ]);
         } catch (\Throwable $e) {
-            $evento->update(['erro' => $e->getMessage()]);
+            $evento->update([
+                'erro'     => $e->getMessage(),
+                'log_acao' => 'Erro ao processar: ' . $e->getMessage(),
+            ]);
         }
     }
 
-    private function handleCompra(array $payload): void
+    private function handleCompra(array $payload): string
     {
         $email = $this->extrairEmail($payload);
 
         if (! $email) {
-            return;
+            return 'Email não encontrado no payload — nenhuma ação tomada';
         }
 
         // Addons têm product_id próprio — verifica primeiro
@@ -84,9 +130,7 @@ class LastlinkHandlerService
             $addonKey = AddonService::resolverAddonKey($productId, 'lastlink');
 
             if ($addonKey !== null) {
-                $this->ativarAddon($payload, $addonKey);
-
-                return;
+                return $this->ativarAddon($payload, $addonKey);
             }
         }
 
@@ -94,22 +138,24 @@ class LastlinkHandlerService
         $planoKey = $this->resolverPlano($payload);
 
         if ($planoKey !== null) {
-            $this->ativarAssinatura($payload, $planoKey);
+            return $this->ativarAssinatura($payload, $planoKey);
         }
+
+        return 'Produto ou plano não identificado — nenhuma ação tomada';
     }
 
-    private function handleCancelamento(array $payload, string $motivo): void
+    private function handleCancelamento(array $payload, string $motivo): string
     {
         $email = $this->extrairEmail($payload);
 
         if (! $email) {
-            return;
+            return 'Email não encontrado no payload — nenhuma ação tomada';
         }
 
         $usuario = User::where('email', $email)->first();
 
         if (! $usuario) {
-            return;
+            return "Usuário não encontrado: {$email}";
         }
 
         $productId = $this->extrairProdutoId($payload);
@@ -120,14 +166,15 @@ class LastlinkHandlerService
             if ($addonKey !== null) {
                 (new AddonService())->cancelar($usuario->id, $addonKey, $motivo);
 
-                return;
+                return "Addon {$addonKey} cancelado ({$motivo}) para {$email}";
             }
         }
 
-        // Se não é addon, cancela o plano principal
-        if ($usuario->assinante?->ativo) {
-            $this->desativarAssinatura($usuario, $motivo);
+        if (! $usuario->assinante?->ativo) {
+            return "Assinatura já inativa para {$email} — nenhuma ação tomada";
         }
+
+        return $this->desativarAssinatura($usuario, $motivo);
     }
 
     // -------------------------------------------------------------------------
@@ -208,7 +255,7 @@ class LastlinkHandlerService
     // Ativação e desativação
     // -------------------------------------------------------------------------
 
-    private function ativarAssinatura(array $payload, string $plano): void
+    private function ativarAssinatura(array $payload, string $plano): string
     {
         $email = $this->extrairEmail($payload);
         $nome  = $this->extrairNome($payload, $email);
@@ -218,16 +265,24 @@ class LastlinkHandlerService
             ['name' => $nome, 'password' => Str::password(24)],
         );
 
-        $assinante   = Assinante::firstOrNew(['user_id' => $usuario->id]);
-        $eraNovo     = ! $assinante->exists;
-        $estavaAtivo = (bool) $assinante->ativo;
+        $assinante     = Assinante::firstOrNew(['user_id' => $usuario->id]);
+        $eraNovo       = ! $assinante->exists;
+        $estavaAtivo   = (bool) $assinante->ativo;
+        $planoAnterior = $assinante->plano;
 
-        $assinante->fill([
+        $fillData = [
             'plano'       => $plano,
             'ativo'       => true,
             'status'      => 'ativo',
             'assinado_em' => now(),
-        ])->save();
+        ];
+
+        $proximaCobranca = $this->extrairProximaCobranca($payload);
+        if ($proximaCobranca !== null) {
+            $fillData['expira_em'] = $proximaCobranca;
+        }
+
+        $assinante->fill($fillData)->save();
 
         $this->sincronizarRolePlano($usuario, $plano);
 
@@ -236,20 +291,28 @@ class LastlinkHandlerService
             $link  = $this->montarLinkRedefinicao($token, $email);
             Mail::to($email)->send(new BoasVindasMail($usuario, $link, $plano));
 
-            return;
+            return "Conta criada para {$email} — plano {$plano}";
         }
 
         if (! $estavaAtivo) {
             Mail::to($email)->send(new AcessoLiberadoMail($usuario, $this->montarLinkAcesso(), $plano));
+
+            return "Acesso reativado para {$email} — plano {$plano}";
         }
+
+        if ($planoAnterior !== $plano) {
+            return "Plano atualizado de {$planoAnterior} para {$plano} — {$email}";
+        }
+
+        return "Acesso renovado para {$email} — plano {$plano}";
     }
 
-    private function desativarAssinatura(User $usuario, string $status): void
+    private function desativarAssinatura(User $usuario, string $status): string
     {
         $assinante = $usuario->assinante;
 
         if (! $assinante) {
-            return;
+            return "Assinatura não encontrada para {$usuario->email}";
         }
 
         $assinante->forceFill([
@@ -266,13 +329,21 @@ class LastlinkHandlerService
         if ($status === 'reembolsado') {
             Mail::to($usuario->email)->send(new ReembolsoMail($usuario, $assinante));
 
-            return;
+            return "Reembolso aplicado para {$usuario->email} — acesso revogado";
         }
 
         Mail::to($usuario->email)->send(new CancelamentoMail($usuario, $assinante));
+
+        $descricao = match ($status) {
+            'cancelado' => 'cancelado',
+            'expirado'  => 'expirado',
+            default     => $status,
+        };
+
+        return "Acesso {$descricao} para {$usuario->email}";
     }
 
-    private function ativarAddon(array $payload, string $addonKey): void
+    private function ativarAddon(array $payload, string $addonKey): string
     {
         $email     = $this->extrairEmail($payload);
         $nome      = $this->extrairNome($payload, $email);
@@ -295,11 +366,17 @@ class LastlinkHandlerService
             $token = app(PasswordBrokerManager::class)->broker()->createToken($usuario);
             $link  = $this->montarLinkRedefinicao($token, $email);
             Mail::to($email)->send(new AddonBoasVindasMail($nome, $addonKey, $link, true));
-        } else {
-            Mail::to($email)->send(new AddonBoasVindasMail($nome, $addonKey, $this->montarLinkAcesso(), false));
+
+            (new AddonService())->ativar($usuario->id, $addonKey, 'lastlink', $orderId, $productId);
+
+            return "Conta criada para {$email} e addon {$addonKey} ativado";
         }
 
+        Mail::to($email)->send(new AddonBoasVindasMail($nome, $addonKey, $this->montarLinkAcesso(), false));
+
         (new AddonService())->ativar($usuario->id, $addonKey, 'lastlink', $orderId, $productId);
+
+        return "Addon {$addonKey} ativado para {$email}";
     }
 
     private function sincronizarRolePlano(User $usuario, string $plano): void
@@ -362,6 +439,16 @@ class LastlinkHandlerService
         ]);
 
         return $id ? (string) $id : null;
+    }
+
+    private function extrairProximaCobranca(array $payload): ?string
+    {
+        return $this->extrairCampo($payload, [
+            'Data.Purchase.NextBilling',
+            'next_billing',
+            'next_billing_date',
+            'expiry_date',
+        ]);
     }
 
     private function extrairCampo(array $payload, array $caminhos): ?string

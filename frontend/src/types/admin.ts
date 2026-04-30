@@ -27,6 +27,7 @@ export interface AdminWebhookEvento {
   processado: boolean
   processado_em: string | null
   erro: string | null
+  log_acao: string | null
   created_at: string
   payload: unknown
 }

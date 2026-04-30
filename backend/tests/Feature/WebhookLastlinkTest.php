@@ -65,6 +65,9 @@ class WebhookLastlinkTest extends TestCase
         $this->assertSame('pro', $usuario->assinante->plano);
         $this->assertTrue($usuario->assinante->ativo);
 
+        $this->assertStringContainsString('novo@teste.com', WebhookEvento::latest()->first()->log_acao);
+        $this->assertStringContainsString('Conta criada', WebhookEvento::latest()->first()->log_acao);
+
         Mail::assertSent(BoasVindasMail::class);
     }
 
@@ -122,6 +125,8 @@ class WebhookLastlinkTest extends TestCase
         $this->assertTrue($usuario->hasRole('assinante_pro'));
         $this->assertSame('pro', $usuario->assinante->plano);
 
+        $this->assertStringContainsString('Plano atualizado', WebhookEvento::latest()->first()->log_acao);
+
         Mail::assertNothingSent();
     }
 
@@ -156,6 +161,10 @@ class WebhookLastlinkTest extends TestCase
         $this->assertFalse($usuario->assinante->ativo);
         $this->assertSame('cancelado', $usuario->assinante->status);
         $this->assertFalse($usuario->hasRole('assinante_pro'));
+
+        $this->assertStringContainsString('cancelado', WebhookEvento::latest()->first()->log_acao);
+        $this->assertStringContainsString('cancelar@teste.com', WebhookEvento::latest()->first()->log_acao);
+
         Mail::assertSent(CancelamentoMail::class);
     }
 
@@ -177,6 +186,9 @@ class WebhookLastlinkTest extends TestCase
         $usuario->refresh();
         $this->assertFalse($usuario->assinante->ativo);
         $this->assertSame('reembolsado', $usuario->assinante->status);
+
+        $this->assertStringContainsString('Reembolso', WebhookEvento::latest()->first()->log_acao);
+
         Mail::assertSent(ReembolsoMail::class);
     }
 
@@ -229,6 +241,197 @@ class WebhookLastlinkTest extends TestCase
     }
 
     // -----------------------------------------------------------------------
+    // Payload PascalCase (formato novo Lastlink) — Compra / Renovação
+    // -----------------------------------------------------------------------
+
+    public function test_payload_pascal_case_ativa_assinatura_com_expira_em(): void
+    {
+        $nextBilling = '2026-05-30T03:23:38.1416146Z';
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Purchase_Order_Confirmed', 'pascal@teste.com', 'Pascal User', 'OFFER_PRO_TEST', 1, $nextBilling))
+            ->assertOk();
+
+        $usuario = User::where('email', 'pascal@teste.com')->firstOrFail();
+        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertNotNull($usuario->assinante->expira_em);
+        Mail::assertSent(BoasVindasMail::class);
+    }
+
+    public function test_renovacao_de_assinatura_atualiza_expira_em(): void
+    {
+        $usuario = User::factory()->create(['email' => 'renovar@teste.com']);
+        $usuario->assignRole('assinante_pro');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
+
+        $nextBilling = '2026-06-30T03:00:00.0000000Z';
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Purchase_Order_Confirmed', 'renovar@teste.com', 'Renovar', 'OFFER_PRO_TEST', 2, $nextBilling))
+            ->assertOk();
+
+        $assinante = $usuario->fresh()->assinante;
+        $this->assertTrue($assinante->ativo);
+        $this->assertNotNull($assinante->expira_em);
+        Mail::assertNothingSent();
+    }
+
+    public function test_product_access_started_ativa_assinatura(): void
+    {
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Product_Access_Started', 'access@teste.com', 'Access User', 'OFFER_ESSENCIAL_TEST'))
+            ->assertOk();
+
+        $usuario = User::where('email', 'access@teste.com')->firstOrFail();
+        $this->assertTrue($usuario->hasRole('assinante_essencial'));
+        $this->assertTrue($usuario->assinante->ativo);
+        Mail::assertSent(BoasVindasMail::class);
+    }
+
+    // -----------------------------------------------------------------------
+    // Novos eventos de desativação
+    // -----------------------------------------------------------------------
+
+    public function test_subscription_expired_desativa_com_status_expirado(): void
+    {
+        $usuario = User::factory()->create(['email' => 'expirar@teste.com']);
+        $usuario->assignRole('assinante_pro');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Subscription_Expired', 'expirar@teste.com', 'Expirar', 'OFFER_PRO_TEST'))
+            ->assertOk();
+
+        $usuario->refresh();
+        $this->assertFalse($usuario->assinante->ativo);
+        $this->assertSame('expirado', $usuario->assinante->status);
+        $this->assertFalse($usuario->hasRole('assinante_pro'));
+        Mail::assertSent(CancelamentoMail::class);
+    }
+
+    public function test_product_access_ended_desativa_com_status_expirado(): void
+    {
+        $usuario = User::factory()->create(['email' => 'acesso-fim@teste.com']);
+        $usuario->assignRole('assinante_essencial');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Product_Access_Ended', 'acesso-fim@teste.com', 'Acesso Fim', 'OFFER_ESSENCIAL_TEST'))
+            ->assertOk();
+
+        $usuario->refresh();
+        $this->assertFalse($usuario->assinante->ativo);
+        $this->assertSame('expirado', $usuario->assinante->status);
+    }
+
+    public function test_payment_refund_desativa_como_reembolsado(): void
+    {
+        $usuario = User::factory()->create(['email' => 'refund@teste.com']);
+        $usuario->assignRole('assinante_pro');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Payment_Refund', 'refund@teste.com', 'Refund', 'OFFER_PRO_TEST'))
+            ->assertOk();
+
+        $usuario->refresh();
+        $this->assertFalse($usuario->assinante->ativo);
+        $this->assertSame('reembolsado', $usuario->assinante->status);
+        Mail::assertSent(ReembolsoMail::class);
+    }
+
+    public function test_payment_chargeback_desativa_como_reembolsado(): void
+    {
+        $usuario = User::factory()->create(['email' => 'chargeback@teste.com']);
+        $usuario->assignRole('assinante_essencial');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Payment_Chargeback', 'chargeback@teste.com', 'Chargeback', 'OFFER_ESSENCIAL_TEST'))
+            ->assertOk();
+
+        $usuario->refresh();
+        $this->assertFalse($usuario->assinante->ativo);
+        $this->assertSame('reembolsado', $usuario->assinante->status);
+    }
+
+    // -----------------------------------------------------------------------
+    // Eventos sem ação (apenas registrado, não processa negócio)
+    // -----------------------------------------------------------------------
+
+    public function test_recurrent_payment_renova_assinatura(): void
+    {
+        $usuario = User::factory()->create(['email' => 'renovar2@teste.com']);
+        $usuario->assignRole('assinante_pro');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
+
+        $nextBilling = '2026-07-30T03:00:00.0000000Z';
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Recurrent_Payment', 'renovar2@teste.com', 'Renovar', 'OFFER_PRO_TEST', 3, $nextBilling))
+            ->assertOk();
+
+        $assinante = $usuario->fresh()->assinante;
+        $this->assertTrue($assinante->ativo);
+        $this->assertNotNull($assinante->expira_em);
+        $this->assertDatabaseHas('webhook_eventos', ['event_type' => 'LASTLINK_RECURRENT_PAYMENT']);
+        Mail::assertNothingSent();
+    }
+
+    public function test_switch_plan_atualiza_plano_e_role(): void
+    {
+        $usuario = User::factory()->create(['email' => 'switch@teste.com']);
+        $usuario->assignRole('assinante_essencial');
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Switch_Plan', 'switch@teste.com', 'Switch', 'OFFER_PRO_TEST'))
+            ->assertOk();
+
+        $usuario->refresh();
+        $this->assertFalse($usuario->hasRole('assinante_essencial'));
+        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertSame('pro', $usuario->assinante->plano);
+    }
+
+    public function test_subscription_product_access_ativa_assinatura(): void
+    {
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $this->payloadNovo('Subscription_Product_Access', 'sub-access@teste.com', 'Sub Access', 'OFFER_ESSENCIAL_TEST'))
+            ->assertOk();
+
+        $usuario = User::where('email', 'sub-access@teste.com')->firstOrFail();
+        $this->assertTrue($usuario->hasRole('assinante_essencial'));
+    }
+
+    // -----------------------------------------------------------------------
+    // Eventos ignorados — não geram registro no banco
+    // -----------------------------------------------------------------------
+
+    public function test_eventos_ignorados_nao_geram_registro_no_banco(): void
+    {
+        $ignorados = [
+            'Refund_Requested',
+            'Refund_Period_Over',
+            'Subscription_Renewal_Pending',
+            'Purchase_Request_Expired',
+            'Purchase_Request_Canceled',
+            'Purchase_Request_Confirmed',
+            'Abandoned_Cart',
+            'Purchase_Expired',
+        ];
+
+        foreach ($ignorados as $evento) {
+            $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+                ->postJson('/api/webhook/lastlink', $this->payloadNovo($evento, 'ignorado@teste.com', 'Ignorado', 'OFFER_PRO_TEST'))
+                ->assertOk();
+        }
+
+        $this->assertDatabaseEmpty('webhook_eventos');
+        Mail::assertNothingSent();
+    }
+
+    // -----------------------------------------------------------------------
     // Token inválido e produto desconhecido
     // -----------------------------------------------------------------------
 
@@ -239,7 +442,9 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk()
             ->assertExactJson(['received' => true]);
 
-        $this->assertFalse(WebhookEvento::query()->firstOrFail()->processado);
+        $evento = WebhookEvento::query()->firstOrFail();
+        $this->assertFalse($evento->processado);
+        $this->assertNull($evento->log_acao);
     }
 
     public function test_offer_e_produto_desconhecidos_nao_criam_usuario(): void
@@ -261,6 +466,24 @@ class WebhookLastlinkTest extends TestCase
     // -----------------------------------------------------------------------
     // Helpers de payload
     // -----------------------------------------------------------------------
+
+    private function payloadNovo(string $event, string $email, string $nome, string $offerCode, int $recurrency = 1, ?string $nextBilling = null): array
+    {
+        return [
+            'Id'        => 'test-' . str_replace('_', '-', strtolower($event)),
+            'Event'     => $event,
+            'IsTest'    => true,
+            'CreatedAt' => '2026-04-30T03:23:38',
+            'Data'      => [
+                'Buyer'    => ['Name' => $nome, 'Email' => $email],
+                'Offer'    => ['Id' => $offerCode, 'Name' => 'Plano GPI'],
+                'Purchase' => [
+                    'Recurrency'  => $recurrency,
+                    'NextBilling' => $nextBilling ?? '2026-05-30T03:23:38.0000000Z',
+                ],
+            ],
+        ];
+    }
 
     private function payloadCompraPlano(string $email, string $nome, string $offerCode): array
     {
