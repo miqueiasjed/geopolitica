@@ -62,12 +62,4 @@ class Assinante extends Model
         return is_array($decodificado) ? $decodificado : [];
     }
 
-    public function temAcessoVertical(string $addonKey): bool
-    {
-        return match ($addonKey) {
-            'elections' => in_array($this->plano, ['pro', 'reservado'], true) || $this->temAddon('elections'),
-            'war'       => $this->plano === 'reservado' || $this->temAddon('war'),
-            default     => false,
-        };
-    }
 }

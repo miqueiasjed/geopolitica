@@ -38,21 +38,20 @@ class Conteudo extends Model
         return $query->where('publicado', true)->whereNotNull('publicado_em');
     }
 
-    public function scopeAcessivelPor(Builder $query, string $role): Builder
+    public function scopeAcessivelPor(Builder $query, string $role, ?int $diasHistorico = null): Builder
     {
-        return match ($role) {
-            'assinante_essencial' => $query
-                ->where('plano_minimo', 'essencial')
-                ->where('publicado_em', '>=', now()->subDays(90)),
-
-            'assinante_pro' => $query
-                ->whereIn('plano_minimo', ['essencial', 'pro'])
-                ->where('publicado_em', '>=', now()->subDays(90)),
-
-            'assinante_reservado', 'admin' => $query,
-
-            default => $query->whereRaw('1 = 0'),
+        $query = match ($role) {
+            'assinante_essencial'              => $query->where('plano_minimo', 'essencial'),
+            'assinante_pro'                    => $query->whereIn('plano_minimo', ['essencial', 'pro']),
+            'assinante_reservado', 'admin'     => $query,
+            default                            => $query->whereRaw('1 = 0'),
         };
+
+        if ($diasHistorico !== null) {
+            $query->where('publicado_em', '>=', now()->subDays($diasHistorico));
+        }
+
+        return $query;
     }
 
     public static function gerarSlug(string $titulo): string

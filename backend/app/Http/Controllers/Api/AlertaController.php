@@ -5,22 +5,28 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AlertaPreditivo;
 use App\Services\AlertaPreditivoService;
+use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AlertaController extends Controller
 {
     public function __construct(
-        private readonly AlertaPreditivoService $alertaPreditivoService
+        private readonly AlertaPreditivoService $alertaPreditivoService,
+        private readonly PlanoService $planoService,
     ) {
     }
 
     public function index(Request $request): JsonResponse
     {
-        $userId = $request->user()->id;
-        $papel  = $request->user()->getRoleNames()->first() ?? 'assinante_essencial';
+        $usuario  = $request->user();
+        $slugPlano = $usuario->assinante?->plano ?? 'essencial';
 
-        $resultado = $this->alertaPreditivoService->alertasNaoLidos($userId, $papel);
+        $nivelPermitido = $usuario->hasRole('admin')
+            ? 'all'
+            : ($this->planoService->valorRecurso($slugPlano, 'alertas_nivel') ?? 'medium');
+
+        $resultado = $this->alertaPreditivoService->alertasNaoLidos($usuario->id, $nivelPermitido);
 
         return response()->json($resultado);
     }

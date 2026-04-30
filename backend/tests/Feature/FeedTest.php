@@ -6,6 +6,7 @@ use App\Jobs\ProcessFeedUpdateJob;
 use App\Models\Assinante;
 use App\Models\Event;
 use App\Models\User;
+use Database\Seeders\PlanoSeeder;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -21,11 +22,12 @@ class FeedTest extends TestCase
         parent::setUp();
 
         $this->seed(RolesSeeder::class);
+        $this->seed(PlanoSeeder::class);
     }
 
     public function test_unauthenticated_returns_401(): void
     {
-        $this->get('/api/feed')
+        $this->getJson('/api/feed')
             ->assertUnauthorized()
             ->assertJsonPath('message', 'Não autenticado.');
     }

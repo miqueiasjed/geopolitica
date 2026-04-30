@@ -7,9 +7,9 @@ use App\Models\AlertaPreditivo;
 
 class AlertaPreditivoService
 {
-    public function alertasNaoLidos(int $userId, string $papel): array
+    public function alertasNaoLidos(int $userId, string $nivelPermitido): array
     {
-        $alertas = AlertaPreditivo::visivelPara($papel)
+        $alertas = AlertaPreditivo::visivelPara($nivelPermitido)
             ->naoLidosPor($userId)
             ->orderByDesc('created_at')
             ->get();

@@ -4,17 +4,27 @@ namespace App\Services;
 
 use App\Http\Resources\ConteudoCardResource;
 use App\Models\Conteudo;
+use App\Models\User;
 
 class ConteudoService
 {
-    public function listar(array $filtros, string $role): array
+    public function __construct(
+        private readonly PlanoService $planoService,
+    ) {}
+
+    public function listar(array $filtros, User $usuario): array
     {
         $limite = min((int) ($filtros['limite'] ?? 20), 50);
         $cursor = (int) ($filtros['cursor'] ?? 0);
+        $role   = $usuario->getRoleNames()->first() ?? 'assinante_essencial';
+
+        $diasHistorico = $usuario->hasRole('admin')
+            ? null
+            : $this->planoService->limiteInteiro($usuario->assinante?->plano ?? 'essencial', 'conteudo_historico_dias');
 
         $query = Conteudo::query()
             ->publicados()
-            ->acessivelPor($role)
+            ->acessivelPor($role, $diasHistorico)
             ->when($cursor > 0, fn ($q) => $q->where('id', '>', $cursor))
             ->orderBy('id', 'asc');
 
@@ -56,7 +66,7 @@ class ConteudoService
         ];
     }
 
-    public function buscarPorSlug(string $slug, string $role): ?Conteudo
+    public function buscarPorSlug(string $slug, User $usuario): ?Conteudo
     {
         $conteudo = Conteudo::query()
             ->publicados()
@@ -67,19 +77,29 @@ class ConteudoService
             return null;
         }
 
-        $temAcesso = match ($role) {
-            'assinante_essencial' => $conteudo->plano_minimo === 'essencial'
-                && $conteudo->publicado_em >= now()->subDays(90),
+        if ($usuario->hasRole('admin')) {
+            return $conteudo;
+        }
 
-            'assinante_pro' => in_array($conteudo->plano_minimo, ['essencial', 'pro'])
-                && $conteudo->publicado_em >= now()->subDays(90),
+        $slugPlano     = $usuario->assinante?->plano ?? 'essencial';
+        $role          = $usuario->getRoleNames()->first() ?? 'assinante_essencial';
+        $diasHistorico = $this->planoService->limiteInteiro($slugPlano, 'conteudo_historico_dias');
 
-            'assinante_reservado', 'admin' => true,
-
-            default => false,
+        $planosPermitidos = match ($role) {
+            'assinante_pro'                => ['essencial', 'pro'],
+            'assinante_reservado'          => ['essencial', 'pro', 'reservado'],
+            default                        => ['essencial'],
         };
 
-        return $temAcesso ? $conteudo : null;
+        if (! in_array($conteudo->plano_minimo, $planosPermitidos, true)) {
+            return null;
+        }
+
+        if ($diasHistorico !== null && $conteudo->publicado_em < now()->subDays($diasHistorico)) {
+            return null;
+        }
+
+        return $conteudo;
     }
 
     public function criar(array $dados): Conteudo

@@ -16,9 +16,7 @@ class BibliotecaController extends Controller
 
     public function index(BibliotecaFiltroRequest $request): JsonResponse
     {
-        $role = $request->user()->getRoleNames()->first();
-
-        $resultado = $this->conteudoService->listar($request->validated(), $role);
+        $resultado = $this->conteudoService->listar($request->validated(), $request->user());
 
         return response()->json([
             'data'        => $resultado['data'],

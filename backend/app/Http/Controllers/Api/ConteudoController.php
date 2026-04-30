@@ -17,9 +17,7 @@ class ConteudoController extends Controller
 
     public function show(Request $request, string $slug): JsonResponse
     {
-        $role = $request->user()->getRoleNames()->first();
-
-        $conteudo = $this->conteudoService->buscarPorSlug($slug, $role);
+        $conteudo = $this->conteudoService->buscarPorSlug($slug, $request->user());
 
         if ($conteudo === null) {
             abort(404);

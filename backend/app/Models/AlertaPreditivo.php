@@ -45,12 +45,14 @@ class AlertaPreditivo extends Model
         });
     }
 
-    public function scopeVisivelPara(Builder $query, string $papel): Builder
+    public function scopeVisivelPara(Builder $query, string $nivelPermitido): Builder
     {
-        return match ($papel) {
-            'assinante_essencial' => $query->where('nivel', 'medium'),
-            'assinante_pro'       => $query->whereIn('nivel', ['medium', 'high']),
-            default               => $query, // assinante_reservado, admin — todos os níveis
-        };
+        if ($nivelPermitido === 'all') {
+            return $query;
+        }
+
+        $niveis = array_map('trim', explode(',', $nivelPermitido));
+
+        return $query->whereIn('nivel', $niveis);
     }
 }

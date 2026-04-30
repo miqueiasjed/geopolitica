@@ -6,14 +6,15 @@ use App\Exceptions\LimitePaisesAtingidoException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdicionarPaisRequest;
 use App\Models\PaisUsuario;
+use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PaisUsuarioController extends Controller
 {
-    private const LIMITES = ['essencial' => 3, 'pro' => 10];
-
-    private const PAPEIS_ILIMITADOS = ['reservado', 'admin'];
+    public function __construct(
+        private readonly PlanoService $planoService,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -26,15 +27,18 @@ class PaisUsuarioController extends Controller
 
     public function store(AdicionarPaisRequest $request): JsonResponse
     {
-        $usuario = $request->user();
-        $plano   = $usuario->getRoleNames()->first() ?? 'essencial';
+        $usuario   = $request->user();
+        $slugPlano = $usuario->assinante?->plano ?? 'essencial';
 
-        if (! in_array($plano, self::PAPEIS_ILIMITADOS)) {
-            $limite        = self::LIMITES[$plano] ?? self::LIMITES['essencial'];
-            $totalSeguidos = PaisUsuario::where('user_id', $usuario->id)->count();
+        if (! $usuario->hasRole('admin')) {
+            $limite = $this->planoService->limiteInteiro($slugPlano, 'paises_seguidos_limite');
 
-            if ($totalSeguidos >= $limite) {
-                throw new LimitePaisesAtingidoException($limite, $plano);
+            if ($limite !== null) {
+                $totalSeguidos = PaisUsuario::where('user_id', $usuario->id)->count();
+
+                if ($totalSeguidos >= $limite) {
+                    throw new LimitePaisesAtingidoException($limite, $slugPlano);
+                }
             }
         }
 
