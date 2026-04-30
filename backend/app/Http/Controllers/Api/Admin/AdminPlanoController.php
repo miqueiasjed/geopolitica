@@ -26,10 +26,7 @@ class AdminPlanoController extends Controller
             $recursos = [];
 
             foreach ($plano->recursos as $recurso) {
-                $recursos[$recurso->chave] = [
-                    'valor' => $recurso->valor,
-                    'ativo' => $recurso->ativo,
-                ];
+                $recursos[$recurso->chave] = $recurso->valor;
             }
 
             return [
@@ -71,7 +68,6 @@ class AdminPlanoController extends Controller
             $plano->id,
             $chave,
             $validados['valor'] ?? null,
-            (bool) $validados['ativo'],
         );
 
         return response()->json(['data' => $recurso]);

@@ -93,7 +93,7 @@ class PlanoService
      * Atualiza um recurso específico de um plano.
      * Invalida o cache do plano após a escrita.
      */
-    public function atualizarRecurso(int $planoId, string $chave, ?string $valor, bool $ativo): PlanoRecurso
+    public function atualizarRecurso(int $planoId, string $chave, ?string $valor): PlanoRecurso
     {
         $plano = Plano::findOrFail($planoId);
 
@@ -103,7 +103,6 @@ class PlanoService
 
         $recurso->update([
             'valor' => $valor,
-            'ativo' => $ativo,
         ]);
 
         $this->invalidarCache($plano->slug);

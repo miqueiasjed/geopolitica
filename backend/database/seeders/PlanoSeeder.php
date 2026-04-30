@@ -91,7 +91,6 @@ class PlanoSeeder extends Seeder
                     ],
                     [
                         'valor' => $valor,
-                        'ativo' => true,
                     ]
                 );
             }

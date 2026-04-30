@@ -47,7 +47,7 @@ function inferirTipo(chave: string): TipoRecurso {
 // ─── Badge de valor ───────────────────────────────────────────────────────────
 
 interface BadgeValorProps {
-  valor: string | null
+  valor: PlanoRecursoItem
   chave: string
 }
 
@@ -104,17 +104,16 @@ function BadgeValor({ valor, chave }: BadgeValorProps) {
 interface EditorRecursoProps {
   planoId: number
   chave: string
-  item: PlanoRecursoItem
+  valor: PlanoRecursoItem
   tipo: TipoRecurso
   onConcluir: () => void
 }
 
-function EditorRecurso({ planoId, chave, item, tipo, onConcluir }: EditorRecursoProps) {
+function EditorRecurso({ planoId, chave, valor, tipo, onConcluir }: EditorRecursoProps) {
   const queryClient = useQueryClient()
 
-  const [valorLocal, setValorLocal] = useState<string>(item.valor ?? '')
-  const [ilimitado, setIlimitado] = useState(item.valor === null)
-  const [ativoLocal, setAtivoLocal] = useState(item.ativo)
+  const [valorLocal, setValorLocal] = useState<string>(valor ?? '')
+  const [ilimitado, setIlimitado] = useState(valor === null)
   const [erroLocal, setErroLocal] = useState<string | null>(null)
 
   const mutation = useMutation({
@@ -123,7 +122,6 @@ function EditorRecurso({ planoId, chave, item, tipo, onConcluir }: EditorRecurso
         planoId,
         chave,
         tipo === 'boolean' ? (valorLocal === 'true' ? 'true' : 'false') : (ilimitado ? null : valorLocal),
-        ativoLocal,
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
@@ -202,23 +200,6 @@ function EditorRecurso({ planoId, chave, item, tipo, onConcluir }: EditorRecurso
         </div>
       )}
 
-      {/* Toggle ativo */}
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id={`ativo-${planoId}-${chave}`}
-          checked={ativoLocal}
-          onChange={(e) => setAtivoLocal(e.target.checked)}
-          className="h-3.5 w-3.5 cursor-pointer accent-[#C9B882]"
-        />
-        <label
-          htmlFor={`ativo-${planoId}-${chave}`}
-          className="cursor-pointer font-mono text-xs text-zinc-400"
-        >
-          Recurso ativo para o plano
-        </label>
-      </div>
-
       {erroLocal && (
         <p className="font-mono text-[11px] text-red-400">{erroLocal}</p>
       )}
@@ -270,10 +251,10 @@ function EditorRecurso({ planoId, chave, item, tipo, onConcluir }: EditorRecurso
 interface LinhaRecursoProps {
   planoId: number
   chave: string
-  item: PlanoRecursoItem
+  valor: PlanoRecursoItem
 }
 
-function LinhaRecurso({ planoId, chave, item }: LinhaRecursoProps) {
+function LinhaRecurso({ planoId, chave, valor }: LinhaRecursoProps) {
   const [editando, setEditando] = useState(false)
   const tipo = inferirTipo(chave)
   const label = LABELS[chave] ?? chave
@@ -307,19 +288,12 @@ function LinhaRecurso({ planoId, chave, item }: LinhaRecursoProps) {
         <EditorRecurso
           planoId={planoId}
           chave={chave}
-          item={item}
+          valor={valor}
           tipo={tipo}
           onConcluir={() => setEditando(false)}
         />
       ) : (
-        <div className="flex items-center gap-2">
-          <BadgeValor valor={item.valor} chave={chave} />
-          {!item.ativo && (
-            <span className="inline-flex items-center rounded-full border border-red-500/20 bg-red-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-red-400">
-              Inativo
-            </span>
-          )}
-        </div>
+        <BadgeValor valor={valor} chave={chave} />
       )}
     </div>
   )
@@ -355,7 +329,6 @@ function CardPlano({ plano }: CardPlanoProps) {
   const headerSlug = HEADER_SLUG[plano.slug] ?? ''
 
   const totalRecursos = Object.keys(plano.recursos).length
-  const recursosAtivos = Object.values(plano.recursos).filter((r) => r.ativo).length
 
   return (
     <div className={`flex flex-col rounded-xl border ${bordaSlug} overflow-hidden`}>
@@ -380,7 +353,7 @@ function CardPlano({ plano }: CardPlanoProps) {
 
         <div className="mt-3 flex items-center gap-3">
           <span className="inline-flex items-center rounded-full bg-zinc-800/80 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
-            {recursosAtivos}/{totalRecursos} ativos
+            {totalRecursos} recursos
           </span>
           {!plano.ativo && (
             <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-red-400">
@@ -397,12 +370,12 @@ function CardPlano({ plano }: CardPlanoProps) {
             Nenhum recurso configurado
           </p>
         ) : (
-          Object.entries(plano.recursos).map(([chave, item]) => (
+          Object.entries(plano.recursos).map(([chave, valor]) => (
             <LinhaRecurso
               key={chave}
               planoId={plano.id}
               chave={chave}
-              item={item}
+              valor={valor}
             />
           ))
         )}

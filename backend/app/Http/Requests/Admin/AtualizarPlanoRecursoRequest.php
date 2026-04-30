@@ -15,7 +15,6 @@ class AtualizarPlanoRecursoRequest extends FormRequest
     {
         return [
             'valor' => ['nullable', 'string', 'max:255'],
-            'ativo' => ['required', 'boolean'],
         ];
     }
 }

@@ -13,14 +13,11 @@ class PlanoRecurso extends Model
         'plano_id',
         'chave',
         'valor',
-        'ativo',
     ];
 
     protected function casts(): array
     {
-        return [
-            'ativo' => 'boolean',
-        ];
+        return [];
     }
 
     // -------------------------------------------------------------------------

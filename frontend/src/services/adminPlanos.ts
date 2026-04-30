@@ -2,10 +2,7 @@ import api from '../lib/axios'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-export interface PlanoRecursoItem {
-  valor: string | null
-  ativo: boolean
-}
+export type PlanoRecursoItem = string | null
 
 export interface Plano {
   id: number
@@ -36,9 +33,8 @@ export async function atualizarRecurso(
   planoId: number,
   chave: string,
   valor: string | null,
-  ativo: boolean,
 ): Promise<void> {
-  await api.put(`/admin/planos/${planoId}/recursos/${chave}`, { valor, ativo })
+  await api.put(`/admin/planos/${planoId}/recursos/${chave}`, { valor })
 }
 
 export async function atualizarPlano(
