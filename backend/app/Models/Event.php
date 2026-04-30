@@ -13,6 +13,8 @@ class Event extends Model
         'titulo',
         'resumo',
         'analise_ia',
+        'headline',
+        'legenda',
         'fonte',
         'fonte_url',
         'regiao',

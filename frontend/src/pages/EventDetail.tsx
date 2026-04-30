@@ -1,8 +1,8 @@
 import { ArrowLeftIcon, ExternalLinkIcon, GlobeIcon } from '@radix-ui/react-icons'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ImpactBadge } from '../components/ImpactBadge'
-import { useEventDetail, useGerarEditorial } from '../hooks/useEventDetail'
+import { useEventDetail } from '../hooks/useEventDetail'
 import { formatDistanceToNow } from '../utils/relativeTime'
 import type { ImpactLabel } from '../types/feed'
 
@@ -36,7 +36,6 @@ export function EventDetail() {
   const prefersReduced = useReducedMotion()
 
   const { data: event, isLoading, isError } = useEventDetail(id ?? '')
-  const { data: editorial, isPending: gerando, mutate: gerarEditorial, error: erroEditorial } = useGerarEditorial(id ?? '')
 
   if (isLoading) {
     return (
@@ -62,6 +61,7 @@ export function EventDetail() {
   }
 
   const publishedAt = event.publicado_em ? formatDistanceToNow(event.publicado_em) : 'sem data'
+  const temEditorial = Boolean(event.headline || event.legenda)
 
   return (
     <section className="mx-auto max-w-3xl space-y-8">
@@ -112,14 +112,14 @@ export function EventDetail() {
           </div>
         </div>
 
-        {/* Resumo e análise */}
+        {/* Análise e resumo */}
         <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-4">
-          {event.analise_ia ? (
+          {event.analise_ia && (
             <div className="space-y-2">
               <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Análise IA</p>
               <p className="text-sm leading-7 text-zinc-300">{event.analise_ia}</p>
             </div>
-          ) : null}
+          )}
 
           {event.resumo && (
             <div className="space-y-2">
@@ -129,98 +129,49 @@ export function EventDetail() {
           )}
         </div>
 
-        {/* Gerador de editorial */}
-        <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-5">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Editorial @danuzioneto</p>
-              <p className="mt-1 text-xs text-zinc-500">
-                Gera HEADLINE + LEGENDA prontos para Instagram e X.
-              </p>
-            </div>
+        {/* Editorial */}
+        {temEditorial && (
+          <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-5">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">
+              Editorial @danuzioneto
+            </p>
 
-            <button
-              onClick={() => gerarEditorial()}
-              disabled={gerando}
-              className="shrink-0 rounded-lg border border-[#BFFF3C]/30 bg-[#BFFF3C]/10 px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[#BFFF3C] transition-colors hover:bg-[#BFFF3C]/20 disabled:cursor-wait disabled:opacity-50"
-            >
-              {gerando ? 'Gerando...' : editorial ? 'Gerar novamente' : 'Gerar editorial'}
-            </button>
+            {event.headline && (
+              <div className="space-y-2">
+                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Headline</p>
+                <div className="rounded-lg border border-white/5 bg-white/2 p-4">
+                  <p className="text-base font-semibold leading-snug text-white">{event.headline}</p>
+                </div>
+                <button
+                  onClick={() => navigator.clipboard.writeText(event.headline!)}
+                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-400"
+                >
+                  Copiar headline
+                </button>
+              </div>
+            )}
+
+            {event.legenda && (
+              <div className="space-y-2">
+                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Legenda</p>
+                <div className="rounded-lg border border-white/5 bg-white/2 p-4">
+                  <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">{event.legenda}</p>
+                </div>
+                <button
+                  onClick={() => navigator.clipboard.writeText(event.legenda!)}
+                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-400"
+                >
+                  Copiar legenda
+                </button>
+              </div>
+            )}
           </div>
-
-          <AnimatePresence>
-            {gerando && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-2"
-              >
-                <div className="animate-pulse space-y-2">
-                  <div className="h-4 w-1/2 rounded bg-zinc-800" />
-                  <div className="h-4 w-full rounded bg-zinc-800" />
-                  <div className="h-4 w-3/4 rounded bg-zinc-800" />
-                </div>
-              </motion.div>
-            )}
-
-            {!gerando && erroEditorial && (
-              <motion.p
-                key="error"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-sm text-red-400"
-              >
-                Erro ao gerar editorial. Verifique a configuração da API de IA e tente novamente.
-              </motion.p>
-            )}
-
-            {!gerando && editorial && (
-              <motion.div
-                key="editorial"
-                initial={prefersReduced ? false : { opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className="space-y-5"
-              >
-                {/* HEADLINE */}
-                <div className="space-y-2">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Headline</p>
-                  <div className="rounded-lg border border-white/5 bg-white/2 p-4">
-                    <p className="text-base font-semibold leading-snug text-white">{editorial.headline}</p>
-                  </div>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(editorial.headline)}
-                    className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-400"
-                  >
-                    Copiar headline
-                  </button>
-                </div>
-
-                {/* LEGENDA */}
-                <div className="space-y-2">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Legenda</p>
-                  <div className="rounded-lg border border-white/5 bg-white/2 p-4">
-                    <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">{editorial.legenda}</p>
-                  </div>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(editorial.legenda)}
-                    className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-400"
-                  >
-                    Copiar legenda
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        )}
 
         {/* Links originais */}
         {event.fonte_url && (
           <div className="space-y-3">
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Fontes originais</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Fonte original</p>
             <a
               href={event.fonte_url}
               target="_blank"

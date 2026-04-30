@@ -13,8 +13,8 @@ class FeedUpdaterService
     public function __construct(
         private readonly RssFetcherService $rssFetcherService,
         private readonly AiAnalyzerService $aiAnalyzerService,
-    ) {
-    }
+        private readonly EditorialService $editorialService,
+    ) {}
 
     public function atualizar(): array
     {
@@ -58,7 +58,7 @@ class FeedUpdaterService
 
         foreach ($itensAnalisados as $item) {
             try {
-                Event::query()->create([
+                $event = Event::query()->create([
                     'titulo' => $item['titulo'],
                     'resumo' => $item['resumo'],
                     'analise_ia' => $item['analise_ia'] ?? null,
@@ -73,6 +73,10 @@ class FeedUpdaterService
                 ]);
 
                 $salvos++;
+
+                if ($event->relevante) {
+                    $this->gerarEditorial($event);
+                }
             } catch (QueryException $exception) {
                 Log::warning('Falha ao persistir evento do feed.', [
                     'fonte_url' => $item['fonte_url'] ?? null,
@@ -99,5 +103,26 @@ class FeedUpdaterService
         }
 
         return $resultado;
+    }
+
+    private function gerarEditorial(Event $event): void
+    {
+        try {
+            $editorial = $this->editorialService->gerar($event);
+
+            $event->update([
+                'headline' => $editorial['headline'] ?: null,
+                'legenda'  => $editorial['legenda'] ?: null,
+            ]);
+
+            Log::channel('pipeline')->info('[FeedUpdater] Editorial gerado.', [
+                'event_id' => $event->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::channel('pipeline')->warning('[FeedUpdater] Falha ao gerar editorial — evento salvo sem editorial.', [
+                'event_id' => $event->id,
+                'erro' => $e->getMessage(),
+            ]);
+        }
     }
 }

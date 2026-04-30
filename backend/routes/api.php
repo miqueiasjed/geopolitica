@@ -57,8 +57,6 @@ Route::prefix('auth')->group(function () {
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/feed', [FeedController::class, 'index']);
     Route::get('/feed/{id}', [FeedController::class, 'show']);
-    Route::post('/feed/{id}/editorial', [FeedController::class, 'gerarEditorial'])
-        ->middleware('throttle:10,1');
     Route::get('/perfil', [PerfilController::class, 'show']);
     Route::patch('/perfil', [PerfilController::class, 'update']);
     Route::post('/feed/atualizar', [FeedController::class, 'atualizar'])

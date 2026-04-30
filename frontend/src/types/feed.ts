@@ -5,6 +5,8 @@ export interface Event {
   titulo: string
   resumo: string
   analise_ia: string | null
+  headline: string | null
+  legenda: string | null
   fonte: string
   fonte_url?: string | null
   regiao: string | null
@@ -18,11 +20,6 @@ export interface FeedFilters {
   categoria?: string
   regiao?: string
   label?: ImpactLabel
-}
-
-export interface Editorial {
-  headline: string
-  legenda: string
 }
 
 export interface FeedPage {
