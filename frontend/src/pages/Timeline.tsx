@@ -4,6 +4,7 @@ import { useTimeline } from '../hooks/useTimeline'
 import { TimelineBar } from '../components/timeline/TimelineBar'
 import { CriseDetailPanel } from '../components/timeline/CriseDetailPanel'
 import { EventoDetailPanel } from '../components/timeline/EventoDetailPanel'
+import { CATEGORY_COLORS } from '../components/timeline/CriseMarker'
 import type { CategoriaCrise, FiltrosTimeline } from '../types/timeline'
 
 export function Timeline() {
@@ -38,13 +39,30 @@ export function Timeline() {
       </div>
 
       {/* Legenda */}
-      <div className="flex flex-wrap gap-4">
-        <span className="flex items-center gap-2 text-sm text-[#BFFF3C]">
-          <span className="w-3 h-3 rounded-sm bg-[#BFFF3C]" /> Crises Históricas
-        </span>
-        <span className="flex items-center gap-2 text-sm text-[#F7F7F2]">
-          <span className="w-3 h-3 rounded-sm bg-[#F7F7F2]" /> Eventos Ativos
-        </span>
+      <div className="space-y-2">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">Categorias de crise</p>
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+          {(Object.entries(CATEGORY_COLORS) as [CategoriaCrise, string][]).map(([cat, cor]) => (
+            <span key={cat} className="flex items-center gap-1.5 text-xs text-zinc-400 capitalize">
+              <span className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ background: cor }} />
+              {cat}
+            </span>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1">
+          <span className="flex items-center gap-1.5 text-xs text-zinc-500">
+            <span className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ background: '#4ade80' }} />
+            Evento baixo impacto
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-zinc-500">
+            <span className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ background: '#FACC15' }} />
+            Evento médio impacto
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-zinc-500">
+            <span className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ background: '#EF4444' }} />
+            Evento alto impacto
+          </span>
+        </div>
       </div>
 
       {/* Filtros */}

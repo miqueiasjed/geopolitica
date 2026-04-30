@@ -157,7 +157,7 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
           />
 
           {/* Marcadores de crises */}
-          {crises.map((crise) => (
+          {crises.map((crise, indice) => (
             <CriseMarker
               key={crise.id}
               crise={crise}
@@ -165,6 +165,7 @@ export function TimelineBar({ crises, eventos, onCriseClick, onEventoClick }: Ti
               posicaoX={posicaoX(crise.ano)}
               larguraPorAno={larguraPorAno}
               anoAtual={anoAtual}
+              indice={indice}
             />
           ))}
 

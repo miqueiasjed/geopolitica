@@ -10,6 +10,7 @@ import {
   GlobeIcon,
   HamburgerMenuIcon,
   LightningBoltIcon,
+  LockClosedIcon,
   PersonIcon,
   ReaderIcon,
 } from '@radix-ui/react-icons'
@@ -31,6 +32,7 @@ interface NavItem {
   to: string
   label: string
   eyebrow?: string
+  locked?: boolean
   isActive: (pathname: string) => boolean
   icon: ReactNode
 }
@@ -100,28 +102,22 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       isActive: (p) => p === '/dashboard/eleicoes',
       icon: <CalendarIcon />,
     },
-    ...(temAcessoEleitoral
-      ? [
-          {
-            to: '/dashboard/monitor-eleitoral',
-            label: 'Monitor Eleitoral',
-            eyebrow: 'Addon',
-            isActive: (p: string) => p === '/dashboard/monitor-eleitoral',
-            icon: <LightningBoltIcon />,
-          },
-        ]
-      : []),
-    ...(temAcessoGuerra
-      ? [
-          {
-            to: '/dashboard/monitor-guerra',
-            label: 'Monitor de Guerra',
-            eyebrow: 'Addon',
-            isActive: (p: string) => p === '/dashboard/monitor-guerra',
-            icon: <Crosshair2Icon />,
-          },
-        ]
-      : []),
+    {
+      to: '/dashboard/monitor-eleitoral',
+      label: 'Monitor Eleitoral',
+      eyebrow: temAcessoEleitoral ? 'Addon' : 'Exclusivo',
+      locked: !temAcessoEleitoral,
+      isActive: (p: string) => p === '/dashboard/monitor-eleitoral',
+      icon: <LightningBoltIcon />,
+    },
+    {
+      to: '/dashboard/monitor-guerra',
+      label: 'Monitor de Guerra',
+      eyebrow: temAcessoGuerra ? 'Addon' : 'Exclusivo',
+      locked: !temAcessoGuerra,
+      isActive: (p: string) => p === '/dashboard/monitor-guerra',
+      icon: <Crosshair2Icon />,
+    },
     {
       to: '/paises',
       label: 'Meus Países',
@@ -143,17 +139,14 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
       isActive: (p) => p.startsWith('/dashboard/relatorios'),
       icon: <FileTextIcon />,
     },
-    ...(temAcessoRiskScore
-      ? [
-          {
-            to: '/dashboard/risk-score',
-            label: 'Risk Score',
-            eyebrow: 'Mercados',
-            isActive: (p: string) => p === '/dashboard/risk-score',
-            icon: <BarChartIcon />,
-          },
-        ]
-      : []),
+    {
+      to: '/dashboard/risk-score',
+      label: 'Risk Score',
+      eyebrow: temAcessoRiskScore ? 'Mercados' : 'Pro+',
+      locked: !temAcessoRiskScore,
+      isActive: (p: string) => p === '/dashboard/risk-score',
+      icon: <BarChartIcon />,
+    },
     ...(isB2B && user?.role === 'company_admin'
       ? [
           {
@@ -191,18 +184,22 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
     </Link>
   )
 
-  const navLinkClass = (active: boolean) =>
+  const navLinkClass = (active: boolean, locked?: boolean) =>
     `group relative flex items-center gap-3 rounded-md border px-3 py-3 transition-all duration-200 ${
-      active
-        ? 'border-[#BFFF3C]/35 bg-[#BFFF3C]/10 text-white shadow-[0_0_24px_rgba(191,255,60,0.08)]'
-        : 'border-transparent text-zinc-400 hover:border-white/10 hover:bg-white/[0.04] hover:text-zinc-100'
+      locked
+        ? 'border-transparent text-zinc-600 hover:border-white/8 hover:bg-white/[0.02] hover:text-zinc-500'
+        : active
+          ? 'border-[#BFFF3C]/35 bg-[#BFFF3C]/10 text-white shadow-[0_0_24px_rgba(191,255,60,0.08)]'
+          : 'border-transparent text-zinc-400 hover:border-white/10 hover:bg-white/[0.04] hover:text-zinc-100'
     }`
 
-  const iconClass = (active: boolean) =>
+  const iconClass = (active: boolean, locked?: boolean) =>
     `flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition-colors ${
-      active
-        ? 'border-[#BFFF3C]/35 bg-[#BFFF3C]/10 text-[#D7FF69]'
-        : 'border-white/8 bg-white/[0.03] text-zinc-500 group-hover:text-[#D7FF69]'
+      locked
+        ? 'border-white/5 bg-white/[0.02] text-zinc-700'
+        : active
+          ? 'border-[#BFFF3C]/35 bg-[#BFFF3C]/10 text-[#D7FF69]'
+          : 'border-white/8 bg-white/[0.03] text-zinc-500 group-hover:text-[#D7FF69]'
     }`
 
   const handleLogout = async () => {
@@ -218,13 +215,13 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
           <Link
             key={item.to}
             to={item.to}
-            className={navLinkClass(active)}
+            className={navLinkClass(active, item.locked)}
             onClick={() => setMenuAberto(false)}
           >
-            <span className={iconClass(active)} aria-hidden="true">
+            <span className={iconClass(active, item.locked)} aria-hidden="true">
               {item.icon}
             </span>
-            <span className="min-w-0">
+            <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-bold">{item.label}</span>
               {item.eyebrow && (
                 <span className="block truncate font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 group-hover:text-zinc-400">
@@ -232,12 +229,16 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
                 </span>
               )}
             </span>
-            {active && (
+            {item.locked ? (
+              <span className="flex-shrink-0 text-zinc-700" aria-label="Acesso bloqueado">
+                <LockClosedIcon />
+              </span>
+            ) : active ? (
               <span
                 className="absolute right-3 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-[#BFFF3C]"
                 aria-hidden="true"
               />
-            )}
+            ) : null}
           </Link>
         )
       })}
