@@ -58,44 +58,38 @@ export function EleicaoCard({ eleicao, onClick }: EleicaoCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
       whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-      className="relative w-full rounded-xl border border-zinc-800 bg-[#111113] p-3 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]"
-      style={
-        {
-          '--relevancia-cor': cor,
-        } as React.CSSProperties
-      }
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = cor
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = ''
-      }}
+      className="w-full rounded-xl border border-zinc-800 bg-[#111113] p-2 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]"
+      style={{ '--relevancia-cor': cor } as React.CSSProperties}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = cor }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = '' }}
     >
-      {/* Badge de relevância */}
-      <span
-        className="absolute right-2 top-2 rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em]"
-        style={badgeStyle}
-      >
-        {BADGE_LABEL[eleicao.relevancia]}
+      {/* Bandeira */}
+      <span className="mb-1 block text-2xl leading-none" role="img" aria-label={`Bandeira de ${eleicao.pais}`}>
+        {bandeira}
       </span>
 
-      {/* Bandeira + País */}
-      <div className="flex items-center gap-2 pr-14">
-        <span className="text-2xl leading-none" role="img" aria-label={`Bandeira de ${eleicao.pais}`}>
-          {bandeira}
-        </span>
-        <span className="truncate font-semibold text-white text-sm leading-tight">{eleicao.pais}</span>
-      </div>
+      {/* País */}
+      <p className="mb-1 truncate font-semibold text-white text-sm leading-tight">
+        {eleicao.pais}
+      </p>
 
       {/* Data + Tipo */}
-      <div className="mt-2 space-y-0.5">
-        <p className="whitespace-nowrap font-mono text-xs text-zinc-400">
+      <div className="mb-2 space-y-0.5">
+        <p className="font-mono text-xs text-zinc-400">
           {formatarDataEleicao(eleicao.data_eleicao)}
         </p>
         <p className="truncate font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
           {eleicao.tipo_eleicao}
         </p>
       </div>
+
+      {/* Badge de relevância */}
+      <span
+        className="inline-block rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em]"
+        style={badgeStyle}
+      >
+        {BADGE_LABEL[eleicao.relevancia]}
+      </span>
     </motion.button>
   )
 }
