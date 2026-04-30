@@ -21,6 +21,7 @@ class ListarWebhookEventosRequest extends FormRequest
         }
 
         $this->merge([
+            'fonte' => $this->string('fonte')->trim()->value() ?: null,
             'type' => $this->string('type')->trim()->value() ?: null,
             'processado' => is_string($processado) ? strtolower($processado) : $processado,
             'page' => $this->integer('page') ?: 1,
@@ -30,6 +31,7 @@ class ListarWebhookEventosRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'fonte' => ['nullable', Rule::in(['lastlink', 'hotmart'])],
             'type' => ['nullable', 'string', 'max:100'],
             'processado' => ['nullable', Rule::in(['true', 'false', '1', '0'])],
             'page' => ['nullable', 'integer', 'min:1'],

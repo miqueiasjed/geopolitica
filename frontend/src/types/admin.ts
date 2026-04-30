@@ -20,9 +20,13 @@ export interface AdminAssinante {
 
 export interface AdminWebhookEvento {
   id: number
+  fonte: 'lastlink' | 'hotmart' | string
   event_type: string
   email: string | null
+  hotmart_subscriber_code: string | null
   processado: boolean
+  processado_em: string | null
+  erro: string | null
   created_at: string
   payload: unknown
 }
@@ -35,6 +39,7 @@ export interface AdminAssinantesFiltros {
 }
 
 export interface AdminWebhookEventosFiltros {
+  fonte?: string
   type?: string
   processado?: string
   page?: number

@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Card,
+  Callout,
   Flex,
   Heading,
   ScrollArea,
@@ -13,18 +14,109 @@ import {
   Table,
   Text,
 } from '@radix-ui/themes'
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ResetIcon } from '@radix-ui/react-icons'
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ExclamationTriangleIcon,
+  ResetIcon,
+} from '@radix-ui/react-icons'
 import { useState } from 'react'
 import { adminKeys, buscarAdminWebhookEventos } from '../../services/admin'
 import { formatarDataCurta, formatarJsonPretty } from '../../utils/formatters'
+import type { AdminWebhookEvento } from '../../types/admin'
 
 const VALOR_TODOS = 'all'
 
-function badgeColorDoProcessamento(processado: boolean) {
+const TIPOS_HOTMART = [
+  'PURCHASE_APPROVED',
+  'PURCHASE_COMPLETE',
+  'PURCHASE_CANCELED',
+  'PURCHASE_REFUNDED',
+  'PURCHASE_CHARGEBACK',
+  'PURCHASE_EXPIRED',
+  'SWITCH_PLAN',
+]
+
+const TIPOS_LASTLINK = [
+  'LASTLINK_APPROVED',
+  'LASTLINK_COMPLETE',
+  'LASTLINK_PAID',
+  'LASTLINK_ORDER_CONFIRMED',
+  'LASTLINK_PURCHASE_ORDER_CONFIRMED',
+  'LASTLINK_CANCELLED',
+  'LASTLINK_CANCELED',
+  'LASTLINK_SUBSCRIPTION_CANCELED',
+  'LASTLINK_REFUNDED',
+  'LASTLINK_PURCHASE_REFUNDED',
+  'LASTLINK_CHARGEBACK',
+]
+
+function badgeFonte(fonte: string) {
+  return fonte === 'lastlink' ? 'violet' : 'orange'
+}
+
+function badgeProcessamento(processado: boolean, erro: string | null) {
+  if (erro) return 'red'
   return processado ? 'green' : 'amber'
 }
 
+function labelProcessamento(processado: boolean, erro: string | null) {
+  if (erro) return 'Erro'
+  return processado ? 'Processado' : 'Pendente'
+}
+
+function DetalheEvento({ evento }: { evento: AdminWebhookEvento }) {
+  return (
+    <Box className="space-y-4 py-2">
+      <Flex gap="6" wrap="wrap">
+        {evento.processado_em && (
+          <Box className="space-y-1">
+            <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
+              Processado em
+            </Text>
+            <Text size="2">{formatarDataCurta(evento.processado_em)}</Text>
+          </Box>
+        )}
+        {evento.hotmart_subscriber_code && (
+          <Box className="space-y-1">
+            <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
+              Subscriber Code
+            </Text>
+            <Text size="2" className="font-mono">
+              {evento.hotmart_subscriber_code}
+            </Text>
+          </Box>
+        )}
+      </Flex>
+
+      {evento.erro && (
+        <Callout.Root color="red" size="1">
+          <Callout.Icon>
+            <ExclamationTriangleIcon />
+          </Callout.Icon>
+          <Callout.Text className="font-mono text-sm">{evento.erro}</Callout.Text>
+        </Callout.Root>
+      )}
+
+      <Box className="space-y-2">
+        <Text size="2" className="uppercase tracking-[0.24em] text-cyan-100/45">
+          Payload JSON
+        </Text>
+        <Card size="2" className="border border-cyan-400/10 bg-slate-950/90">
+          <ScrollArea type="auto" scrollbars="both" className="max-h-[360px]">
+            <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-6 text-cyan-50">
+              {formatarJsonPretty(evento.payload)}
+            </pre>
+          </ScrollArea>
+        </Card>
+      </Box>
+    </Box>
+  )
+}
+
 export function AdminWebhookEventos() {
+  const [fonte, setFonte] = useState(VALOR_TODOS)
   const [type, setType] = useState(VALOR_TODOS)
   const [processado, setProcessado] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
@@ -32,12 +124,14 @@ export function AdminWebhookEventos() {
 
   const query = useQuery({
     queryKey: adminKeys.webhookEventos({
+      fonte: fonte === VALOR_TODOS ? undefined : fonte,
       type: type === VALOR_TODOS ? undefined : type,
       processado: processado === VALOR_TODOS ? undefined : processado,
       page,
     }),
     queryFn: () =>
       buscarAdminWebhookEventos({
+        fonte: fonte === VALOR_TODOS ? undefined : fonte,
         type: type === VALOR_TODOS ? undefined : type,
         processado: processado === VALOR_TODOS ? undefined : processado,
         page,
@@ -50,6 +144,17 @@ export function AdminWebhookEventos() {
   const paginaAtual = query.data?.current_page ?? 1
   const ultimaPagina = query.data?.last_page ?? 1
 
+  function limparFiltros() {
+    setFonte(VALOR_TODOS)
+    setType(VALOR_TODOS)
+    setProcessado(VALOR_TODOS)
+    setPage(1)
+  }
+
+  function toggleExpanded(id: number) {
+    setExpandedId((atual) => (atual === id ? null : id))
+  }
+
   return (
     <main className="min-h-screen bg-[#0a0a0b] px-6 py-10 text-cyan-50">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -58,9 +163,10 @@ export function AdminWebhookEventos() {
             <Text size="2" className="uppercase tracking-[0.3em] text-cyan-300/70">
               Painel admin
             </Text>
-            <Heading size="8">Eventos do webhook</Heading>
+            <Heading size="8">Logs de Webhook</Heading>
             <Text size="3" className="max-w-2xl text-cyan-100/65">
-              Monitoramento dos eventos recebidos, com filtros por tipo e status de processamento.
+              Registro de todos os eventos recebidos via webhook (Lastlink e Hotmart), com payload
+              completo, status de processamento e erros.
             </Text>
           </Box>
 
@@ -72,7 +178,28 @@ export function AdminWebhookEventos() {
         <Card size="4" className="border border-cyan-400/10 bg-slate-950/80 backdrop-blur">
           <Flex direction="column" gap="4">
             <Flex wrap="wrap" gap="3" align="end">
-              <label className="min-w-[220px] space-y-2">
+              <label className="min-w-[180px] space-y-2">
+                <Text size="2" weight="medium">
+                  Origem
+                </Text>
+                <Select.Root
+                  value={fonte}
+                  onValueChange={(valor) => {
+                    setFonte(valor)
+                    setType(VALOR_TODOS)
+                    setPage(1)
+                  }}
+                >
+                  <Select.Trigger placeholder="Todas as origens" />
+                  <Select.Content>
+                    <Select.Item value={VALOR_TODOS}>Todas as origens</Select.Item>
+                    <Select.Item value="lastlink">Lastlink</Select.Item>
+                    <Select.Item value="hotmart">Hotmart</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+              </label>
+
+              <label className="min-w-[240px] space-y-2">
                 <Text size="2" weight="medium">
                   Tipo do evento
                 </Text>
@@ -86,20 +213,33 @@ export function AdminWebhookEventos() {
                   <Select.Trigger placeholder="Todos os tipos" />
                   <Select.Content>
                     <Select.Item value={VALOR_TODOS}>Todos os tipos</Select.Item>
-                    <Select.Item value="PURCHASE_APPROVED">PURCHASE_APPROVED</Select.Item>
-                    <Select.Item value="PURCHASE_COMPLETE">PURCHASE_COMPLETE</Select.Item>
-                    <Select.Item value="PURCHASE_CANCELED">PURCHASE_CANCELED</Select.Item>
-                    <Select.Item value="PURCHASE_REFUNDED">PURCHASE_REFUNDED</Select.Item>
-                    <Select.Item value="PURCHASE_CHARGEBACK">PURCHASE_CHARGEBACK</Select.Item>
-                    <Select.Item value="PURCHASE_EXPIRED">PURCHASE_EXPIRED</Select.Item>
-                    <Select.Item value="SWITCH_PLAN">SWITCH_PLAN</Select.Item>
+                    {(fonte === VALOR_TODOS || fonte === 'hotmart') && (
+                      <Select.Group>
+                        <Select.Label>Hotmart</Select.Label>
+                        {TIPOS_HOTMART.map((t) => (
+                          <Select.Item key={t} value={t}>
+                            {t}
+                          </Select.Item>
+                        ))}
+                      </Select.Group>
+                    )}
+                    {(fonte === VALOR_TODOS || fonte === 'lastlink') && (
+                      <Select.Group>
+                        <Select.Label>Lastlink</Select.Label>
+                        {TIPOS_LASTLINK.map((t) => (
+                          <Select.Item key={t} value={t}>
+                            {t}
+                          </Select.Item>
+                        ))}
+                      </Select.Group>
+                    )}
                   </Select.Content>
                 </Select.Root>
               </label>
 
-              <label className="min-w-[220px] space-y-2">
+              <label className="min-w-[180px] space-y-2">
                 <Text size="2" weight="medium">
-                  Processamento
+                  Status
                 </Text>
                 <Select.Root
                   value={processado}
@@ -117,16 +257,7 @@ export function AdminWebhookEventos() {
                 </Select.Root>
               </label>
 
-              <Button
-                size="3"
-                variant="soft"
-                color="gray"
-                onClick={() => {
-                  setType(VALOR_TODOS)
-                  setProcessado(VALOR_TODOS)
-                  setPage(1)
-                }}
-              >
+              <Button size="3" variant="soft" color="gray" onClick={limparFiltros}>
                 <ResetIcon />
                 Limpar
               </Button>
@@ -140,17 +271,18 @@ export function AdminWebhookEventos() {
               </Flex>
             ) : query.isError ? (
               <Text color="ruby" size="3">
-                Nao foi possivel carregar os eventos do webhook. Tente novamente.
+                Não foi possível carregar os eventos do webhook. Tente novamente.
               </Text>
             ) : (
               <ScrollArea type="auto" scrollbars="horizontal" className="w-full">
-                <Table.Root className="min-w-[920px]">
+                <Table.Root className="min-w-[980px]">
                   <Table.Header>
                     <Table.Row className="border-b border-cyan-400/10">
+                      <Table.ColumnHeaderCell>Origem</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Tipo</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>E-mail</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Processado</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Criado em</Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell>Recebido em</Table.ColumnHeaderCell>
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
@@ -164,45 +296,51 @@ export function AdminWebhookEventos() {
                             className="cursor-pointer transition-colors hover:bg-cyan-400/5"
                             aria-expanded={expandido}
                             tabIndex={0}
-                            onClick={() => setExpandedId((atual) => (atual === evento.id ? null : evento.id))}
-                            onKeyDown={(event) => {
-                              if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault()
-                                setExpandedId((atual) => (atual === evento.id ? null : evento.id))
+                            onClick={() => toggleExpanded(evento.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                toggleExpanded(evento.id)
                               }
                             }}
                           >
+                            <Table.Cell>
+                              <Badge
+                                color={badgeFonte(evento.fonte)}
+                                variant="soft"
+                                size="1"
+                                className="uppercase"
+                              >
+                                {evento.fonte}
+                              </Badge>
+                            </Table.Cell>
                             <Table.Cell className="font-medium">
                               <Flex align="center" gap="2">
                                 <ChevronDownIcon
-                                  className={`transition-transform ${expandido ? 'rotate-180' : 'rotate-0'}`}
+                                  className={`shrink-0 transition-transform ${expandido ? 'rotate-180' : 'rotate-0'}`}
                                 />
-                                <Text>{evento.event_type}</Text>
+                                <Text size="2">{evento.event_type}</Text>
                               </Flex>
                             </Table.Cell>
-                            <Table.Cell>{evento.email ?? 'Sem e-mail'}</Table.Cell>
                             <Table.Cell>
-                              <Badge color={badgeColorDoProcessamento(evento.processado)} variant="soft">
-                                {evento.processado ? 'Processado' : 'Pendente'}
+                              <Text size="2">{evento.email ?? '—'}</Text>
+                            </Table.Cell>
+                            <Table.Cell>
+                              <Badge
+                                color={badgeProcessamento(evento.processado, evento.erro)}
+                                variant="soft"
+                              >
+                                {labelProcessamento(evento.processado, evento.erro)}
                               </Badge>
                             </Table.Cell>
-                            <Table.Cell>{formatarDataCurta(evento.created_at)}</Table.Cell>
+                            <Table.Cell>
+                              <Text size="2">{formatarDataCurta(evento.created_at)}</Text>
+                            </Table.Cell>
                           </Table.Row>,
                           expandido ? (
-                            <Table.Row key={`${evento.id}-payload`} className="bg-cyan-400/5">
-                              <Table.Cell colSpan={4}>
-                                <Box className="space-y-3 py-2">
-                                  <Text size="2" className="uppercase tracking-[0.24em] text-cyan-100/45">
-                                    Payload JSON
-                                  </Text>
-                                  <Card size="2" className="border border-cyan-400/10 bg-slate-950/90">
-                                    <ScrollArea type="auto" scrollbars="both" className="max-h-[360px]">
-                                      <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-6 text-cyan-50">
-                                        {formatarJsonPretty(evento.payload)}
-                                      </pre>
-                                    </ScrollArea>
-                                  </Card>
-                                </Box>
+                            <Table.Row key={`${evento.id}-detalhe`} className="bg-cyan-400/5">
+                              <Table.Cell colSpan={5}>
+                                <DetalheEvento evento={evento} />
                               </Table.Cell>
                             </Table.Row>
                           ) : null,
@@ -210,7 +348,7 @@ export function AdminWebhookEventos() {
                       })
                     ) : (
                       <Table.Row>
-                        <Table.Cell colSpan={4}>
+                        <Table.Cell colSpan={5}>
                           <Box className="py-10 text-center">
                             <Text size="3" className="text-cyan-100/65">
                               Nenhum evento encontrado com os filtros atuais.

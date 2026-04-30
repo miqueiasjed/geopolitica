@@ -16,12 +16,14 @@ class AdminWebhookEventoService
         };
 
         return WebhookEvento::query()
+            ->when($filtros['fonte'] ?? null, fn ($query, $fonte) => $query->where('fonte', $fonte))
             ->when($filtros['type'] ?? null, fn ($query, $tipo) => $query->where('event_type', $tipo))
             ->when($processado !== null, fn ($query) => $query->where('processado', $processado))
             ->latest()
             ->paginate(25)
             ->through(fn (WebhookEvento $evento) => [
                 'id' => $evento->id,
+                'fonte' => $evento->fonte,
                 'event_type' => $evento->event_type,
                 'email' => $evento->email,
                 'hotmart_subscriber_code' => $evento->hotmart_subscriber_code,
