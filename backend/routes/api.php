@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Admin\AdminCriseHistoricaController;
 use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
 use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
+use App\Http\Controllers\Api\Admin\ImportarAssinantesController;
 use App\Http\Controllers\Api\CarteiraRiscoController;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\ExportPdfController;
@@ -132,6 +133,8 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
+    Route::post('/assinantes/importar', [ImportarAssinantesController::class, 'store']);
+    Route::get('/assinantes/importar/{id}/status', [ImportarAssinantesController::class, 'status']);
     Route::get('/webhook-eventos', [AdminWebhookController::class, 'index']);
     Route::delete('/webhook-eventos', [AdminWebhookController::class, 'destroyBulk']);
 

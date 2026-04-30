@@ -1,11 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Badge,
   Box,
   Button,
+  Callout,
   Card,
+  Dialog,
   Flex,
   Heading,
+  Progress,
   ScrollArea,
   Select,
   Separator,
@@ -14,13 +17,185 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes'
-import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon, ResetIcon } from '@radix-ui/react-icons'
-import { useState } from 'react'
-import { buscarAdminAssinantes, adminKeys } from '../../services/admin'
+import {
+  CheckCircledIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ExclamationTriangleIcon,
+  MagnifyingGlassIcon,
+  ResetIcon,
+  UploadIcon,
+} from '@radix-ui/react-icons'
+import { useEffect, useRef, useState } from 'react'
+import {
+  adminKeys,
+  buscarAdminAssinantes,
+  buscarStatusImportacao,
+  importarAssinantesLastlink,
+} from '../../services/admin'
+import type { ImportacaoAssinantesStatus } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
 
 const VALOR_TODOS = 'all'
+
+function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
+  const queryClient = useQueryClient()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [arquivo, setArquivo] = useState<File | null>(null)
+  const [erro, setErro] = useState('')
+  const [importacaoId, setImportacaoId] = useState<string | null>(null)
+  const [status, setStatus] = useState<ImportacaoAssinantesStatus | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function limpar() {
+    setArquivo(null)
+    setErro('')
+    setImportacaoId(null)
+    setStatus(null)
+    if (intervalRef.current) clearInterval(intervalRef.current)
+  }
+
+  useEffect(() => {
+    if (!aberto) limpar()
+  }, [aberto])
+
+  useEffect(() => {
+    if (!importacaoId) return
+
+    intervalRef.current = setInterval(async () => {
+      try {
+        const s = await buscarStatusImportacao(importacaoId)
+        setStatus(s)
+        if (s.concluido) {
+          clearInterval(intervalRef.current!)
+          queryClient.invalidateQueries({ queryKey: adminKeys.all })
+        }
+      } catch {
+        clearInterval(intervalRef.current!)
+      }
+    }, 2000)
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [importacaoId, queryClient])
+
+  const mutacao = useMutation({
+    mutationFn: (file: File) => importarAssinantesLastlink(file),
+    onSuccess: (data) => {
+      setImportacaoId(data.importacao_id)
+    },
+    onError: (err: { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }) => {
+      const erros = err.response?.data?.errors
+      setErro(erros ? Object.values(erros).flat().join(' ') : (err.response?.data?.message ?? 'Erro ao enviar arquivo.'))
+    },
+  })
+
+  const emProgresso = !!importacaoId && !status?.concluido
+  const concluido = status?.concluido ?? false
+
+  return (
+    <Dialog.Root
+      open={aberto}
+      onOpenChange={(v) => {
+        if (!v) { limpar(); onFechar() }
+      }}
+    >
+      <Dialog.Content maxWidth="520px">
+        <Dialog.Title>Importar assinantes da Lastlink</Dialog.Title>
+        <Dialog.Description size="2" mb="4" className="text-zinc-400">
+          Envie o CSV exportado do painel Lastlink. Colunas esperadas: email, nome, plano (ou offer code),
+          status, data de expiração. Separador vírgula ou ponto-e-vírgula.
+        </Dialog.Description>
+
+        <Flex direction="column" gap="4">
+          {!importacaoId && (
+            <label className="space-y-1.5">
+              <Text size="2" weight="medium">Arquivo CSV</Text>
+              <div
+                className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-zinc-600 bg-zinc-900/60 px-4 py-5 transition hover:border-cyan-500/60"
+                onClick={() => inputRef.current?.click()}
+              >
+                <UploadIcon className="size-5 text-zinc-500" />
+                <Text size="2" className="text-zinc-400">
+                  {arquivo ? arquivo.name : 'Clique para selecionar o arquivo .csv'}
+                </Text>
+              </div>
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={(e) => {
+                  setErro('')
+                  setArquivo(e.target.files?.[0] ?? null)
+                }}
+              />
+            </label>
+          )}
+
+          {emProgresso && (
+            <Flex direction="column" gap="2">
+              <Flex justify="between">
+                <Text size="2" className="text-zinc-400">Processando…</Text>
+                <Text size="2" weight="medium">{status?.percentual ?? 0}%</Text>
+              </Flex>
+              <Progress value={status?.percentual ?? 0} />
+              <Text size="1" className="text-zinc-500">
+                {status?.processados ?? 0} de {status?.total ?? 0} registros
+              </Text>
+            </Flex>
+          )}
+
+          {concluido && status && (
+            <Flex direction="column" gap="3">
+              <Callout.Root color="green" size="1">
+                <Callout.Icon><CheckCircledIcon /></Callout.Icon>
+                <Callout.Text>
+                  Importação concluída — {status.sucesso} importados com sucesso
+                  {status.erros_count > 0 ? `, ${status.erros_count} com erro` : ''}.
+                </Callout.Text>
+              </Callout.Root>
+              {status.erros.length > 0 && (
+                <Box className="max-h-40 overflow-y-auto rounded border border-red-500/20 bg-red-950/20 p-3">
+                  <Text size="1" weight="medium" className="mb-2 block text-red-400">Erros (amostra):</Text>
+                  {status.erros.map((e, i) => (
+                    <Text key={i} size="1" className="block text-red-300/80">{e}</Text>
+                  ))}
+                </Box>
+              )}
+            </Flex>
+          )}
+
+          {erro && (
+            <Callout.Root color="ruby" size="1">
+              <Callout.Icon><ExclamationTriangleIcon /></Callout.Icon>
+              <Callout.Text>{erro}</Callout.Text>
+            </Callout.Root>
+          )}
+        </Flex>
+
+        <Flex gap="3" mt="5" justify="end">
+          <Dialog.Close>
+            <Button variant="soft" color="gray">
+              {concluido ? 'Fechar' : 'Cancelar'}
+            </Button>
+          </Dialog.Close>
+          {!importacaoId && (
+            <Button
+              onClick={() => arquivo && mutacao.mutate(arquivo)}
+              disabled={!arquivo || mutacao.isPending}
+            >
+              {mutacao.isPending ? <Spinner size="1" /> : <UploadIcon />}
+              Importar
+            </Button>
+          )}
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
+  )
+}
 
 function badgeColorDoStatus(status: string) {
   const normalizado = status.toLowerCase()
@@ -63,6 +238,7 @@ export function AdminAssinantes() {
   const [plano, setPlano] = useState(VALOR_TODOS)
   const [status, setStatus] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
+  const [importando, setImportando] = useState(false)
   const searchDebounced = useDebouncedValue(search, 300)
 
   const query = useQuery({
@@ -101,9 +277,15 @@ export function AdminAssinantes() {
             </Text>
           </Box>
 
-          <Badge size="3" color="cyan" variant="soft">
-            {total} registros
-          </Badge>
+          <Flex gap="3" align="center">
+            <Badge size="3" color="cyan" variant="soft">
+              {total} registros
+            </Badge>
+            <Button size="2" variant="soft" onClick={() => setImportando(true)}>
+              <UploadIcon />
+              Importar CSV
+            </Button>
+          </Flex>
         </Flex>
 
         <Card size="4" className="border border-cyan-400/10 bg-slate-950/80 backdrop-blur">
@@ -281,6 +463,8 @@ export function AdminAssinantes() {
           </Flex>
         </Card>
       </div>
+
+      <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
     </main>
   )
 }

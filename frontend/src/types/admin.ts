@@ -18,6 +18,22 @@ export interface AdminAssinante {
   assinado_em: string | null
 }
 
+export interface ImportacaoAssinantesResponse {
+  importacao_id: string
+  total: number
+  message: string
+}
+
+export interface ImportacaoAssinantesStatus {
+  total: number
+  processados: number
+  sucesso: number
+  erros_count: number
+  erros: string[]
+  concluido: boolean
+  percentual: number
+}
+
 export interface AdminWebhookEvento {
   id: number
   fonte: 'lastlink' | 'hotmart' | string

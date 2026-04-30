@@ -10,6 +10,8 @@ import type {
   AdminUsuariosFiltros,
   AtualizarUsuarioPayload,
   CriarUsuarioPayload,
+  ImportacaoAssinantesResponse,
+  ImportacaoAssinantesStatus,
   PaginacaoLaravel,
   AdminCriseHistorica,
   CriarCrisePayload,
@@ -144,6 +146,22 @@ export async function atualizarAdminUsuario(
 
 export async function excluirAdminUsuario(id: number): Promise<void> {
   await api.delete(`/admin/usuarios/${id}`)
+}
+
+// --- Importação Lastlink ---
+
+export async function importarAssinantesLastlink(arquivo: File): Promise<ImportacaoAssinantesResponse> {
+  const form = new FormData()
+  form.append('arquivo', arquivo)
+  const resposta = await api.post<ImportacaoAssinantesResponse>('/admin/assinantes/importar', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return resposta.data
+}
+
+export async function buscarStatusImportacao(id: string): Promise<ImportacaoAssinantesStatus> {
+  const resposta = await api.get<ImportacaoAssinantesStatus>(`/admin/assinantes/importar/${id}/status`)
+  return resposta.data
 }
 
 // --- B2B Admin ---
