@@ -67,15 +67,9 @@ export function EventCard({ event }: EventCardProps) {
       </header>
 
       <div className="mt-4 space-y-3">
-        {event.analise_ia ? (
-          <p title={event.analise_ia} className="line-clamp-3 text-sm leading-6 text-zinc-400">
-            {event.analise_ia}
-          </p>
-        ) : (
-          <p title={event.resumo} className="line-clamp-3 text-sm leading-6 text-zinc-500">
-            {event.resumo}
-          </p>
-        )}
+        <p title={event.resumo} className="line-clamp-3 text-sm leading-6 text-zinc-400">
+          {event.resumo}
+        </p>
       </div>
 
       <footer className="mt-5 flex flex-wrap gap-2">

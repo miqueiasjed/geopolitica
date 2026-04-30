@@ -111,22 +111,20 @@ export function EventDetail() {
           </div>
         </div>
 
-        {/* Análise e resumo */}
-        <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-4">
-          {event.analise_ia && (
-            <div className="space-y-2">
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Análise</p>
-              <p className="text-sm leading-7 text-zinc-300">{event.analise_ia}</p>
+        {/* Análise editorial */}
+        {(event.headline || event.legenda) && (
+          <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Análise</p>
+            <div className="space-y-4 text-sm leading-7 text-zinc-300">
+              {event.headline && (
+                <p className="font-semibold text-white">{event.headline}</p>
+              )}
+              {event.legenda && (
+                <p className="whitespace-pre-wrap">{event.legenda}</p>
+              )}
             </div>
-          )}
-
-          {event.resumo && (
-            <div className="space-y-2">
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Resumo</p>
-              <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-400">{event.resumo}</p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Links originais */}
         {event.fonte_url && (
