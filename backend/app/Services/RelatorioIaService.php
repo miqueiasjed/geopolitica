@@ -16,11 +16,11 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 class RelatorioIaService
 {
     private const LIMITES_POR_PLANO = [
-        'essencial' => 2,
-        'pro'       => 10,
+        'assinante_essencial' => 2,
+        'assinante_pro'       => 10,
     ];
 
-    private const PLANOS_SEM_LIMITE = ['reservado', 'admin'];
+    private const PLANOS_SEM_LIMITE = ['assinante_reservado', 'admin'];
 
     private const MAX_TOKENS = 4096;
 
@@ -32,11 +32,7 @@ class RelatorioIaService
             return;
         }
 
-        $limite = self::LIMITES_POR_PLANO[$plano] ?? null;
-
-        if ($limite === null) {
-            return;
-        }
+        $limite = self::LIMITES_POR_PLANO[$plano] ?? self::LIMITES_POR_PLANO['assinante_essencial'];
 
         $mesAtual = now()->timezone('America/Sao_Paulo')->format('Y-m');
 

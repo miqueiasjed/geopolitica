@@ -6,11 +6,18 @@
   font-family: "Sora", "Inter", sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  --gpi-bg: #050606;
+  --gpi-surface: #101111;
+  --gpi-surface-2: #171817;
+  --gpi-border: rgba(191, 255, 60, 0.13);
+  --gpi-accent: #bfff3c;
+  --gpi-accent-2: #d7ff69;
+  --gpi-danger: #ff5b20;
   background:
-    radial-gradient(circle at top, rgba(33, 150, 243, 0.2), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.16), transparent 30%),
-    #0a0a0b;
-  color: #ecfeff;
+    radial-gradient(circle at 72% 0%, rgba(191, 255, 60, 0.12), transparent 28%),
+    radial-gradient(circle at 96% 34%, rgba(255, 91, 32, 0.12), transparent 24%),
+    #050606;
+  color: #f7f7f2;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -21,7 +28,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #0a0a0b;
+  background: #050606;
 }
 
 a {
@@ -47,6 +54,11 @@ select {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+::selection {
+  background: rgba(191, 255, 60, 0.28);
+  color: #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {

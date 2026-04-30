@@ -61,7 +61,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
         ->middleware('role:admin');
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'role:assinante_pro|assinante_reservado|admin'])->group(function () {
     Route::get('/biblioteca', [BibliotecaController::class, 'index']);
     Route::get('/biblioteca/{slug}', [ConteudoController::class, 'show']);
 });

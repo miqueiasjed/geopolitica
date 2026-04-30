@@ -12,6 +12,8 @@ class EleicaoController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('acessar-vertical', 'elections');
+
         $ano = (int) $request->query('ano', now()->year);
         $relevancia = $request->query('relevancia');
 
@@ -48,6 +50,8 @@ class EleicaoController extends Controller
 
     public function show(int $id): JsonResponse
     {
+        $this->authorize('acessar-vertical', 'elections');
+
         $eleicao = Cache::remember("eleicao_{$id}", 3600, function () use ($id) {
             $eleicao = Eleicao::find($id);
 

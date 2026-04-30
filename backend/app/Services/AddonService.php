@@ -66,4 +66,15 @@ class AddonService
 
         return $mapa[$productId] ?? null;
     }
+
+    public static function resolverPlanoByOferta(string $ofertaId): ?string
+    {
+        $mapa = config('addons.lastlink_offers');
+
+        if (! is_array($mapa)) {
+            return null;
+        }
+
+        return $mapa[$ofertaId] ?? null;
+    }
 }

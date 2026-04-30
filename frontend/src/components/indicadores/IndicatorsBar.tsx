@@ -90,13 +90,13 @@ export function IndicatorsBar() {
 
   return (
     <section
-      className="border-b border-[#1e1e20] bg-[#080809]/95"
+      className="border-b border-[#BFFF3C]/10 bg-[#070808]/82 backdrop-blur-xl"
       role="region"
       aria-label="Indicadores de mercado"
     >
-      <div className="mx-auto flex max-w-7xl items-center px-4 sm:px-6">
+      <div className="mx-auto flex max-w-[1500px] items-center px-4 sm:px-6 lg:px-8">
         <div className="flex h-12 shrink-0 items-center gap-3 border-r border-white/8 pr-4">
-          <p className="font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-[#C9B882]/80">
+          <p className="font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-[#BFFF3C]/80">
             Mercados
           </p>
           {timestamp && (
@@ -107,7 +107,7 @@ export function IndicatorsBar() {
         </div>
 
         <div className="relative min-w-0 flex-1">
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#080809] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#070808] to-transparent" />
           <div className="overflow-x-auto scrollbar-hide">
             {isLoading ? (
               <SkeletonCards prefersReduced={prefersReduced} />

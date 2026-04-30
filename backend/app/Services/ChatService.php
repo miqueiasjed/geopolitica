@@ -15,11 +15,11 @@ class ChatService
     private const MAX_TOKENS = 1024;
 
     private const LIMITES_POR_PLANO = [
-        'essencial' => 5,
-        'pro'       => 20,
+        'assinante_essencial' => 5,
+        'assinante_pro'       => 20,
     ];
 
-    private const PLANOS_SEM_LIMITE = ['reservado', 'admin'];
+    private const PLANOS_SEM_LIMITE = ['assinante_reservado', 'admin'];
 
     private const HISTORICO_MAX_MENSAGENS = 10;
 
@@ -35,7 +35,7 @@ class ChatService
             return;
         }
 
-        $limite = self::LIMITES_POR_PLANO[$plano] ?? self::LIMITES_POR_PLANO['essencial'];
+        $limite = self::LIMITES_POR_PLANO[$plano] ?? self::LIMITES_POR_PLANO['assinante_essencial'];
 
         $dataBrasilia = now()->timezone('America/Sao_Paulo')->format('Y-m-d');
         $chaveRedis   = "chat_limite_{$usuario->id}_{$dataBrasilia}";
