@@ -61,7 +61,6 @@ export function EventDetail() {
   }
 
   const publishedAt = event.publicado_em ? formatDistanceToNow(event.publicado_em) : 'sem data'
-  const temEditorial = Boolean(event.headline || event.legenda)
 
   return (
     <section className="mx-auto max-w-3xl space-y-8">
@@ -116,57 +115,18 @@ export function EventDetail() {
         <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-4">
           {event.analise_ia && (
             <div className="space-y-2">
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Análise IA</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Análise</p>
               <p className="text-sm leading-7 text-zinc-300">{event.analise_ia}</p>
             </div>
           )}
 
           {event.resumo && (
             <div className="space-y-2">
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Resumo original</p>
-              <p className="text-sm leading-7 text-zinc-400">{event.resumo}</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Resumo</p>
+              <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-400">{event.resumo}</p>
             </div>
           )}
         </div>
-
-        {/* Editorial */}
-        {temEditorial && (
-          <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-5">
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">
-              Editorial @danuzioneto
-            </p>
-
-            {event.headline && (
-              <div className="space-y-2">
-                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Headline</p>
-                <div className="rounded-lg border border-white/5 bg-white/2 p-4">
-                  <p className="text-base font-semibold leading-snug text-white">{event.headline}</p>
-                </div>
-                <button
-                  onClick={() => navigator.clipboard.writeText(event.headline!)}
-                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-400"
-                >
-                  Copiar headline
-                </button>
-              </div>
-            )}
-
-            {event.legenda && (
-              <div className="space-y-2">
-                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-500">Legenda</p>
-                <div className="rounded-lg border border-white/5 bg-white/2 p-4">
-                  <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">{event.legenda}</p>
-                </div>
-                <button
-                  onClick={() => navigator.clipboard.writeText(event.legenda!)}
-                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-400"
-                >
-                  Copiar legenda
-                </button>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Links originais */}
         {event.fonte_url && (
