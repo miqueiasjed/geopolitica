@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\WarFeedService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class WarFeedController extends Controller
 {
@@ -16,7 +17,7 @@ class WarFeedController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $this->authorize('acessar-vertical', 'war');
+        Gate::authorize('acessar-vertical', 'war');
 
         $resultado = $this->warFeedService->buscarFeed([
             'cursor' => $request->query('cursor'),

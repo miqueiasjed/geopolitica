@@ -7,12 +7,13 @@ use App\Models\Eleicao;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 
 class EleicaoController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $this->authorize('acessar-vertical', 'elections');
+        Gate::authorize('acessar-vertical', 'elections');
 
         $ano = (int) $request->query('ano', now()->year);
         $relevancia = $request->query('relevancia');
@@ -50,7 +51,7 @@ class EleicaoController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $this->authorize('acessar-vertical', 'elections');
+        Gate::authorize('acessar-vertical', 'elections');
 
         $eleicao = Cache::remember("eleicao_{$id}", 3600, function () use ($id) {
             $eleicao = Eleicao::find($id);
