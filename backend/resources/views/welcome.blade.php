@@ -3,471 +3,699 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Geopolitica para Investidores</title>
+    <title>Geopolítica para Investidores</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #0a0a0b;
-            --blue: #2196F3;
-            --sky: #0ea5e9;
-            --text: #ecfeff;
-            --muted: #94a3b8;
-            --card: rgba(255,255,255,0.04);
-            --border: rgba(255,255,255,0.07);
+            --bg: #050606;
+            --surface: #0d0e0e;
+            --lime: #bfff3c;
+            --lime-soft: #d7ff69;
+            --orange: #ff5b20;
+            --text: #ffffff;
+            --muted: #a1a1aa;
+            --border: rgba(191, 255, 60, 0.16);
         }
 
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Sora', sans-serif;
-            background: var(--bg);
-            color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        .bg-glow {
-            position: fixed; inset: 0; pointer-events: none; z-index: 0;
-            background:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(33,150,243,0.18), transparent),
-                radial-gradient(ellipse 60% 40% at 80% 90%, rgba(14,165,233,0.12), transparent),
-                radial-gradient(ellipse 40% 30% at 10% 60%, rgba(33,150,243,0.08), transparent);
-        }
-
-        .bg-grid {
-            position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.025;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
-            background-size: 60px 60px;
-        }
-
-        main { position: relative; z-index: 1; }
-
-        nav {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 1.25rem 2rem;
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            background: rgba(10,10,11,0.6);
-            position: sticky; top: 0; z-index: 10;
-        }
-
-        .nav-logo {
-            display: flex; align-items: center; gap: 0.6rem; text-decoration: none;
-        }
-
-        .nav-logo-text {
-            font-size: 0.95rem; font-weight: 600; color: var(--text);
-            letter-spacing: -0.02em;
-        }
-
-        .nav-logo-text span { color: var(--sky); }
-
-        .btn-login {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.5rem 1.25rem; border-radius: 8px;
-            background: rgba(33,150,243,0.12); border: 1px solid rgba(33,150,243,0.3);
-            color: var(--sky); font-size: 0.875rem; font-weight: 500;
-            text-decoration: none; transition: all 0.2s;
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Sora', sans-serif;
         }
-        .btn-login:hover { background: rgba(33,150,243,0.22); border-color: rgba(33,150,243,0.5); }
 
-        .hero {
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            padding: 6rem 1.5rem 3rem;
-            max-width: 860px; margin: 0 auto;
+        .page {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            background: var(--bg);
         }
 
-        .badge {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            padding: 0.3rem 0.9rem; border-radius: 999px;
-            background: rgba(33,150,243,0.1); border: 1px solid rgba(33,150,243,0.25);
-            font-size: 0.78rem; font-weight: 500; color: var(--sky);
-            margin-bottom: 1.75rem; letter-spacing: 0.03em;
-        }
-
-        .badge-dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--sky); animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        h1 {
-            font-size: clamp(2.2rem, 5vw, 3.6rem);
-            font-weight: 700; line-height: 1.12;
-            letter-spacing: -0.03em; margin-bottom: 1.5rem;
-        }
-
-        h1 .accent {
-            background: linear-gradient(135deg, #2196F3, #0ea5e9, #38bdf8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-sub {
-            font-size: 1.1rem; color: var(--muted); line-height: 1.7;
-            max-width: 580px; margin-bottom: 2.5rem;
-        }
-
-        .hero-cta {
-            display: inline-flex; align-items: center; gap: 0.6rem;
-            padding: 0.85rem 2rem; border-radius: 10px;
-            background: linear-gradient(135deg, #2196F3, #0ea5e9);
-            color: #fff; font-size: 1rem; font-weight: 600;
-            text-decoration: none; letter-spacing: -0.01em;
-            box-shadow: 0 0 32px rgba(33,150,243,0.35);
-            transition: all 0.25s; font-family: 'Sora', sans-serif;
-        }
-        .hero-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 48px rgba(33,150,243,0.5);
-        }
-        .hero-cta svg { transition: transform 0.2s; }
-        .hero-cta:hover svg { transform: translateX(3px); }
-
-        .globe-wrap {
-            margin-top: 4rem; position: relative;
-            width: min(560px, 100%);
-        }
-
-        .globe-wrap::before {
-            content: '';
-            position: absolute; inset: -40px;
-            background: radial-gradient(circle, rgba(33,150,243,0.12), transparent 65%);
+        .ambient,
+        .grid,
+        .planet,
+        .vignette {
+            position: absolute;
+            inset: 0;
             pointer-events: none;
         }
 
-        .globe-svg {
-            width: 100%; opacity: 0.7;
-            animation: float 8s ease-in-out infinite;
+        .ambient {
+            background:
+                linear-gradient(90deg, rgba(5, 6, 6, 0.98) 0%, rgba(5, 6, 6, 0.88) 35%, rgba(5, 6, 6, 0.48) 63%, rgba(5, 6, 6, 0.88) 100%),
+                radial-gradient(circle at 72% 18%, rgba(255, 91, 32, 0.34), transparent 24%),
+                radial-gradient(circle at 54% 38%, rgba(191, 255, 60, 0.16), transparent 28%),
+                linear-gradient(180deg, #071018 0%, #050606 82%);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
+        .grid {
+            opacity: 0.16;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 32px 32px;
         }
 
-        .stats {
-            display: flex; justify-content: center; flex-wrap: wrap; gap: 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            margin: 2rem 0;
+        .planet {
+            left: auto;
+            right: 0;
+            width: 64vw;
+            min-width: 720px;
+            opacity: 0.72;
         }
 
-        .stat-item {
-            flex: 1; min-width: 180px;
-            padding: 1.75rem 2rem; text-align: center;
-            border-right: 1px solid var(--border);
+        .planet::before {
+            content: '';
+            position: absolute;
+            right: 2%;
+            top: 4%;
+            width: 48rem;
+            height: 48rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 44% 36%, rgba(255, 255, 255, 0.12), transparent 9%),
+                radial-gradient(circle at 67% 31%, rgba(191, 255, 60, 0.12), transparent 10%),
+                radial-gradient(circle at 52% 58%, rgba(255, 91, 32, 0.14), transparent 14%),
+                linear-gradient(145deg, rgba(22, 25, 27, 0.88), rgba(6, 8, 10, 0.92));
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.75);
         }
-        .stat-item:last-child { border-right: none; }
 
-        .stat-number {
-            font-size: 2rem; font-weight: 700;
-            background: linear-gradient(135deg, #fff, #94a3b8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; letter-spacing: -0.03em;
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(191, 255, 60, 0.1);
+            border-radius: 50%;
         }
 
-        .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; }
+        .orbit.one { right: 7%; top: 10%; width: 42rem; height: 42rem; }
+        .orbit.two { right: 12%; top: 16%; width: 36rem; height: 36rem; border-color: rgba(255, 255, 255, 0.08); }
+        .orbit.three { right: 18%; top: 22%; width: 30rem; height: 30rem; border-color: rgba(255, 255, 255, 0.07); }
+
+        .land {
+            position: absolute;
+            border-radius: 48%;
+            background: rgba(17, 22, 26, 0.86);
+            box-shadow: inset 0 0 42px rgba(255, 255, 255, 0.05);
+        }
+
+        .land.one { right: 27%; top: 18%; width: 18rem; height: 28rem; transform: rotate(-12deg); }
+        .land.two { right: 9%; top: 18%; width: 16rem; height: 30rem; transform: rotate(10deg); background: rgba(23, 16, 13, 0.86); box-shadow: inset 0 0 54px rgba(255, 91, 32, 0.12); }
+        .land.three { right: 34%; top: 31%; width: 5rem; height: 8rem; transform: rotate(-28deg); background: #23313a; }
+
+        .line {
+            position: absolute;
+            height: 1px;
+            background: rgba(191, 255, 60, 0.2);
+        }
+
+        .line.one { right: 46%; top: 50%; width: 18rem; transform: rotate(-18deg); }
+        .line.two { right: 18%; top: 48%; width: 24rem; transform: rotate(22deg); background: rgba(255, 255, 255, 0.1); }
+
+        .vignette {
+            background: radial-gradient(circle at 26% 38%, transparent 0%, rgba(5, 6, 6, 0.34) 46%, rgba(5, 6, 6, 0.92) 100%);
+        }
+
+        .site-header,
+        .hero,
+        .metrics,
+        .features,
+        .final-cta,
+        footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .site-header {
+            border-bottom: 1px solid rgba(191, 255, 60, 0.1);
+            background: rgba(7, 8, 8, 0.82);
+            backdrop-filter: blur(16px);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            width: min(1500px, 100%);
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .brand,
+        .login-button,
+        .hero-button,
+        .ghost-button {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .brand {
+            min-width: 0;
+            gap: 0.75rem;
+            color: var(--text);
+        }
+
+        .brand-icon {
+            display: grid;
+            width: 2.5rem;
+            height: 2.5rem;
+            flex: 0 0 auto;
+            place-items: center;
+            border: 1px solid rgba(191, 255, 60, 0.3);
+            border-radius: 50%;
+            background: rgba(191, 255, 60, 0.1);
+            color: var(--lime-soft);
+        }
+
+        .brand-name {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .brand-name span { color: var(--lime-soft); }
+
+        .brand-sub {
+            display: block;
+            margin-top: 0.25rem;
+            color: #71717a;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.63rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+
+        .login-button {
+            height: 2.75rem;
+            gap: 0.5rem;
+            border: 1px solid rgba(191, 255, 60, 0.25);
+            border-radius: 0.375rem;
+            background: rgba(191, 255, 60, 0.1);
+            padding: 0 1rem;
+            color: var(--lime-soft);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .login-button:hover {
+            background: rgba(191, 255, 60, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            display: grid;
+            min-height: calc(100vh - 73px);
+            align-items: center;
+            width: min(1500px, 100%);
+            margin: 0 auto;
+            padding: 4rem 2rem 5rem;
+        }
+
+        .hero-content { max-width: 72rem; }
+
+        .eyebrow {
+            display: inline-flex;
+            max-width: 100%;
+            align-items: center;
+            gap: 0.55rem;
+            border: 1px solid rgba(191, 255, 60, 0.3);
+            border-radius: 999px;
+            background: rgba(191, 255, 60, 0.08);
+            padding: 0.65rem 1rem;
+            color: var(--lime-soft);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            max-width: 68rem;
+            margin-top: 1.75rem;
+            color: var(--text);
+            font-size: clamp(3.2rem, 8vw, 8.7rem);
+            font-weight: 900;
+            letter-spacing: 0;
+            line-height: 0.92;
+        }
+
+        h1 span {
+            display: block;
+            color: var(--lime);
+        }
+
+        .hero-copy {
+            max-width: 43rem;
+            margin-top: 1.75rem;
+            color: #d4d4d8;
+            font-size: clamp(1rem, 1.6vw, 1.25rem);
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .hero-copy strong { color: var(--text); }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            margin-top: 2rem;
+        }
+
+        .hero-button,
+        .ghost-button {
+            min-height: 3.5rem;
+            justify-content: center;
+            gap: 0.75rem;
+            border-radius: 0.375rem;
+            padding: 0 1.75rem;
+            font-size: 1rem;
+            font-weight: 900;
+            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+        }
+
+        .hero-button {
+            background: var(--orange);
+            color: var(--text);
+            box-shadow: 0 0 38px rgba(255, 91, 32, 0.36);
+        }
+
+        .hero-button:hover {
+            background: #ff6b34;
+            transform: translateY(-2px);
+        }
+
+        .ghost-button {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: #f4f4f5;
+            backdrop-filter: blur(14px);
+        }
+
+        .ghost-button:hover {
+            border-color: rgba(191, 255, 60, 0.35);
+            color: var(--lime-soft);
+        }
+
+        .checks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 2rem;
+            margin-top: 2rem;
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        .checks span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            border-top: 1px solid rgba(191, 255, 60, 0.1);
+            border-bottom: 1px solid rgba(191, 255, 60, 0.1);
+            background: rgba(7, 8, 8, 0.62);
+            backdrop-filter: blur(16px);
+        }
+
+        .metric {
+            min-height: 7rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border-right: 1px solid rgba(191, 255, 60, 0.1);
+        }
+
+        .metric:last-child { border-right: 0; }
+
+        .metric-number {
+            color: var(--lime);
+            font-size: clamp(1.8rem, 3vw, 2.65rem);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .metric-label {
+            margin-top: 0.55rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
 
         .features {
-            max-width: 1100px; margin: 0 auto; padding: 4rem 1.5rem;
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            padding: 5rem 2rem;
         }
 
         .section-label {
-            text-align: center; font-size: 0.8rem; font-weight: 600;
-            color: var(--sky); letter-spacing: 0.1em; text-transform: uppercase;
-            margin-bottom: 0.75rem;
+            color: var(--lime);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.22em;
+            text-align: center;
+            text-transform: uppercase;
         }
 
         .section-title {
-            text-align: center; font-size: clamp(1.5rem, 3vw, 2.2rem);
-            font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3rem;
+            max-width: 50rem;
+            margin: 0.85rem auto 2rem;
+            color: var(--text);
+            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.05;
+            text-align: center;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
         }
 
         .feature-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px; padding: 1.75rem;
-            transition: border-color 0.2s, background 0.2s;
+            min-height: 13rem;
+            border: 1px solid rgba(191, 255, 60, 0.13);
+            border-radius: 0.375rem;
+            background: rgba(13, 14, 14, 0.78);
+            padding: 1.35rem;
+            box-shadow: 0 24px 90px rgba(0, 0, 0, 0.22);
+            backdrop-filter: blur(14px);
+            transition: border-color 0.2s, background 0.2s, transform 0.2s;
         }
+
         .feature-card:hover {
-            border-color: rgba(33,150,243,0.3);
-            background: rgba(33,150,243,0.05);
+            border-color: rgba(191, 255, 60, 0.3);
+            background: rgba(16, 18, 18, 0.9);
+            transform: translateY(-2px);
         }
 
         .feature-icon {
-            width: 44px; height: 44px; border-radius: 10px;
-            background: rgba(33,150,243,0.12); border: 1px solid rgba(33,150,243,0.2);
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 1.1rem;
+            display: grid;
+            width: 2.75rem;
+            height: 2.75rem;
+            place-items: center;
+            border: 1px solid rgba(191, 255, 60, 0.18);
+            border-radius: 0.375rem;
+            background: rgba(191, 255, 60, 0.08);
+            color: var(--lime-soft);
         }
 
-        .feature-icon svg { width: 22px; height: 22px; color: var(--sky); }
-
         .feature-title {
-            font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 900;
         }
 
         .feature-desc {
-            font-size: 0.875rem; color: var(--muted); line-height: 1.65;
+            margin-top: 0.55rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.65;
         }
 
-        .cta-section {
-            max-width: 700px; margin: 2rem auto 6rem;
-            padding: 3rem 2rem;
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; text-align: center;
-            position: relative; overflow: hidden;
+        .final-cta {
+            width: min(760px, calc(100% - 2rem));
+            margin: 0 auto 5rem;
+            border: 1px solid rgba(191, 255, 60, 0.15);
+            border-radius: 0.375rem;
+            background: rgba(13, 14, 14, 0.88);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
+            backdrop-filter: blur(16px);
         }
 
-        .cta-section::before {
-            content: '';
-            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
-            width: 300px; height: 200px;
-            background: radial-gradient(circle, rgba(33,150,243,0.2), transparent 70%);
-            pointer-events: none;
+        .final-cta h2 {
+            color: var(--text);
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 900;
+            line-height: 1.1;
         }
 
-        .cta-section h2 {
-            font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em;
-            margin-bottom: 0.75rem; position: relative;
+        .final-cta p {
+            max-width: 36rem;
+            margin: 0.85rem auto 1.5rem;
+            color: var(--muted);
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.65;
         }
 
-        .cta-section p {
-            color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; position: relative;
+        .final-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.85rem;
         }
 
         footer {
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(191, 255, 60, 0.1);
             padding: 1.5rem 2rem;
-            text-align: center; color: var(--muted); font-size: 0.8rem;
+            color: #71717a;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
         }
 
-        @media (max-width: 600px) {
-            nav { padding: 1rem; }
-            .stat-item { min-width: 140px; padding: 1.25rem 1rem; }
+        svg { display: block; }
+
+        @media (max-width: 980px) {
+            .planet { right: -24rem; min-width: 680px; opacity: 0.38; }
+            .hero { min-height: auto; padding-top: 3rem; }
+            .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .metric:nth-child(2) { border-right: 0; }
+            .metric:nth-child(-n+2) { border-bottom: 1px solid rgba(191, 255, 60, 0.1); }
+            .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 640px) {
+            .header-inner { padding: 0.9rem 1rem; }
+            .brand-icon { width: 2.25rem; height: 2.25rem; }
+            .brand-name { font-size: 0.92rem; }
+            .brand-sub { display: none; }
+            .login-button { width: 2.75rem; padding: 0; justify-content: center; }
+            .login-button span { display: none; }
+            .hero { padding: 2.5rem 1rem 3.25rem; }
+            .eyebrow { font-size: 0.65rem; letter-spacing: 0.14em; }
+            h1 { font-size: clamp(2.9rem, 14vw, 4.6rem); line-height: 0.95; }
+            .hero-button, .ghost-button { width: 100%; }
+            .checks { gap: 0.75rem; }
+            .metrics { grid-template-columns: 1fr; }
+            .metric { border-right: 0; border-bottom: 1px solid rgba(191, 255, 60, 0.1); }
+            .metric:last-child { border-bottom: 0; }
+            .features { padding: 4rem 1rem; }
+            .features-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <div class="bg-grid"></div>
+    @php
+        $loginUrl = rtrim((string) config('app.frontend_url'), '/') . '/login';
+        $checkoutUrl = 'https://lp.danuzioneto.com.br/geopolitica-investidor';
+    @endphp
 
-    <main>
-        <nav>
-            <a href="/" class="nav-logo">
-                <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="16" cy="16" r="14" stroke="#2196F3" stroke-width="1.5" opacity="0.5"/>
-                    <ellipse cx="16" cy="16" rx="6" ry="14" stroke="#0ea5e9" stroke-width="1.5"/>
-                    <line x1="2" y1="16" x2="30" y2="16" stroke="#2196F3" stroke-width="1.5" opacity="0.5"/>
-                    <line x1="2" y1="10" x2="30" y2="10" stroke="#2196F3" stroke-width="1" opacity="0.3"/>
-                    <line x1="2" y1="22" x2="30" y2="22" stroke="#2196F3" stroke-width="1" opacity="0.3"/>
-                </svg>
-                <span class="nav-logo-text">Geopolitica <span>para Investidores</span></span>
-            </a>
-            <a href="{{ config('app.frontend_url') }}/login" class="btn-login">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                    <polyline points="10 17 15 12 10 7"/>
-                    <line x1="15" y1="12" x2="3" y2="12"/>
-                </svg>
-                Entrar
-            </a>
-        </nav>
+    <main class="page">
+        <div class="ambient" aria-hidden="true"></div>
+        <div class="grid" aria-hidden="true"></div>
+        <div class="planet" aria-hidden="true">
+            <span class="orbit one"></span>
+            <span class="orbit two"></span>
+            <span class="orbit three"></span>
+            <span class="land one"></span>
+            <span class="land two"></span>
+            <span class="land three"></span>
+            <span class="line one"></span>
+            <span class="line two"></span>
+        </div>
+        <div class="vignette" aria-hidden="true"></div>
+
+        <header class="site-header">
+            <div class="header-inner">
+                <a href="/" class="brand" aria-label="Geopolítica para Investidores">
+                    <span class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.7"/>
+                            <path d="M3 12h18M12 2.5c2.5 2.7 3.8 5.9 3.8 9.5s-1.3 6.8-3.8 9.5M12 2.5C9.5 5.2 8.2 8.4 8.2 12s1.3 6.8 3.8 9.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span>
+                        <span class="brand-name">Geopolítica <span>para Investidores</span></span>
+                        <span class="brand-sub">inteligência geopolítica aplicada</span>
+                    </span>
+                </a>
+
+                <a href="{{ $loginUrl }}" class="login-button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <path d="m10 17 5-5-5-5"/>
+                        <path d="M15 12H3"/>
+                    </svg>
+                    <span>Já sou assinante</span>
+                </a>
+            </div>
+        </header>
 
         <section class="hero">
-            <div class="badge">
-                <span class="badge-dot"></span>
-                Análise geopolítica em tempo real
-            </div>
+            <div class="hero-content">
+                <div class="eyebrow">
+                    <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M10 1.7l2.4 5 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8L10 1.7z"/>
+                    </svg>
+                    Plataforma de inteligência geopolítica aplicada
+                </div>
 
-            <h1>
-                Entenda o mundo.<br>
-                <span class="accent">Proteja seus investimentos.</span>
-            </h1>
+                <h1>
+                    O mundo não para.
+                    <span>E você não pode</span>
+                    ficar para trás.
+                </h1>
 
-            <p class="hero-sub">
-                Alertas preditivos com IA, cenários de risco geopolítico e análises profundas
-                para investidores que precisam antecipar movimentos globais.
-            </p>
+                <p class="hero-copy">
+                    Enquanto a maioria lê manchetes, uma minoria entende o que está por trás delas e age antes que o resto perceba.
+                    <strong>Geopolítica para Investidores</strong> existe para quem quer estar nessa minoria.
+                </p>
 
-            <a href="{{ config('app.frontend_url') }}/login" class="hero-cta">
-                Acessar a plataforma
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                    <polyline points="12 5 19 12 12 19"/>
-                </svg>
-            </a>
+                <div class="hero-actions">
+                    <a href="{{ $checkoutUrl }}" class="hero-button">
+                        Assinar
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="{{ $loginUrl }}" class="ghost-button">Já sou assinante</a>
+                </div>
 
-            <div class="globe-wrap">
-                <svg class="globe-svg" viewBox="0 0 560 340" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="280" cy="170" rx="260" ry="155" stroke="#2196F3" stroke-width="0.8" opacity="0.2"/>
-                    <ellipse cx="280" cy="170" rx="200" ry="155" stroke="#2196F3" stroke-width="0.6" opacity="0.15"/>
-                    <ellipse cx="280" cy="170" rx="130" ry="155" stroke="#2196F3" stroke-width="0.6" opacity="0.15"/>
-                    <ellipse cx="280" cy="170" rx="60" ry="155" stroke="#2196F3" stroke-width="0.6" opacity="0.15"/>
-                    <line x1="20" y1="105" x2="540" y2="105" stroke="#2196F3" stroke-width="0.6" opacity="0.15"/>
-                    <line x1="20" y1="170" x2="540" y2="170" stroke="#2196F3" stroke-width="0.8" opacity="0.2"/>
-                    <line x1="20" y1="235" x2="540" y2="235" stroke="#2196F3" stroke-width="0.6" opacity="0.15"/>
-                    <path d="M140 100 L155 90 L170 95 L175 115 L165 130 L160 150 L150 165 L145 185 L135 195 L125 190 L120 175 L125 160 L130 145 L125 130 L128 115 Z" fill="#2196F3" opacity="0.25" stroke="#0ea5e9" stroke-width="0.8"/>
-                    <path d="M255 75 L275 70 L290 78 L295 95 L285 108 L280 95 L270 100 L260 92 Z" fill="#2196F3" opacity="0.25" stroke="#0ea5e9" stroke-width="0.8"/>
-                    <path d="M265 115 L285 112 L295 120 L298 140 L290 158 L280 170 L268 165 L260 148 L258 130 Z" fill="#2196F3" opacity="0.2" stroke="#0ea5e9" stroke-width="0.8"/>
-                    <path d="M310 70 L345 65 L375 72 L395 85 L400 100 L385 112 L360 115 L340 108 L318 105 L308 90 Z" fill="#2196F3" opacity="0.25" stroke="#0ea5e9" stroke-width="0.8"/>
-                    <path d="M355 118 L380 115 L400 122 L408 138 L395 150 L375 152 L358 142 L350 130 Z" fill="#2196F3" opacity="0.2" stroke="#0ea5e9" stroke-width="0.8"/>
-                    <path d="M390 195 L415 190 L428 200 L425 218 L410 225 L395 220 L388 208 Z" fill="#2196F3" opacity="0.18" stroke="#0ea5e9" stroke-width="0.8"/>
-                    <circle cx="148" cy="130" r="3" fill="#0ea5e9" opacity="0.9"/>
-                    <circle cx="148" cy="130" r="6" fill="#0ea5e9" opacity="0.2"/>
-                    <circle cx="148" cy="130" r="10" fill="#0ea5e9" opacity="0.07"/>
-                    <circle cx="275" cy="88" r="3" fill="#0ea5e9" opacity="0.9"/>
-                    <circle cx="275" cy="88" r="6" fill="#0ea5e9" opacity="0.2"/>
-                    <circle cx="275" cy="88" r="10" fill="#0ea5e9" opacity="0.07"/>
-                    <circle cx="360" cy="90" r="3" fill="#2196F3" opacity="0.9"/>
-                    <circle cx="360" cy="90" r="6" fill="#2196F3" opacity="0.2"/>
-                    <circle cx="360" cy="90" r="10" fill="#2196F3" opacity="0.07"/>
-                    <circle cx="408" cy="200" r="2.5" fill="#0ea5e9" opacity="0.7"/>
-                    <circle cx="408" cy="200" r="5" fill="#0ea5e9" opacity="0.15"/>
-                    <line x1="148" y1="130" x2="275" y2="88" stroke="#0ea5e9" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.35"/>
-                    <line x1="275" y1="88" x2="360" y2="90" stroke="#0ea5e9" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.35"/>
-                    <line x1="360" y1="90" x2="408" y2="200" stroke="#2196F3" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.25"/>
-                    <ellipse cx="280" cy="170" rx="262" ry="157" stroke="url(#glowGrad)" stroke-width="1.5" opacity="0.4"/>
-                    <defs>
-                        <linearGradient id="glowGrad" x1="0" y1="0" x2="560" y2="340" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#2196F3"/>
-                            <stop offset="50%" stop-color="#0ea5e9"/>
-                            <stop offset="100%" stop-color="#2196F3"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
+                <div class="checks">
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg>
+                        Briefing diário
+                    </span>
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg>
+                        Alertas por IA
+                    </span>
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg>
+                        Cenários de risco
+                    </span>
+                </div>
             </div>
         </section>
 
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number">180+</div>
-                <div class="stat-label">Países monitorados</div>
+        <section class="metrics" aria-label="Indicadores da plataforma">
+            <div class="metric">
+                <div class="metric-number">180+</div>
+                <div class="metric-label">Países monitorados</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">Monitoramento contínuo</div>
+            <div class="metric">
+                <div class="metric-number">24/7</div>
+                <div class="metric-label">Monitoramento contínuo</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">IA</div>
-                <div class="stat-label">Alertas preditivos</div>
+            <div class="metric">
+                <div class="metric-number">IA</div>
+                <div class="metric-label">Alertas preditivos</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">Real-time</div>
-                <div class="stat-label">Análises atualizadas</div>
+            <div class="metric">
+                <div class="metric-number">Real-time</div>
+                <div class="metric-label">Análises atualizadas</div>
             </div>
-        </div>
+        </section>
 
         <section class="features">
             <p class="section-label">Recursos da plataforma</p>
-            <h2 class="section-title">Tudo que você precisa para decidir com confiança</h2>
+            <h2 class="section-title">Tudo que você precisa para decidir antes do consenso</h2>
 
             <div class="features-grid">
-                <div class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                     </div>
-                    <div class="feature-title">Alertas Preditivos com IA</div>
-                    <p class="feature-desc">Nossa IA analisa padrões históricos e sinais geopolíticos para antecipar movimentos de mercado antes que se tornem manchetes.</p>
-                </div>
+                    <h3 class="feature-title">Alertas preditivos com IA</h3>
+                    <p class="feature-desc">Sinais geopolíticos monitorados continuamente para antecipar riscos antes que virem manchete.</p>
+                </article>
 
-                <div class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="2" y1="12" x2="22" y2="12"/>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>
                     </div>
-                    <div class="feature-title">Mapa de Riscos Globais</div>
-                    <p class="feature-desc">Visualize em tempo real zonas de conflito, instabilidade política e tensões comerciais que impactam seus ativos e carteiras.</p>
-                </div>
+                    <h3 class="feature-title">Mapa de riscos globais</h3>
+                    <p class="feature-desc">Conflitos, instabilidade política e tensões comerciais organizados por impacto para investidores.</p>
+                </article>
 
-                <div class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                            <polyline points="17 6 23 6 23 12"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m23 6-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
                     </div>
-                    <div class="feature-title">Cenários de Investimento</div>
-                    <p class="feature-desc">Projeções baseadas em análise geopolítica para commodities, moedas e mercados emergentes com diferentes níveis de risco.</p>
-                </div>
+                    <h3 class="feature-title">Cenários de investimento</h3>
+                    <p class="feature-desc">Análises sobre commodities, moedas e mercados emergentes com contexto estratégico claro.</p>
+                </article>
 
-                <div class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>
                     </div>
-                    <div class="feature-title">Relatórios Aprofundados</div>
-                    <p class="feature-desc">Análises detalhadas sobre regiões estratégicas, com contexto histórico, atores relevantes e implicações para o portfólio.</p>
-                </div>
+                    <h3 class="feature-title">Relatórios aprofundados</h3>
+                    <p class="feature-desc">Briefings com contexto histórico, atores relevantes e implicações práticas para portfólio.</p>
+                </article>
 
-                <div class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 20V10"/>
-                            <path d="M12 20V4"/>
-                            <path d="M6 20v-6"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
                     </div>
-                    <div class="feature-title">Dashboard Personalizado</div>
-                    <p class="feature-desc">Configure seu painel de acordo com suas regiões e classes de ativos de interesse para monitorar só o que importa para você.</p>
-                </div>
+                    <h3 class="feature-title">Dashboard personalizado</h3>
+                    <p class="feature-desc">Acompanhe regiões e classes de ativos relevantes para sua tomada de decisão.</p>
+                </article>
 
-                <div class="feature-card">
+                <article class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
                     </div>
-                    <div class="feature-title">Notificações em Tempo Real</div>
-                    <p class="feature-desc">Receba alertas imediatos quando eventos geopolíticos relevantes ocorrem em regiões ou setores que você acompanha.</p>
-                </div>
+                    <h3 class="feature-title">Notificações em tempo real</h3>
+                    <p class="feature-desc">Receba alertas quando eventos relevantes surgirem em regiões ou setores acompanhados.</p>
+                </article>
             </div>
         </section>
 
-        <section style="padding: 0 1.5rem;">
-            <div class="cta-section">
-                <h2>Comece a investir com mais inteligência</h2>
-                <p>Acesse a plataforma e tenha visibilidade sobre os riscos que movem os mercados.</p>
-                <a href="{{ config('app.frontend_url') }}/login" class="hero-cta" style="display: inline-flex;">
-                    Acessar minha conta
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
+        <section class="final-cta">
+            <h2>Escolha como quer acessar a plataforma</h2>
+            <p>Assinantes entram direto na área privada. Quem ainda não tem acesso pode assinar pela página oficial.</p>
+            <div class="final-actions">
+                <a href="{{ $checkoutUrl }}" class="hero-button">
+                    Assinar
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
                     </svg>
                 </a>
+                <a href="{{ $loginUrl }}" class="ghost-button">Já sou assinante</a>
             </div>
         </section>
 
         <footer>
-            &copy; {{ date('Y') }} Geopolitica para Investidores. Todos os direitos reservados.
+            &copy; {{ date('Y') }} Geopolítica para Investidores. Todos os direitos reservados.
         </footer>
     </main>
 </body>

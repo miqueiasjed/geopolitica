@@ -88,22 +88,6 @@ export function Login() {
             existe para quem quer estar nessa minoria.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="#acesso"
-              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-md bg-[#ff5b20] px-7 text-base font-black text-white shadow-[0_0_38px_rgba(255,91,32,0.36)] transition-transform hover:-translate-y-0.5 hover:bg-[#ff6b34]"
-            >
-              Acessar a plataforma
-              <ArrowRightIcon className="h-5 w-5" />
-            </a>
-            <a
-              href="#acesso"
-              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-md border border-white/12 bg-white/[0.04] px-7 text-base font-bold text-zinc-100 backdrop-blur transition-colors hover:border-[#BFFF3C]/35 hover:text-[#D7FF69]"
-            >
-              Já sou assinante
-            </a>
-          </div>
-
           <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm font-bold text-zinc-400">
             {['Briefing diário', 'Alertas por IA', 'Cenários de risco'].map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
