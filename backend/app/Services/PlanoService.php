@@ -97,13 +97,10 @@ class PlanoService
     {
         $plano = Plano::findOrFail($planoId);
 
-        $recurso = PlanoRecurso::where('plano_id', $planoId)
-            ->where('chave', $chave)
-            ->firstOrFail();
-
-        $recurso->update([
-            'valor' => $valor,
-        ]);
+        $recurso = PlanoRecurso::updateOrCreate(
+            ['plano_id' => $planoId, 'chave' => $chave],
+            ['valor' => $valor],
+        );
 
         $this->invalidarCache($plano->slug);
 

@@ -292,6 +292,188 @@ function LinhaRecurso({ planoId, chave, valor }: LinhaRecursoProps) {
   )
 }
 
+// ─── Adicionar recurso ───────────────────────────────────────────────────────
+
+interface AdicionarRecursoProps {
+  plano: Plano
+}
+
+function AdicionarRecurso({ plano }: AdicionarRecursoProps) {
+  const queryClient = useQueryClient()
+  const [aberto, setAberto] = useState(false)
+  const [chaveSelecionada, setChaveSelecionada] = useState('')
+  const [valorLocal, setValorLocal] = useState('false')
+  const [ilimitado, setIlimitado] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+
+  const chavesDisponiveis = Object.keys(LABELS).filter(
+    (chave) => !(chave in plano.recursos),
+  )
+
+  const tipo = chaveSelecionada ? inferirTipo(chaveSelecionada) : 'boolean'
+
+  function abrirForm() {
+    const primeira = chavesDisponiveis[0] ?? ''
+    setChaveSelecionada(primeira)
+    setValorLocal(inferirTipo(primeira) === 'boolean' ? 'false' : '')
+    setIlimitado(false)
+    setErro(null)
+    setAberto(true)
+  }
+
+  function trocarChave(chave: string) {
+    setChaveSelecionada(chave)
+    setValorLocal(inferirTipo(chave) === 'boolean' ? 'false' : '')
+    setIlimitado(false)
+  }
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      let valor: string | null
+      if (tipo === 'boolean') {
+        valor = valorLocal === 'true' ? 'true' : 'false'
+      } else if (tipo === 'numero') {
+        valor = ilimitado ? null : valorLocal
+      } else {
+        valor = valorLocal
+      }
+      return atualizarRecurso(plano.id, chaveSelecionada, valor)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
+      setAberto(false)
+    },
+    onError: () => setErro('Erro ao salvar. Tente novamente.'),
+  })
+
+  if (chavesDisponiveis.length === 0) return null
+
+  const baseInput =
+    'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-1.5 font-mono text-sm text-zinc-200 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
+
+  if (!aberto) {
+    return (
+      <button
+        type="button"
+        onClick={abrirForm}
+        className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-800 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-600 transition-colors hover:border-zinc-600 hover:text-zinc-400"
+      >
+        <PlusIcon className="h-3.5 w-3.5" />
+        Adicionar recurso
+      </button>
+    )
+  }
+
+  return (
+    <div className="rounded-lg border border-[#C9B882]/20 bg-[#C9B882]/5 p-3 space-y-3">
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#C9B882]/70">Novo recurso</p>
+
+      {/* Seletor de chave */}
+      <div className="space-y-1">
+        <label className="font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-500">Recurso</label>
+        <select
+          value={chaveSelecionada}
+          onChange={(e) => trocarChave(e.target.value)}
+          className={`${baseInput} w-full cursor-pointer`}
+        >
+          {chavesDisponiveis.map((chave) => (
+            <option key={chave} value={chave} className="bg-[#111113]">
+              {LABELS[chave]} ({chave})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Editor por tipo */}
+      {tipo === 'boolean' && (
+        <div className="flex items-center gap-3">
+          <label className="font-mono text-xs text-zinc-400">Valor:</label>
+          <select
+            value={valorLocal}
+            onChange={(e) => setValorLocal(e.target.value)}
+            className={`${baseInput} cursor-pointer`}
+          >
+            <option value="true" className="bg-[#111113]">Ativo (true)</option>
+            <option value="false" className="bg-[#111113]">Desativado (false)</option>
+          </select>
+        </div>
+      )}
+
+      {tipo === 'numero' && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={`novo-ilimitado-${plano.id}`}
+              checked={ilimitado}
+              onChange={(e) => { setIlimitado(e.target.checked); if (e.target.checked) setValorLocal('') }}
+              className="h-3.5 w-3.5 cursor-pointer accent-[#C9B882]"
+            />
+            <label htmlFor={`novo-ilimitado-${plano.id}`} className="cursor-pointer font-mono text-xs text-zinc-400">
+              Ilimitado (null)
+            </label>
+          </div>
+          {!ilimitado && (
+            <input
+              type="number"
+              value={valorLocal}
+              onChange={(e) => setValorLocal(e.target.value)}
+              min={0}
+              className={`${baseInput} w-24`}
+              placeholder="0"
+            />
+          )}
+        </div>
+      )}
+
+      {tipo === 'alertas_nivel' && (
+        <div className="flex items-center gap-3">
+          <label className="font-mono text-xs text-zinc-400">Nível:</label>
+          <select
+            value={valorLocal}
+            onChange={(e) => setValorLocal(e.target.value)}
+            className={`${baseInput} cursor-pointer`}
+          >
+            <option value="medium" className="bg-[#111113]">medium</option>
+            <option value="medium,high" className="bg-[#111113]">medium,high</option>
+            <option value="all" className="bg-[#111113]">all</option>
+          </select>
+        </div>
+      )}
+
+      {erro && <p className="font-mono text-[11px] text-red-400">{erro}</p>}
+
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          disabled={mutation.isPending || !chaveSelecionada}
+          onClick={() => mutation.mutate()}
+          className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {mutation.isPending ? (
+            <>
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              Salvando…
+            </>
+          ) : (
+            <><PlusIcon className="h-3 w-3" />Adicionar</>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setAberto(false)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700/50 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+        >
+          <Cross2Icon className="h-3 w-3" />
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Card de plano ────────────────────────────────────────────────────────────
 
 const COR_SLUG: Record<string, string> = {
@@ -386,6 +568,7 @@ function CardPlano({ plano }: { plano: Plano }) {
             />
           ))
         )}
+        <AdicionarRecurso plano={plano} />
       </div>
     </div>
   )
