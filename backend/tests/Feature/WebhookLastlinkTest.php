@@ -68,7 +68,7 @@ class WebhookLastlinkTest extends TestCase
         $this->assertStringContainsString('novo@teste.com', WebhookEvento::latest()->first()->log_acao);
         $this->assertStringContainsString('Conta criada', WebhookEvento::latest()->first()->log_acao);
 
-        Mail::assertSent(BoasVindasMail::class);
+        Mail::assertQueued(BoasVindasMail::class);
     }
 
     public function test_compra_plano_essencial_por_offer_code(): void
@@ -127,7 +127,7 @@ class WebhookLastlinkTest extends TestCase
 
         $this->assertStringContainsString('Plano atualizado', WebhookEvento::latest()->first()->log_acao);
 
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_reativacao_de_plano_envia_email_acesso_liberado(): void
@@ -140,7 +140,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $this->assertTrue($usuario->fresh()->assinante->ativo);
-        Mail::assertSent(AcessoLiberadoMail::class);
+        Mail::assertQueued(AcessoLiberadoMail::class);
     }
 
     // -----------------------------------------------------------------------
@@ -165,7 +165,7 @@ class WebhookLastlinkTest extends TestCase
         $this->assertStringContainsString('cancelado', WebhookEvento::latest()->first()->log_acao);
         $this->assertStringContainsString('cancelar@teste.com', WebhookEvento::latest()->first()->log_acao);
 
-        Mail::assertSent(CancelamentoMail::class);
+        Mail::assertQueued(CancelamentoMail::class);
     }
 
     public function test_reembolso_plano_desativa_e_envia_email_reembolso(): void
@@ -189,7 +189,7 @@ class WebhookLastlinkTest extends TestCase
 
         $this->assertStringContainsString('Reembolso', WebhookEvento::latest()->first()->log_acao);
 
-        Mail::assertSent(ReembolsoMail::class);
+        Mail::assertQueued(ReembolsoMail::class);
     }
 
     // -----------------------------------------------------------------------
@@ -207,7 +207,7 @@ class WebhookLastlinkTest extends TestCase
         $this->assertSame('essencial', $assinante->plano);
         $this->assertContains('elections', $assinante->addons);
         $this->assertDatabaseHas('assinante_addons', ['addon_key' => 'elections', 'status' => 'ativo']);
-        Mail::assertSent(AddonBoasVindasMail::class);
+        Mail::assertQueued(AddonBoasVindasMail::class);
     }
 
     public function test_compra_addon_ativa_addon_em_conta_existente(): void
@@ -222,7 +222,7 @@ class WebhookLastlinkTest extends TestCase
         $assinante = $usuario->fresh()->assinante;
         $this->assertContains('elections', $assinante->addons);
         $this->assertSame('pro', $assinante->plano);
-        Mail::assertSent(AddonBoasVindasMail::class);
+        Mail::assertQueued(AddonBoasVindasMail::class);
     }
 
     public function test_cancelamento_addon_remove_addon(): void
@@ -255,7 +255,7 @@ class WebhookLastlinkTest extends TestCase
         $usuario = User::where('email', 'pascal@teste.com')->firstOrFail();
         $this->assertTrue($usuario->hasRole('assinante_pro'));
         $this->assertNotNull($usuario->assinante->expira_em);
-        Mail::assertSent(BoasVindasMail::class);
+        Mail::assertQueued(BoasVindasMail::class);
     }
 
     public function test_renovacao_de_assinatura_atualiza_expira_em(): void
@@ -273,7 +273,7 @@ class WebhookLastlinkTest extends TestCase
         $assinante = $usuario->fresh()->assinante;
         $this->assertTrue($assinante->ativo);
         $this->assertNotNull($assinante->expira_em);
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_product_access_started_ativa_assinatura(): void
@@ -285,7 +285,7 @@ class WebhookLastlinkTest extends TestCase
         $usuario = User::where('email', 'access@teste.com')->firstOrFail();
         $this->assertTrue($usuario->hasRole('assinante_essencial'));
         $this->assertTrue($usuario->assinante->ativo);
-        Mail::assertSent(BoasVindasMail::class);
+        Mail::assertQueued(BoasVindasMail::class);
     }
 
     // -----------------------------------------------------------------------
@@ -306,7 +306,7 @@ class WebhookLastlinkTest extends TestCase
         $this->assertFalse($usuario->assinante->ativo);
         $this->assertSame('expirado', $usuario->assinante->status);
         $this->assertFalse($usuario->hasRole('assinante_pro'));
-        Mail::assertSent(CancelamentoMail::class);
+        Mail::assertQueued(CancelamentoMail::class);
     }
 
     public function test_product_access_ended_desativa_com_status_expirado(): void
@@ -337,7 +337,7 @@ class WebhookLastlinkTest extends TestCase
         $usuario->refresh();
         $this->assertFalse($usuario->assinante->ativo);
         $this->assertSame('reembolsado', $usuario->assinante->status);
-        Mail::assertSent(ReembolsoMail::class);
+        Mail::assertQueued(ReembolsoMail::class);
     }
 
     public function test_payment_chargeback_desativa_como_reembolsado(): void
@@ -375,7 +375,7 @@ class WebhookLastlinkTest extends TestCase
         $this->assertTrue($assinante->ativo);
         $this->assertNotNull($assinante->expira_em);
         $this->assertDatabaseHas('webhook_eventos', ['event_type' => 'LASTLINK_RECURRENT_PAYMENT']);
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_switch_plan_atualiza_plano_e_role(): void
@@ -428,7 +428,7 @@ class WebhookLastlinkTest extends TestCase
         }
 
         $this->assertDatabaseEmpty('webhook_eventos');
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     // -----------------------------------------------------------------------
