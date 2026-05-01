@@ -143,6 +143,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('suporte')->group
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
+    Route::post('/assinantes/{id}/reenviar-boas-vindas', [AdminAssinanteController::class, 'reenviarBoasVindas']);
     Route::post('/assinantes/importar', [ImportarAssinantesController::class, 'store']);
     Route::get('/assinantes/importar/{id}/status', [ImportarAssinantesController::class, 'status']);
     Route::get('/webhook-eventos', [AdminWebhookController::class, 'index']);

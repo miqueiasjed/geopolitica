@@ -8,6 +8,7 @@ import {
   Dialog,
   Flex,
   Heading,
+  IconButton,
   Progress,
   ScrollArea,
   Select,
@@ -16,11 +17,13 @@ import {
   Table,
   Text,
   TextField,
+  Tooltip,
 } from '@radix-ui/themes'
 import {
   CheckCircledIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  EnvelopeClosedIcon,
   ExclamationTriangleIcon,
   MagnifyingGlassIcon,
   ResetIcon,
@@ -32,6 +35,7 @@ import {
   buscarAdminAssinantes,
   buscarStatusImportacao,
   importarAssinantesLastlink,
+  reenviarBoasVindasAssinante,
 } from '../../services/admin'
 import type { ImportacaoAssinantesStatus } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
@@ -239,7 +243,22 @@ export function AdminAssinantes() {
   const [status, setStatus] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
   const [importando, setImportando] = useState(false)
+  const [reenvioFeedback, setReenvioFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
+  const [reenvioEmAndamento, setReenvioEmAndamento] = useState<number | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
+
+  const mutacaoReenvio = useMutation({
+    mutationFn: (id: number) => reenviarBoasVindasAssinante(id),
+    onMutate: (id) => setReenvioEmAndamento(id),
+    onSuccess: (data) => {
+      setReenvioFeedback({ tipo: 'sucesso', mensagem: data.message })
+      setReenvioEmAndamento(null)
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      setReenvioFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao reenviar e-mail.' })
+      setReenvioEmAndamento(null)
+    },
+  })
 
   const query = useQuery({
     queryKey: adminKeys.assinantes({
@@ -371,6 +390,24 @@ export function AdminAssinantes() {
 
             <Separator size="4" />
 
+            {reenvioFeedback && (
+              <Callout.Root color={reenvioFeedback.tipo === 'sucesso' ? 'green' : 'ruby'} size="1">
+                <Callout.Icon>
+                  {reenvioFeedback.tipo === 'sucesso' ? <CheckCircledIcon /> : <ExclamationTriangleIcon />}
+                </Callout.Icon>
+                <Callout.Text>{reenvioFeedback.mensagem}</Callout.Text>
+                <Button
+                  variant="ghost"
+                  size="1"
+                  color={reenvioFeedback.tipo === 'sucesso' ? 'green' : 'ruby'}
+                  ml="auto"
+                  onClick={() => setReenvioFeedback(null)}
+                >
+                  Fechar
+                </Button>
+              </Callout.Root>
+            )}
+
             {query.isLoading ? (
               <Flex justify="center" py="8">
                 <Spinner size="3" />
@@ -390,6 +427,7 @@ export function AdminAssinantes() {
                       <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Ativo</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Assinado em</Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell>Ações</Table.ColumnHeaderCell>
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
@@ -414,11 +452,31 @@ export function AdminAssinantes() {
                             </Badge>
                           </Table.Cell>
                           <Table.Cell>{formatarDataCurta(assinante.assinado_em)}</Table.Cell>
+                          <Table.Cell>
+                            <Tooltip content="Reenviar e-mail de boas-vindas">
+                              <IconButton
+                                size="1"
+                                variant="ghost"
+                                color="cyan"
+                                disabled={reenvioEmAndamento === assinante.id}
+                                onClick={() => {
+                                  setReenvioFeedback(null)
+                                  mutacaoReenvio.mutate(assinante.id)
+                                }}
+                              >
+                                {reenvioEmAndamento === assinante.id ? (
+                                  <Spinner size="1" />
+                                ) : (
+                                  <EnvelopeClosedIcon />
+                                )}
+                              </IconButton>
+                            </Tooltip>
+                          </Table.Cell>
                         </Table.Row>
                       ))
                     ) : (
                       <Table.Row>
-                        <Table.Cell colSpan={6}>
+                        <Table.Cell colSpan={7}>
                           <Box className="py-10 text-center">
                             <Text size="3" className="text-cyan-100/65">
                               Nenhum assinante encontrado com os filtros atuais.

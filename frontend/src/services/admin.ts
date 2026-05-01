@@ -177,6 +177,11 @@ export async function buscarStatusImportacao(id: string): Promise<ImportacaoAssi
   return resposta.data
 }
 
+export async function reenviarBoasVindasAssinante(id: number): Promise<{ message: string }> {
+  const resposta = await api.post<{ message: string }>(`/admin/assinantes/${id}/reenviar-boas-vindas`)
+  return resposta.data
+}
+
 // --- B2B Admin ---
 
 export async function fetchAdminB2BEmpresas(): Promise<EmpresaB2B[]> {

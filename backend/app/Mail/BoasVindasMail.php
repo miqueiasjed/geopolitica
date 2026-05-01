@@ -19,6 +19,7 @@ class BoasVindasMail extends Mailable implements ShouldQueue
         public string $linkAcesso,
         public string $plano,
         public string $senhaTemporaria = '12345678',
+        public bool $reenvio = false,
     ) {
     }
 

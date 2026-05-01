@@ -19,4 +19,11 @@ class AdminAssinanteController extends Controller
             $this->adminAssinanteService->listar($request->validated())
         );
     }
+
+    public function reenviarBoasVindas(int $id): JsonResponse
+    {
+        $this->adminAssinanteService->reenviarBoasVindas($id);
+
+        return response()->json(['message' => 'E-mail de boas-vindas reenviado com sucesso.']);
+    }
 }
