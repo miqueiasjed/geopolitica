@@ -214,7 +214,7 @@ function ThreadView({ ticket }: { ticket: SuporteTicket; onVoltar: () => void })
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-3">
-        {ticketDetalhe?.mensagens.map((msg) => (
+        {(ticketDetalhe?.mensagens ?? []).map((msg) => (
           <motion.div
             key={msg.id}
             className={`rounded-xl border p-4 ${

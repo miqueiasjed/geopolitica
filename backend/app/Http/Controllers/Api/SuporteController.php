@@ -30,6 +30,7 @@ class SuporteController extends Controller
     public function store(AbrirTicketSuporteRequest $request): JsonResponse
     {
         $ticket = $this->suporteService->abrirTicket(auth()->user(), $request->validated());
+        $ticket->load('mensagens.anexos', 'mensagens.user', 'user');
 
         return response()->json(new SuporteTicketResource($ticket), 201);
     }
@@ -52,6 +53,7 @@ class SuporteController extends Controller
             ->findOrFail($id);
 
         $ticket = $this->suporteService->responder($ticket, auth()->user(), $request->validated(), false);
+        $ticket->load('mensagens.anexos', 'mensagens.user', 'user');
 
         return response()->json(new SuporteTicketResource($ticket));
     }
