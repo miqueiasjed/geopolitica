@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Models\WebhookEvento;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -236,8 +235,9 @@ class HotmartHandlerService
         $usuario = User::query()->firstOrCreate(
             ['email' => $email],
             [
-                'name' => $nome,
-                'password' => Str::password(24),
+                'name'               => $nome,
+                'password'           => '12345678',
+                'deve_alterar_senha' => true,
             ],
         );
 
@@ -263,11 +263,9 @@ class HotmartHandlerService
         $this->sincronizarRolePlano($usuario, $plano);
 
         if ($enviarBoasVindas && ($usuario->wasRecentlyCreated || $eraNovo)) {
-            $token = Password::createToken($usuario);
-
             Mail::to($usuario->email)->send(new BoasVindasMail(
                 $usuario,
-                $this->montarLinkRedefinicao($token, $usuario->email),
+                $this->montarLinkAcesso(),
                 $plano,
             ));
 
@@ -364,13 +362,6 @@ class HotmartHandlerService
             str_contains($valor, 'essencial'), str_contains($valor, 'essential') => 'essencial',
             default => 'pro',
         };
-    }
-
-    private function montarLinkRedefinicao(string $token, string $email): string
-    {
-        $frontendUrl = rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/');
-
-        return $frontendUrl.'/redefinir-senha?token='.urlencode($token).'&email='.urlencode($email);
     }
 
     private function montarLinkAcesso(): string

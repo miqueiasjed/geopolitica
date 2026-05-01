@@ -81,7 +81,7 @@ export interface AdminConteudosResponse {
   last_page: number
 }
 
-export type RoleUsuario = 'admin' | 'assinante_essencial' | 'assinante_pro' | 'assinante_reservado' | 'company_admin'
+export type RoleUsuario = string
 
 export interface AdminUsuario {
   id: number

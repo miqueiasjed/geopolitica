@@ -32,58 +32,69 @@ import {
   buscarAdminUsuarios,
   criarAdminUsuario,
   excluirAdminUsuario,
+  fetchAdminRoles,
 } from '../../services/admin'
+import type { AdminRole } from '../../services/admin'
 import type { AdminUsuario, AtualizarUsuarioPayload, CriarUsuarioPayload, RoleUsuario } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
 
 const VALOR_TODOS = 'all'
 
-const ROLES: { valor: RoleUsuario; label: string }[] = [
-  { valor: 'admin', label: 'Admin' },
-  { valor: 'assinante_essencial', label: 'Essencial' },
-  { valor: 'assinante_pro', label: 'Pro' },
-  { valor: 'assinante_reservado', label: 'Reservado' },
-  { valor: 'company_admin', label: 'Empresa Admin' },
-]
-
-function badgeColorDaRole(role: string | null) {
-  switch (role) {
-    case 'admin':
-      return 'ruby'
-    case 'assinante_reservado':
-      return 'purple'
-    case 'assinante_pro':
-      return 'cyan'
-    case 'assinante_essencial':
-      return 'amber'
-    case 'company_admin':
-      return 'blue'
-    default:
-      return 'gray'
-  }
+const BADGE_COLORS_FIXOS: Record<string, string> = {
+  admin: 'ruby',
+  company_admin: 'blue',
+  assinante_reservado: 'purple',
+  assinante_pro: 'cyan',
+  assinante_essencial: 'amber',
 }
 
-function labelDaRole(role: string | null) {
-  return ROLES.find((r) => r.valor === role)?.label ?? role ?? '—'
+type BadgeColor = 'ruby' | 'blue' | 'cyan' | 'amber' | 'purple' | 'green' | 'gray'
+
+function badgeColorDaRole(role: string | null): BadgeColor {
+  if (!role) return 'gray'
+  return (BADGE_COLORS_FIXOS[role] ?? (role.startsWith('assinante_') ? 'green' : 'gray')) as BadgeColor
 }
 
-const ROLES_ASSINANTE = ['assinante_essencial', 'assinante_pro', 'assinante_reservado']
+function labelDaRole(role: string | null, roles: AdminRole[]) {
+  if (!role) return '—'
+  return roles.find((r) => r.role === role)?.label ?? role
+}
+
+function ehAssinanteRole(role: string, roles: AdminRole[]) {
+  return roles.find((r) => r.role === role)?.assinante ?? role.startsWith('assinante_')
+}
+
+const adminRolesKey = ['admin', 'roles'] as const
 
 function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
   const queryClient = useQueryClient()
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [role, setRole] = useState<RoleUsuario>('assinante_essencial')
+  const [role, setRole] = useState<RoleUsuario>('')
   const [expiraEm, setExpiraEm] = useState('')
   const [erro, setErro] = useState('')
+
+  const { data: rolesDisponiveis = [] } = useQuery({
+    queryKey: adminRolesKey,
+    queryFn: fetchAdminRoles,
+    staleTime: 60_000,
+  })
+
+  // Define role inicial quando as roles carregam
+  useEffect(() => {
+    if (role === '' && rolesDisponiveis.length > 0) {
+      const primeiraAssinante = rolesDisponiveis.find((r) => r.assinante)
+      setRole(primeiraAssinante?.role ?? rolesDisponiveis[0].role)
+    }
+  }, [rolesDisponiveis, role])
 
   function resetar() {
     setNome('')
     setEmail('')
     setSenha('')
-    setRole('assinante_essencial')
+    setRole('')
     setExpiraEm('')
     setErro('')
   }
@@ -108,13 +119,13 @@ function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => v
   function salvar() {
     setErro('')
     const payload: CriarUsuarioPayload = { name: nome, email, password: senha, role }
-    if (ROLES_ASSINANTE.includes(role) && expiraEm) {
+    if (ehAssinanteRole(role, rolesDisponiveis) && expiraEm) {
       payload.expira_em = expiraEm
     }
     mutacao.mutate(payload)
   }
 
-  const ehAssinante = ROLES_ASSINANTE.includes(role)
+  const ehAssinante = ehAssinanteRole(role, rolesDisponiveis)
 
   return (
     <Dialog.Root
@@ -175,11 +186,11 @@ function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => v
             <Text size="2" weight="medium">
               Perfil (role)
             </Text>
-            <Select.Root value={role} onValueChange={(v) => setRole(v as RoleUsuario)}>
+            <Select.Root value={role} onValueChange={(v) => setRole(v)}>
               <Select.Trigger className="w-full" />
               <Select.Content>
-                {ROLES.map((r) => (
-                  <Select.Item key={r.valor} value={r.valor}>
+                {rolesDisponiveis.map((r) => (
+                  <Select.Item key={r.role} value={r.role}>
                     {r.label}
                   </Select.Item>
                 ))}
@@ -240,6 +251,12 @@ function ModalEdicao({
   const [expiraEm, setExpiraEm] = useState('')
   const [erro, setErro] = useState('')
 
+  const { data: rolesDisponiveis = [] } = useQuery({
+    queryKey: adminRolesKey,
+    queryFn: fetchAdminRoles,
+    staleTime: 60_000,
+  })
+
   const detalheQuery = useQuery({
     queryKey: adminKeys.usuario(usuario.id),
     queryFn: () => buscarAdminUsuario(usuario.id),
@@ -279,7 +296,7 @@ function ModalEdicao({
     if (role && role !== usuario.role) payload.role = role as RoleUsuario
 
     const roleEfetiva = role || usuario.role || ''
-    if (ROLES_ASSINANTE.includes(roleEfetiva)) {
+    if (ehAssinanteRole(roleEfetiva, rolesDisponiveis)) {
       const expiraEmInicial = detalhe?.assinante?.expira_em?.slice(0, 10) ?? ''
       if (expiraEm !== expiraEmInicial) {
         payload.expira_em = expiraEm || null
@@ -295,7 +312,7 @@ function ModalEdicao({
   }
 
   const roleEfetiva = role || usuario.role || ''
-  const ehAssinante = ROLES_ASSINANTE.includes(roleEfetiva)
+  const ehAssinante = ehAssinanteRole(roleEfetiva, rolesDisponiveis)
 
   return (
     <Dialog.Root open={aberto} onOpenChange={(v) => !v && onFechar()}>
@@ -382,11 +399,11 @@ function ModalEdicao({
                 <Text size="2" weight="medium">
                   Perfil (role)
                 </Text>
-                <Select.Root value={role} onValueChange={(v) => setRole(v as RoleUsuario)}>
+                <Select.Root value={role} onValueChange={(v) => setRole(v)}>
                   <Select.Trigger className="w-full" />
                   <Select.Content>
-                    {ROLES.map((r) => (
-                      <Select.Item key={r.valor} value={r.valor}>
+                    {rolesDisponiveis.map((r) => (
+                      <Select.Item key={r.role} value={r.role}>
                         {r.label}
                       </Select.Item>
                     ))}
@@ -492,6 +509,12 @@ export function AdminUsuarios() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
+
+  const { data: rolesListagem = [] } = useQuery({
+    queryKey: adminRolesKey,
+    queryFn: fetchAdminRoles,
+    staleTime: 60_000,
+  })
   const [criando, setCriando] = useState(false)
   const [usuarioEditando, setUsuarioEditando] = useState<AdminUsuario | null>(null)
   const [usuarioExcluindo, setUsuarioExcluindo] = useState<AdminUsuario | null>(null)
@@ -578,8 +601,8 @@ export function AdminUsuarios() {
                   <Select.Trigger placeholder="Todos os perfis" />
                   <Select.Content>
                     <Select.Item value={VALOR_TODOS}>Todos os perfis</Select.Item>
-                    {ROLES.map((r) => (
-                      <Select.Item key={r.valor} value={r.valor}>
+                    {rolesListagem.map((r) => (
+                      <Select.Item key={r.role} value={r.role}>
                         {r.label}
                       </Select.Item>
                     ))}
@@ -632,7 +655,7 @@ export function AdminUsuarios() {
                           <Table.Cell className="text-zinc-300">{usuario.email}</Table.Cell>
                           <Table.Cell>
                             <Badge color={badgeColorDaRole(usuario.role)} variant="soft">
-                              {labelDaRole(usuario.role)}
+                              {labelDaRole(usuario.role, rolesListagem)}
                             </Badge>
                           </Table.Cell>
                           <Table.Cell className="text-zinc-400">

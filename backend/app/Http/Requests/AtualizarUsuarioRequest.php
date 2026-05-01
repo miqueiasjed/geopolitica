@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class AtualizarUsuarioRequest extends FormRequest
 {
@@ -19,7 +20,7 @@ class AtualizarUsuarioRequest extends FormRequest
         return [
             'name'  => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuarioId)],
-            'role'      => ['sometimes', 'string', Rule::in(['admin', 'assinante_essencial', 'assinante_pro', 'assinante_reservado', 'company_admin'])],
+            'role'      => ['sometimes', 'string', Rule::in(Role::where('guard_name', 'sanctum')->pluck('name'))],
             'expira_em' => ['sometimes', 'nullable', 'date'],
         ];
     }

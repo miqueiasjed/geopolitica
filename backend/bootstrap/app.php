@@ -20,11 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        $middleware->appendToGroup('api', \App\Http\Middleware\ForcarAlteracaoSenha::class);
         $middleware->alias([
-            'assinante.ativo'    => \App\Http\Middleware\EnsureAssinanteAtivo::class,
-            'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'cron.secret'        => \App\Http\Middleware\CronSecretMiddleware::class,
-            'identificar.tenant' => \App\Http\Middleware\IdentificarTenantMiddleware::class,
+            'assinante.ativo'      => \App\Http\Middleware\EnsureAssinanteAtivo::class,
+            'role'                 => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'cron.secret'          => \App\Http\Middleware\CronSecretMiddleware::class,
+            'identificar.tenant'   => \App\Http\Middleware\IdentificarTenantMiddleware::class,
+            'forcar.alterar.senha' => \App\Http\Middleware\ForcarAlteracaoSenha::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

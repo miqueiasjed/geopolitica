@@ -7,6 +7,11 @@ import type {
   UsuarioAutenticado,
 } from '../types/auth'
 
+export interface AlterarSenhaInicialInput {
+  password: string
+  password_confirmation: string
+}
+
 export async function login(payload: LoginInput): Promise<LoginResponse> {
   const resposta = await api.post<LoginResponse>('/auth/login', payload)
 
@@ -31,6 +36,12 @@ export async function solicitarResetSenha(payload: SolicitarResetSenhaInput) {
 
 export async function redefinirSenha(payload: RedefinirSenhaInput) {
   const resposta = await api.post<{ message: string }>('/auth/senha/redefinir', payload)
+
+  return resposta.data
+}
+
+export async function alterarSenhaInicial(payload: AlterarSenhaInicialInput) {
+  const resposta = await api.post<{ message: string }>('/auth/senha/alterar-inicial', payload)
 
   return resposta.data
 }

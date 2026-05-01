@@ -10,7 +10,6 @@ use App\Mail\ReembolsoMail;
 use App\Models\Assinante;
 use App\Models\User;
 use App\Models\WebhookEvento;
-use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -262,7 +261,7 @@ class LastlinkHandlerService
 
         $usuario = User::firstOrCreate(
             ['email' => $email],
-            ['name' => $nome, 'password' => Str::password(24)],
+            ['name' => $nome, 'password' => '12345678', 'deve_alterar_senha' => true],
         );
 
         $assinante     = Assinante::firstOrNew(['user_id' => $usuario->id]);
@@ -287,9 +286,7 @@ class LastlinkHandlerService
         $this->sincronizarRolePlano($usuario, $plano);
 
         if ($usuario->wasRecentlyCreated || $eraNovo) {
-            $token = app(PasswordBrokerManager::class)->broker()->createToken($usuario);
-            $link  = $this->montarLinkRedefinicao($token, $email);
-            Mail::to($email)->send(new BoasVindasMail($usuario, $link, $plano));
+            Mail::to($email)->send(new BoasVindasMail($usuario, $this->montarLinkAcesso(), $plano));
 
             return "Conta criada para {$email} — plano {$plano}";
         }
@@ -352,7 +349,7 @@ class LastlinkHandlerService
 
         $usuario = User::firstOrCreate(
             ['email' => $email],
-            ['name' => $nome, 'password' => Str::password(24)],
+            ['name' => $nome, 'password' => '12345678', 'deve_alterar_senha' => true],
         );
 
         if ($usuario->wasRecentlyCreated) {
@@ -363,9 +360,7 @@ class LastlinkHandlerService
                 'status'  => 'ativo',
             ]);
 
-            $token = app(PasswordBrokerManager::class)->broker()->createToken($usuario);
-            $link  = $this->montarLinkRedefinicao($token, $email);
-            Mail::to($email)->send(new AddonBoasVindasMail($nome, $addonKey, $link, true));
+            Mail::to($email)->send(new AddonBoasVindasMail($nome, $addonKey, $this->montarLinkAcesso(), true, $email));
 
             (new AddonService())->ativar($usuario->id, $addonKey, 'lastlink', $orderId, $productId);
 
@@ -462,12 +457,6 @@ class LastlinkHandlerService
         }
 
         return null;
-    }
-
-    private function montarLinkRedefinicao(string $token, string $email): string
-    {
-        return rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/')
-            . '/redefinir-senha?token=' . urlencode($token) . '&email=' . urlencode($email);
     }
 
     private function montarLinkAcesso(): string

@@ -15,7 +15,7 @@ class BoasVindasMail extends Mailable
 
     public function __construct(
         public User $user,
-        public string $linkRedefinicao,
+        public string $linkAcesso,
         public string $plano,
     ) {
     }

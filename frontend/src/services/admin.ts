@@ -115,6 +115,19 @@ export async function despublicarConteudo(id: number): Promise<void> {
   await api.delete(`/admin/conteudos/${id}`)
 }
 
+// --- Roles Admin ---
+
+export interface AdminRole {
+  role: string
+  label: string
+  assinante: boolean
+}
+
+export async function fetchAdminRoles(): Promise<AdminRole[]> {
+  const res = await api.get<{ data: AdminRole[] }>('/admin/usuarios/roles')
+  return res.data.data
+}
+
 // --- Usuários Admin ---
 
 export async function criarAdminUsuario(payload: CriarUsuarioPayload): Promise<AdminUsuario> {

@@ -54,6 +54,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/senha/alterar-inicial', [SenhaController::class, 'alterarInicial']);
     });
 });
 
@@ -169,6 +170,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         ->middleware('throttle:20,1');
 
     // Gestão de usuários
+    Route::get('/usuarios/roles', [AdminUsuarioController::class, 'roles']);
     Route::get('/usuarios', [AdminUsuarioController::class, 'index']);
     Route::post('/usuarios', [AdminUsuarioController::class, 'store']);
     Route::get('/usuarios/{usuario}', [AdminUsuarioController::class, 'show']);

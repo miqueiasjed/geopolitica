@@ -30,6 +30,10 @@ export function RotaProtegida({ requiredRole }: RotaProtegidaProps) {
     return <Navigate to="/login" replace />
   }
 
+  if (user?.deve_alterar_senha) {
+    return <Navigate to="/alterar-senha-inicial" replace />
+  }
+
   if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to="/" replace />
   }

@@ -29,6 +29,7 @@ import { AdminFontes } from '../pages/admin/AdminFontes'
 import { AdminPaises } from '../pages/admin/AdminPaises'
 import { AdminPlanos } from '../pages/admin/AdminPlanos'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
+import { AlterarSenhaInicial } from '../pages/AlterarSenhaInicial'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
 import { PerfilPaisPage } from '../pages/PerfilPaisPage'
 import { ChatBriefings } from '../pages/ChatBriefings'
@@ -54,6 +55,7 @@ export function AppRouter() {
       <Route path="/esqueci-senha" element={<EsqueciSenha />} />
       <Route path="/redefinir-senha" element={<RedefinirSenha />} />
       <Route path="/convite/:token" element={<AceitarConvitePage />} />
+      <Route path="/alterar-senha-inicial" element={<AlterarSenhaInicial />} />
       <Route element={<RotaProtegida />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/feed" element={<Feed />} />

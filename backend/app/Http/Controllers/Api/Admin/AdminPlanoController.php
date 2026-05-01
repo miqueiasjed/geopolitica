@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\CriarPlanoRequest;
 use App\Models\Plano;
 use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
+use Spatie\Permission\Models\Role;
 
 class AdminPlanoController extends Controller
 {
@@ -52,6 +53,11 @@ class AdminPlanoController extends Controller
     public function store(CriarPlanoRequest $request): JsonResponse
     {
         $plano = $this->planoService->criarPlano($request->validated());
+
+        Role::firstOrCreate([
+            'name'       => 'assinante_' . $plano->slug,
+            'guard_name' => 'sanctum',
+        ]);
 
         return response()->json(['data' => $plano], 201);
     }

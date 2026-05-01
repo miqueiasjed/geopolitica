@@ -43,10 +43,11 @@ class AutenticacaoService
     private function serializarUsuario(User $usuario): array
     {
         return [
-            'id' => $usuario->id,
-            'name' => $usuario->name,
-            'email' => $usuario->email,
-            'role' => $usuario->getRoleNames()->first(),
+            'id'                 => $usuario->id,
+            'name'               => $usuario->name,
+            'email'              => $usuario->email,
+            'role'               => $usuario->getRoleNames()->first(),
+            'deve_alterar_senha' => (bool) $usuario->deve_alterar_senha,
             'assinante' => $usuario->assinante ? [
                 'id' => $usuario->assinante->id,
                 'plano' => $usuario->assinante->plano,

@@ -15,6 +15,7 @@ class AddonBoasVindasMail extends Mailable
         public string $addonKey,
         public string $linkAcesso,
         public bool $contaNova,
+        public string $email = '',
     ) {
     }
 

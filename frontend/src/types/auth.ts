@@ -14,6 +14,7 @@ export interface UsuarioAutenticado {
   name: string
   email: string
   role: string | null
+  deve_alterar_senha?: boolean
   assinante?: Assinante | null
 }
 
