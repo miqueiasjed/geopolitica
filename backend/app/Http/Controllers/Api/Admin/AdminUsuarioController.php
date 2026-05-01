@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AtualizarUsuarioRequest;
 use App\Http\Requests\CriarUsuarioRequest;
+use App\Mail\BoasVindasMail;
 use App\Models\Assinante;
 use App\Models\Plano;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 
 class AdminUsuarioController extends Controller
@@ -66,11 +68,12 @@ class AdminUsuarioController extends Controller
     public function store(CriarUsuarioRequest $request): JsonResponse
     {
         $dados = $request->validated();
+        $senhaTexto = $dados['password'];
 
         $user                     = new User();
         $user->name               = $dados['name'];
         $user->email              = $dados['email'];
-        $user->password           = Hash::make($dados['password']);
+        $user->password           = Hash::make($senhaTexto);
         $user->deve_alterar_senha = true;
         $user->save();
 
@@ -80,13 +83,16 @@ class AdminUsuarioController extends Controller
         $plano = $this->planoFromRole($dados['role']);
         if ($plano !== null) {
             Assinante::create([
-                'user_id'    => $user->id,
-                'plano'      => $plano,
-                'ativo'      => true,
-                'status'     => 'ativo',
+                'user_id'     => $user->id,
+                'plano'       => $plano,
+                'ativo'       => true,
+                'status'      => 'ativo',
                 'assinado_em' => now(),
-                'expira_em'  => $dados['expira_em'] ?? null,
+                'expira_em'   => $dados['expira_em'] ?? null,
             ]);
+
+            $linkAcesso = rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/') . '/login';
+            Mail::to($user->email)->send(new BoasVindasMail($user, $linkAcesso, $plano, $senhaTexto));
         }
 
         $user->load('roles');

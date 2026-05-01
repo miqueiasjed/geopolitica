@@ -17,6 +17,7 @@ class BoasVindasMail extends Mailable
         public User $user,
         public string $linkAcesso,
         public string $plano,
+        public string $senhaTemporaria = '12345678',
     ) {
     }
 
