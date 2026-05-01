@@ -26,7 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'                 => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'cron.secret'          => \App\Http\Middleware\CronSecretMiddleware::class,
             'identificar.tenant'   => \App\Http\Middleware\IdentificarTenantMiddleware::class,
-            'forcar.alterar.senha' => \App\Http\Middleware\ForcarAlteracaoSenha::class,
+            'forcar.alterar.senha'    => \App\Http\Middleware\ForcarAlteracaoSenha::class,
+            'risk_score.acesso'       => \App\Http\Middleware\VerificarAcessoRiskScore::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

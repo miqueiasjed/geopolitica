@@ -3,52 +3,40 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AtualizarSourceRequest;
+use App\Http\Requests\Admin\CriarSourceRequest;
 use App\Models\Source;
+use App\Services\SourceService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AdminSourceController extends Controller
 {
+    public function __construct(
+        private readonly SourceService $sourceService,
+    ) {}
+
     public function index(): JsonResponse
     {
-        $sources = Source::orderBy('categoria')->orderBy('nome')->get();
-
-        return response()->json(['data' => $sources]);
+        return response()->json(['data' => $this->sourceService->listar()]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(CriarSourceRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nome'      => ['required', 'string', 'max:255'],
-            'rss_url'   => ['required', 'url', 'max:500', 'unique:sources,rss_url'],
-            'categoria' => ['required', 'in:geopolitica,economia,defesa,mercados'],
-            'tier'      => ['sometimes', 'in:A,B'],
-            'ativo'     => ['boolean'],
-        ]);
-
-        $source = Source::create($validated);
+        $source = $this->sourceService->criar($request->validated());
 
         return response()->json(['data' => $source], 201);
     }
 
-    public function update(Request $request, Source $source): JsonResponse
+    public function update(AtualizarSourceRequest $request, Source $source): JsonResponse
     {
-        $validated = $request->validate([
-            'nome'      => ['sometimes', 'string', 'max:255'],
-            'rss_url'   => ['sometimes', 'url', 'max:500', 'unique:sources,rss_url,' . $source->id],
-            'categoria' => ['sometimes', 'in:geopolitica,economia,defesa,mercados'],
-            'tier'      => ['sometimes', 'in:A,B'],
-            'ativo'     => ['sometimes', 'boolean'],
-        ]);
+        $source = $this->sourceService->atualizar($source, $request->validated());
 
-        $source->update($validated);
-
-        return response()->json(['data' => $source->fresh()]);
+        return response()->json(['data' => $source]);
     }
 
     public function destroy(Source $source): JsonResponse
     {
-        $source->delete();
+        $this->sourceService->excluir($source);
 
         return response()->json(null, 204);
     }

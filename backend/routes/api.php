@@ -129,7 +129,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/eleicoes/{id}', [EleicaoController::class, 'show']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'risk_score.acesso'])->group(function () {
     Route::get('/carteira',  [CarteiraRiscoController::class, 'buscar']);
     Route::post('/carteira', [CarteiraRiscoController::class, 'calcular']);
 });

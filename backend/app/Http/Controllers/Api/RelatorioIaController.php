@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GerarRelatorioIaRequest;
 use App\Services\RelatorioIaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,23 +12,18 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class RelatorioIaController extends Controller
 {
-    public function __construct(private RelatorioIaService $relatorioIaService)
+    public function __construct(private readonly RelatorioIaService $relatorioIaService)
     {
     }
 
-    public function gerar(Request $request): StreamedResponse
+    public function gerar(GerarRelatorioIaRequest $request): StreamedResponse
     {
-        $request->validate([
-            'topico' => 'required|string|max:300',
-            'escopo' => 'nullable|string|max:500',
-        ]);
-
         return response()->stream(function () use ($request): void {
             try {
                 $relatorio = $this->relatorioIaService->gerarComStreaming(
                     usuario:        auth()->user(),
-                    topico:         $request->input('topico'),
-                    escopo:         $request->input('escopo', ''),
+                    topico:         $request->validated('topico'),
+                    escopo:         $request->validated('escopo') ?? '',
                     aoReceberToken: function (string $token): void {
                         echo 'data: ' . json_encode(['token' => $token]) . "\n\n";
                         ob_flush();

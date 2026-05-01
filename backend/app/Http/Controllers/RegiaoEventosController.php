@@ -4,21 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegiaoEventosRequest;
 use App\Http\Resources\EventResource;
-use App\Models\Event;
+use App\Services\RegiaoEventosService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class RegiaoEventosController extends Controller
 {
+    public function __construct(
+        private readonly RegiaoEventosService $regiaoEventosService,
+    ) {}
+
     public function index(RegiaoEventosRequest $request): AnonymousResourceCollection
     {
-        $regiao = $request->validated()['regiao'];
-
-        $eventos = Event::relevantes()
-            ->porRegiao($regiao)
-            ->ultimas48h()
-            ->orderBy('impact_score', 'desc')
-            ->limit(10)
-            ->get();
+        $eventos = $this->regiaoEventosService->buscarPorRegiao($request->validated('regiao'));
 
         return EventResource::collection($eventos);
     }

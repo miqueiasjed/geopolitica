@@ -3,24 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChatPerguntarRequest;
 use App\Services\ChatService;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ChatController extends Controller
 {
-    public function __construct(private ChatService $chatService)
+    public function __construct(private readonly ChatService $chatService)
     {
     }
 
-    public function perguntar(Request $request): StreamedResponse
+    public function perguntar(ChatPerguntarRequest $request): StreamedResponse
     {
-        $request->validate(['pergunta' => 'required|string|max:500']);
-
         return response()->stream(function () use ($request): void {
             $this->chatService->perguntar(
                 auth()->user(),
-                $request->input('pergunta'),
+                $request->validated('pergunta'),
                 function (string $token): void {
                     echo 'data: ' . json_encode(['token' => $token]) . "\n\n";
                     ob_flush();

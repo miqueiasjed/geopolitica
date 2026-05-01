@@ -7,6 +7,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class AdminWebhookEventoService
 {
+    public function excluirEmLote(array $ids): int
+    {
+        return WebhookEvento::whereIn('id', $ids)->delete();
+    }
+
     public function listar(array $filtros): LengthAwarePaginator
     {
         $processado = match ($filtros['processado'] ?? null) {

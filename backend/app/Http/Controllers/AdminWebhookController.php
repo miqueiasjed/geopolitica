@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExcluirWebhooksBulkRequest;
 use App\Http\Requests\ListarWebhookEventosRequest;
-use App\Models\WebhookEvento;
 use App\Services\AdminWebhookEventoService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AdminWebhookController extends Controller
 {
@@ -22,14 +21,9 @@ class AdminWebhookController extends Controller
         );
     }
 
-    public function destroyBulk(Request $request): JsonResponse
+    public function destroyBulk(ExcluirWebhooksBulkRequest $request): JsonResponse
     {
-        $ids = $request->validate([
-            'ids' => ['required', 'array', 'min:1'],
-            'ids.*' => ['required', 'integer'],
-        ])['ids'];
-
-        $deletados = WebhookEvento::whereIn('id', $ids)->delete();
+        $deletados = $this->adminWebhookEventoService->excluirEmLote($request->validated('ids'));
 
         return response()->json(['deleted' => $deletados]);
     }
