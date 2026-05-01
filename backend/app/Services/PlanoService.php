@@ -111,7 +111,15 @@ class PlanoService
     }
 
     /**
-     * Atualiza metadados de um plano (nome, descricao, preco).
+     * Cria um novo plano.
+     */
+    public function criarPlano(array $dados): Plano
+    {
+        return Plano::create($dados);
+    }
+
+    /**
+     * Atualiza metadados de um plano (nome, descricao, preco, lastlink_url).
      * Invalida o cache do plano após a escrita.
      */
     public function atualizarPlano(int $planoId, array $dados): Plano

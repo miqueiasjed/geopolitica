@@ -12,6 +12,7 @@ export interface Plano {
   preco: string
   ordem: number
   ativo: boolean
+  lastlink_url: string | null
   recursos: Record<string, PlanoRecursoItem>
 }
 
@@ -39,7 +40,20 @@ export async function atualizarRecurso(
 
 export async function atualizarPlano(
   planoId: number,
-  dados: { nome: string; descricao: string | null; preco: number },
+  dados: { nome: string; descricao: string | null; preco: number; lastlink_url: string | null },
 ): Promise<void> {
   await api.put(`/admin/planos/${planoId}`, dados)
+}
+
+export async function criarPlano(dados: {
+  slug: string
+  nome: string
+  descricao: string | null
+  preco: number
+  ordem: number
+  ativo: boolean
+  lastlink_url: string | null
+}): Promise<Plano> {
+  const res = await api.post<{ data: Plano }>('/admin/planos', dados)
+  return res.data.data
 }

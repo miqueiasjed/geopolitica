@@ -208,6 +208,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     // Gestão de planos e recursos
     Route::get('/planos', [AdminPlanoController::class, 'index']);
+    Route::post('/planos', [AdminPlanoController::class, 'store']);
     Route::put('/planos/{plano}', [AdminPlanoController::class, 'update']);
     Route::put('/planos/{plano}/recursos/{chave}', [AdminPlanoController::class, 'atualizarRecurso']);
 });

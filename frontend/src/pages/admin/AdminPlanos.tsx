@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CheckCircledIcon, Cross2Icon, Pencil1Icon } from '@radix-ui/react-icons'
+import { CheckCircledIcon, Cross2Icon, Pencil1Icon, PlusIcon, Link2Icon } from '@radix-ui/react-icons'
 import {
   fetchPlanos,
   atualizarRecurso,
+  criarPlano,
   adminPlanosKeys,
 } from '../../services/adminPlanos'
 import type { Plano, PlanoRecursoItem } from '../../services/adminPlanos'
@@ -79,7 +80,6 @@ function BadgeValor({ valor, chave }: BadgeValorProps) {
     )
   }
 
-  // Valor numérico com unidade contextual
   if (chave.includes('_dias')) {
     return (
       <span className="font-mono text-sm font-semibold text-zinc-200">
@@ -139,7 +139,6 @@ function EditorRecurso({ planoId, chave, valor, tipo, onConcluir }: EditorRecurs
 
   return (
     <div className="space-y-3">
-      {/* Campo de valor por tipo */}
       {tipo === 'boolean' && (
         <div className="flex items-center gap-3">
           <label className="font-mono text-xs text-zinc-400">Valor:</label>
@@ -206,7 +205,6 @@ function EditorRecurso({ planoId, chave, valor, tipo, onConcluir }: EditorRecurs
         <p className="font-mono text-[11px] text-red-400">{erroLocal}</p>
       )}
 
-      {/* Ações */}
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -216,14 +214,7 @@ function EditorRecurso({ planoId, chave, valor, tipo, onConcluir }: EditorRecurs
         >
           {mutation.isPending ? (
             <>
-              <svg
-                className="h-3 w-3 animate-spin"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-              >
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
               </svg>
               Salvando…
@@ -303,10 +294,6 @@ function LinhaRecurso({ planoId, chave, valor }: LinhaRecursoProps) {
 
 // ─── Card de plano ────────────────────────────────────────────────────────────
 
-interface CardPlanoProps {
-  plano: Plano
-}
-
 const COR_SLUG: Record<string, string> = {
   essencial: 'text-amber-400',
   pro: 'text-cyan-400',
@@ -325,7 +312,7 @@ const HEADER_SLUG: Record<string, string> = {
   reservado: 'bg-purple-500/5',
 }
 
-function CardPlano({ plano }: CardPlanoProps) {
+function CardPlano({ plano }: { plano: Plano }) {
   const corSlug = COR_SLUG[plano.slug] ?? 'text-zinc-300'
   const bordaSlug = BORDA_SLUG[plano.slug] ?? 'border-[#1e1e20]'
   const headerSlug = HEADER_SLUG[plano.slug] ?? ''
@@ -334,7 +321,6 @@ function CardPlano({ plano }: CardPlanoProps) {
 
   return (
     <div className={`flex flex-col rounded-xl border ${bordaSlug} overflow-hidden`}>
-      {/* Cabeçalho do plano */}
       <div className={`border-b ${bordaSlug} ${headerSlug} px-5 py-4`}>
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-0.5">
@@ -353,7 +339,27 @@ function CardPlano({ plano }: CardPlanoProps) {
           <p className="mt-2 text-xs text-zinc-500">{plano.descricao}</p>
         )}
 
-        <div className="mt-3 flex items-center gap-3">
+        {/* Link Lastlink */}
+        <div className="mt-3">
+          {plano.lastlink_url ? (
+            <a
+              href={plano.lastlink_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-blue-400 transition-colors hover:bg-blue-500/20"
+            >
+              <Link2Icon className="h-3 w-3" />
+              Lastlink vinculado
+            </a>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-800/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-zinc-600">
+              <Link2Icon className="h-3 w-3" />
+              Sem link Lastlink
+            </span>
+          )}
+        </div>
+
+        <div className="mt-2 flex items-center gap-3">
           <span className="inline-flex items-center rounded-full bg-zinc-800/80 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
             {totalRecursos} recursos
           </span>
@@ -365,7 +371,6 @@ function CardPlano({ plano }: CardPlanoProps) {
         </div>
       </div>
 
-      {/* Lista de recursos */}
       <div className="flex flex-1 flex-col gap-2 bg-[#0a0a0b] p-4">
         {Object.entries(plano.recursos).length === 0 ? (
           <p className="py-4 text-center font-mono text-xs text-zinc-600">
@@ -386,9 +391,219 @@ function CardPlano({ plano }: CardPlanoProps) {
   )
 }
 
+// ─── Modal de criação de plano ────────────────────────────────────────────────
+
+interface ModalCriarPlanoProps {
+  onFechar: () => void
+  onCriado: () => void
+}
+
+const CAMPO = 'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 font-mono text-sm text-zinc-200 outline-none w-full transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20 placeholder:text-zinc-600'
+
+function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
+  const queryClient = useQueryClient()
+
+  const [form, setForm] = useState({
+    slug: '',
+    nome: '',
+    descricao: '',
+    preco: '',
+    ordem: '',
+    ativo: true,
+    lastlink_url: '',
+  })
+  const [erro, setErro] = useState<string | null>(null)
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      criarPlano({
+        slug: form.slug.trim(),
+        nome: form.nome.trim(),
+        descricao: form.descricao.trim() || null,
+        preco: parseFloat(form.preco) || 0,
+        ordem: parseInt(form.ordem) || 0,
+        ativo: form.ativo,
+        lastlink_url: form.lastlink_url.trim() || null,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
+      onCriado()
+    },
+    onError: (e: unknown) => {
+      const msg =
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message
+        ?? 'Erro ao criar plano.'
+      setErro(msg)
+    },
+  })
+
+  function set(campo: string, valor: string | boolean) {
+    setForm((prev) => ({ ...prev, [campo]: valor }))
+    setErro(null)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl border border-[#2a2a2e] bg-[#0d0d0f] shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#1e1e20] px-6 py-4">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C9B882]/70">admin</p>
+            <h2 className="text-base font-semibold text-white">Novo Plano</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onFechar}
+            className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+          >
+            <Cross2Icon className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-4 px-6 py-5">
+          {/* Slug + Nome */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Slug *</label>
+              <input
+                type="text"
+                value={form.slug}
+                onChange={(e) => set('slug', e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                placeholder="ex: premium"
+                className={CAMPO}
+              />
+              <p className="font-mono text-[10px] text-zinc-600">Apenas letras minúsculas, números, - e _</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Nome *</label>
+              <input
+                type="text"
+                value={form.nome}
+                onChange={(e) => set('nome', e.target.value)}
+                placeholder="ex: Premium"
+                className={CAMPO}
+              />
+            </div>
+          </div>
+
+          {/* Preço + Ordem */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Preço (R$) *</label>
+              <input
+                type="number"
+                value={form.preco}
+                onChange={(e) => set('preco', e.target.value)}
+                min={0}
+                step="0.01"
+                placeholder="0.00"
+                className={CAMPO}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Ordem *</label>
+              <input
+                type="number"
+                value={form.ordem}
+                onChange={(e) => set('ordem', e.target.value)}
+                min={0}
+                placeholder="0"
+                className={CAMPO}
+              />
+            </div>
+          </div>
+
+          {/* Descrição */}
+          <div className="space-y-1.5">
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Descrição</label>
+            <textarea
+              value={form.descricao}
+              onChange={(e) => set('descricao', e.target.value)}
+              rows={2}
+              placeholder="Descrição opcional do plano"
+              className={`${CAMPO} resize-none`}
+            />
+          </div>
+
+          {/* Lastlink URL */}
+          <div className="space-y-1.5">
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+              URL Lastlink <span className="text-zinc-600">(opcional)</span>
+            </label>
+            <input
+              type="url"
+              value={form.lastlink_url}
+              onChange={(e) => set('lastlink_url', e.target.value)}
+              placeholder="https://..."
+              className={CAMPO}
+            />
+            <p className="font-mono text-[10px] text-zinc-600">
+              Quando preenchida, alunos que comprarem por esse link serão vinculados automaticamente a este plano.
+            </p>
+          </div>
+
+          {/* Ativo */}
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="ativo-novo-plano"
+              checked={form.ativo}
+              onChange={(e) => set('ativo', e.target.checked)}
+              className="h-4 w-4 cursor-pointer accent-[#C9B882]"
+            />
+            <label htmlFor="ativo-novo-plano" className="cursor-pointer font-mono text-sm text-zinc-300">
+              Plano ativo
+            </label>
+          </div>
+
+          {erro && (
+            <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">
+              {erro}
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 border-t border-[#1e1e20] px-6 py-4">
+          <button
+            type="button"
+            onClick={onFechar}
+            className="rounded-full border border-zinc-700/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            disabled={mutation.isPending || !form.slug || !form.nome || !form.preco}
+            onClick={() => mutation.mutate()}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {mutation.isPending ? (
+              <>
+                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+                Criando…
+              </>
+            ) : (
+              <>
+                <PlusIcon className="h-3 w-3" />
+                Criar Plano
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export function AdminPlanos() {
+  const [modalAberto, setModalAberto] = useState(false)
+
   const { data: planos, isLoading, isError } = useQuery({
     queryKey: adminPlanosKeys.lista(),
     queryFn: fetchPlanos,
@@ -411,17 +626,26 @@ export function AdminPlanos() {
           </p>
         </div>
 
-        {!isLoading && planos && (
-          <div className="flex-shrink-0 rounded-xl border border-[#1e1e20] bg-[#111113] px-4 py-3 text-center">
-            <p className="font-mono text-xl font-semibold text-white">{planos.length}</p>
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              planos
-            </p>
-          </div>
-        )}
+        <div className="flex items-start gap-3">
+          {!isLoading && planos && (
+            <div className="flex-shrink-0 rounded-xl border border-[#1e1e20] bg-[#111113] px-4 py-3 text-center">
+              <p className="font-mono text-xl font-semibold text-white">{planos.length}</p>
+              <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                planos
+              </p>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setModalAberto(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-[#C9B882]/25 bg-[#C9B882]/8 px-4 py-3 font-mono text-sm text-[#C9B882] transition-colors hover:bg-[#C9B882]/15"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Novo Plano
+          </button>
+        </div>
       </div>
 
-      {/* Estado de carregamento */}
       {isLoading && (
         <div className="grid gap-4 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -434,20 +658,25 @@ export function AdminPlanos() {
         </div>
       )}
 
-      {/* Estado de erro */}
       {isError && (
         <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 font-mono text-sm text-red-300">
           Não foi possível carregar os planos. Verifique a conexão e tente novamente.
         </div>
       )}
 
-      {/* Grade de planos */}
       {planosOrdenados.length > 0 && (
         <div className="grid gap-4 lg:grid-cols-3">
           {planosOrdenados.map((plano) => (
             <CardPlano key={plano.id} plano={plano} />
           ))}
         </div>
+      )}
+
+      {modalAberto && (
+        <ModalCriarPlano
+          onFechar={() => setModalAberto(false)}
+          onCriado={() => setModalAberto(false)}
+        />
       )}
     </div>
   )

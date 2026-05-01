@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AtualizarPlanoRecursoRequest;
 use App\Http\Requests\Admin\AtualizarPlanoRequest;
+use App\Http\Requests\Admin\CriarPlanoRequest;
 use App\Models\Plano;
 use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
@@ -30,18 +31,29 @@ class AdminPlanoController extends Controller
             }
 
             return [
-                'id'       => $plano->id,
-                'slug'     => $plano->slug,
-                'nome'     => $plano->nome,
-                'descricao' => $plano->descricao,
-                'preco'    => $plano->preco,
-                'ordem'    => $plano->ordem,
-                'ativo'    => $plano->ativo,
-                'recursos' => $recursos,
+                'id'           => $plano->id,
+                'slug'         => $plano->slug,
+                'nome'         => $plano->nome,
+                'descricao'    => $plano->descricao,
+                'preco'        => $plano->preco,
+                'ordem'        => $plano->ordem,
+                'ativo'        => $plano->ativo,
+                'lastlink_url' => $plano->lastlink_url,
+                'recursos'     => $recursos,
             ];
         });
 
         return response()->json(['data' => $dados]);
+    }
+
+    /**
+     * Cria um novo plano.
+     */
+    public function store(CriarPlanoRequest $request): JsonResponse
+    {
+        $plano = $this->planoService->criarPlano($request->validated());
+
+        return response()->json(['data' => $plano], 201);
     }
 
     /**
