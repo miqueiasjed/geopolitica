@@ -31,16 +31,18 @@ body {
   background: #050606;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 }
 
 #root {

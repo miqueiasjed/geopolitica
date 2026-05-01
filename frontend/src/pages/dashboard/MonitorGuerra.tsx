@@ -59,7 +59,7 @@ export function MonitorGuerra() {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useWarFeed()
+  } = useWarFeed(temAcesso)
 
   const {
     data: briefings,

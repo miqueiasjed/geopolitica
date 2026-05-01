@@ -22,13 +22,14 @@ async function fetchWarFeed({ cursor }: { cursor?: string | null }): Promise<War
   return response.data
 }
 
-export function useWarFeed() {
+export function useWarFeed(enabled = true) {
   const query = useInfiniteQuery({
     queryKey: warFeedKeys.all,
     queryFn: ({ pageParam }) => fetchWarFeed({ cursor: pageParam }),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     staleTime: 5 * 60 * 1000,
+    enabled,
   })
 
   const events: Event[] = query.data?.pages.flatMap((page) => page.events) ?? []

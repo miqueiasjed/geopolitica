@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SuporteMensagem extends Model
 {
+    protected $table = 'suporte_mensagens';
+
     protected $fillable = ['ticket_id', 'user_id', 'corpo', 'is_admin'];
 
     protected $casts = [
