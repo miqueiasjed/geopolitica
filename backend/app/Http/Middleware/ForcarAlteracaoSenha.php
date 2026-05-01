@@ -12,7 +12,7 @@ class ForcarAlteracaoSenha
     {
         $usuario = $request->user();
 
-        if ($usuario && $usuario->deve_alterar_senha && ! $request->is('auth/*')) {
+        if ($usuario && $usuario->deve_alterar_senha && ! $request->is('api/auth/*')) {
             return response()->json([
                 'message' => 'Você precisa alterar sua senha antes de continuar.',
                 'codigo'  => 'deve_alterar_senha',
