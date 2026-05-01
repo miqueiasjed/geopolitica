@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { ArrowRightIcon, GlobeIcon, LockClosedIcon } from '@radix-ui/react-icons'
+import { ArrowRightIcon, ExitIcon, GlobeIcon, LockClosedIcon } from '@radix-ui/react-icons'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { alterarSenhaInicial } from '../services/auth'
@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 
 export function AlterarSenhaInicial() {
   const navigate = useNavigate()
-  const { checkAuth } = useAuth()
+  const { checkAuth, logout } = useAuth()
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
 
@@ -42,10 +42,23 @@ export function AlterarSenhaInicial() {
             </span>
           </Link>
 
-          <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-3 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#D7FF69]">
-            <LockClosedIcon className="h-3 w-3" />
-            Primeiro acesso
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#BFFF3C]/20 bg-[#BFFF3C]/8 px-3 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#D7FF69]">
+              <LockClosedIcon className="h-3 w-3" />
+              Primeiro acesso
+            </span>
+            <button
+              type="button"
+              onClick={async () => {
+                await logout()
+                navigate('/login', { replace: true })
+              }}
+              className="inline-flex h-9 items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 text-xs font-semibold text-zinc-400 transition-colors hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
+            >
+              <ExitIcon className="h-3.5 w-3.5" />
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 
