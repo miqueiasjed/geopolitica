@@ -198,7 +198,7 @@ export interface AtualizarPerfilPaisPayload {
 
 // --- Webhook Offer → Plano ---
 
-export type PlanoWebhook = 'essencial' | 'pro' | 'reservado'
+export type PlanoWebhook = string
 
 export interface AdminWebhookOfferPlano {
   id: number

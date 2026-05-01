@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WebhookOfferPlano;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Plano;
 use Illuminate\Validation\Rule;
 
 class AdminWebhookOfferPlanoController extends Controller
@@ -27,6 +28,8 @@ class AdminWebhookOfferPlanoController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $slugsValidos = Plano::where('ativo', true)->pluck('slug')->toArray();
+
         $dados = $request->validate([
             'fonte'     => ['required', Rule::in(['hotmart', 'lastlink'])],
             'offer_id'  => [
@@ -34,7 +37,7 @@ class AdminWebhookOfferPlanoController extends Controller
                 Rule::unique('webhook_offer_planos')->where(fn ($q) => $q->where('fonte', $request->fonte)),
             ],
             'descricao' => ['required', 'string', 'max:150'],
-            'plano'     => ['required', Rule::in(['essencial', 'pro', 'reservado'])],
+            'plano'     => ['required', 'string', Rule::in($slugsValidos)],
         ]);
 
         $registro = WebhookOfferPlano::create($dados);

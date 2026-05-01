@@ -50,6 +50,7 @@ export const adminKeys = {
   webhookEventos: (filtros: AdminWebhookEventosFiltros) => [...adminKeys.all, 'webhook-eventos', filtros] as const,
   webhookTokens: () => [...adminKeys.all, 'webhook-tokens'] as const,
   webhookOfferPlanos: () => [...adminKeys.all, 'webhook-offer-planos'] as const,
+  planosAtivos: () => [...adminKeys.all, 'planos-ativos'] as const,
   conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
   usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
@@ -127,6 +128,20 @@ export async function toggleWebhookToken(id: number): Promise<AdminWebhookToken>
 
 export async function excluirWebhookToken(id: number): Promise<void> {
   await api.delete(`/admin/webhook-tokens/${id}`)
+}
+
+// --- Planos ativos (para dropdowns) ---
+
+export interface PlanoOpcao {
+  id: number
+  slug: string
+  nome: string
+  ativo: boolean
+}
+
+export async function buscarPlanosAtivos(): Promise<PlanoOpcao[]> {
+  const resposta = await api.get<{ data: PlanoOpcao[] }>('/admin/planos')
+  return resposta.data.data.filter((p) => p.ativo)
 }
 
 // --- Webhook Offer → Plano Admin ---

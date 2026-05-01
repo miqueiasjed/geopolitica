@@ -27,13 +27,13 @@ import {
   buscarWebhookOfferPlanos,
   criarWebhookOfferPlano,
   excluirWebhookOfferPlano,
+  buscarPlanosAtivos,
 } from '../../services/admin'
 import { formatarDataCurta } from '../../utils/formatters'
 import type {
   CriarWebhookTokenPayload,
   CriarWebhookOfferPlanoPayload,
   FonteWebhook,
-  PlanoWebhook,
 } from '../../types/admin'
 
 const TOKEN_INICIAL: CriarWebhookTokenPayload = { fonte: 'lastlink', descricao: '', token: '' }
@@ -41,7 +41,7 @@ const OFFER_INICIAL: CriarWebhookOfferPlanoPayload = {
   fonte: 'lastlink',
   offer_id: '',
   descricao: '',
-  plano: 'essencial',
+  plano: '',
 }
 
 function corFonte(f: string): 'violet' | 'orange' {
@@ -67,6 +67,7 @@ export function AdminWebhookTokens() {
     queryKey: adminKeys.webhookOfferPlanos(),
     queryFn: buscarWebhookOfferPlanos,
   })
+  const planosQuery = useQuery({ queryKey: adminKeys.planosAtivos(), queryFn: buscarPlanosAtivos })
 
   const criarToken = useMutation({
     mutationFn: criarWebhookToken,
@@ -311,13 +312,13 @@ export function AdminWebhookTokens() {
                     <Text size="2" weight="medium">Plano</Text>
                     <Select.Root
                       value={offerForm.plano}
-                      onValueChange={(v) => setOfferForm((f) => ({ ...f, plano: v as PlanoWebhook }))}
+                      onValueChange={(v) => setOfferForm((f) => ({ ...f, plano: v }))}
                     >
                       <Select.Trigger className="w-full" />
                       <Select.Content>
-                        <Select.Item value="essencial">Essencial</Select.Item>
-                        <Select.Item value="pro">Pro</Select.Item>
-                        <Select.Item value="reservado">Reservado</Select.Item>
+                        {(planosQuery.data ?? []).map((p) => (
+                          <Select.Item key={p.slug} value={p.slug}>{p.nome}</Select.Item>
+                        ))}
                       </Select.Content>
                     </Select.Root>
                   </label>
