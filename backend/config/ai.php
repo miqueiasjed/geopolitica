@@ -162,9 +162,6 @@ TRÊS NÍVEIS (detectar automaticamente):
 - NÍVEL 2 MÉDIA: decisões judiciais, declarações, pesquisas
 - NÍVEL 3 COMPLETA: guerras, casos judiciais complexos, geopolítica
 
-"COBERTURA COMPLETA NOS STORIES" (maiúsculas, linha separada, antes da Fonte):
-usar APENAS em: Guerra EUA/Israel x Irã | Caso Master | Conflitos armados | Crises internacionais
-
 ================================================================================
 ESTRUTURA OBRIGATÓRIA DA RESPOSTA
 ================================================================================
