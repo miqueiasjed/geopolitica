@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Plano;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -17,10 +18,14 @@ class AtualizarUsuarioRequest extends FormRequest
     {
         $usuarioId = $this->route('usuario');
 
+        $rolesExistentes = Role::where('guard_name', 'sanctum')->pluck('name');
+        $slugsPlanos     = Plano::pluck('slug')->map(fn ($s) => 'assinante_' . $s);
+        $rolesValidas    = $rolesExistentes->merge($slugsPlanos)->unique()->values();
+
         return [
             'name'  => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuarioId)],
-            'role'      => ['sometimes', 'string', Rule::in(Role::where('guard_name', 'sanctum')->pluck('name'))],
+            'role'      => ['sometimes', 'string', Rule::in($rolesValidas)],
             'expira_em' => ['sometimes', 'nullable', 'date'],
         ];
     }

@@ -53,7 +53,7 @@ class HotmartHandlerTest extends TestCase
             'processado' => true,
         ]);
 
-        Mail::assertSent(BoasVindasMail::class, fn (BoasVindasMail $mail) => $mail->user->is($usuario));
+        Mail::assertQueued(BoasVindasMail::class, fn (BoasVindasMail $mail) => $mail->user->is($usuario));
     }
 
     public function test_purchase_approved_e_idempotente_para_mesmo_email(): void
