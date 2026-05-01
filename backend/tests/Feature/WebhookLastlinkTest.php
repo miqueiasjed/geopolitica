@@ -11,6 +11,7 @@ use App\Models\Assinante;
 use App\Models\AssinanteAddon;
 use App\Models\User;
 use App\Models\WebhookEvento;
+use App\Models\WebhookToken;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
@@ -27,7 +28,12 @@ class WebhookLastlinkTest extends TestCase
 
         $this->seed(RolesSeeder::class);
 
-        Config::set('services.lastlink.webhook_token', 'test-lastlink-token');
+        WebhookToken::create([
+            'fonte'     => 'lastlink',
+            'descricao' => 'Teste',
+            'token'     => 'test-lastlink-token',
+            'ativo'     => true,
+        ]);
 
         // Addons: identificados por product_id único (produtos separados na Lastlink)
         Config::set('addons.lastlink_products', [

@@ -196,6 +196,25 @@ export interface AtualizarPerfilPaisPayload {
   termos_busca: string[]
 }
 
+// --- Webhook Tokens ---
+
+export type FonteWebhook = 'hotmart' | 'lastlink'
+
+export interface AdminWebhookToken {
+  id: number
+  fonte: FonteWebhook
+  descricao: string
+  token: string
+  ativo: boolean
+  created_at: string
+}
+
+export interface CriarWebhookTokenPayload {
+  fonte: FonteWebhook
+  descricao: string
+  token: string
+}
+
 // --- Fontes RSS ---
 
 export type CategoriaSource = 'geopolitica' | 'economia' | 'defesa' | 'mercados'

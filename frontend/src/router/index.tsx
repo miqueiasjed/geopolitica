@@ -10,6 +10,7 @@ import { Login } from '../pages/Login'
 import { Perfil } from '../pages/Perfil'
 import { AdminAssinantes } from '../pages/admin/AdminAssinantes'
 import { AdminWebhookEventos } from '../pages/admin/AdminWebhookEventos'
+import { AdminWebhookTokens } from '../pages/admin/AdminWebhookTokens'
 import { AdminNovoConteudo } from '../pages/admin/AdminNovoConteudo'
 import { AdminBiblioteca } from '../pages/admin/AdminBiblioteca'
 import { RedefinirSenha } from '../pages/RedefinirSenha'
@@ -86,6 +87,7 @@ export function AppRouter() {
           <Route path="assinantes" element={<AdminAssinantes />} />
           <Route path="usuarios" element={<AdminUsuarios />} />
           <Route path="webhook-eventos" element={<AdminWebhookEventos />} />
+          <Route path="webhook-tokens" element={<AdminWebhookTokens />} />
           <Route path="novo-conteudo" element={<AdminNovoConteudo />} />
           <Route path="biblioteca" element={<AdminBiblioteca />} />
           <Route path="eleicoes" element={<AdminEleicoes />} />

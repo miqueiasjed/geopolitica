@@ -4,12 +4,29 @@ namespace App\Services;
 
 use App\Models\WebhookEvento;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use RuntimeException;
 
 class AdminWebhookEventoService
 {
     public function excluirEmLote(array $ids): int
     {
         return WebhookEvento::whereIn('id', $ids)->delete();
+    }
+
+    public function reprocessar(WebhookEvento $evento): void
+    {
+        $evento->forceFill([
+            'erro'          => null,
+            'processado'    => false,
+            'processado_em' => null,
+            'log_acao'      => null,
+        ])->save();
+
+        match ($evento->fonte) {
+            'hotmart'  => app(HotmartHandlerService::class)->handle($evento),
+            'lastlink' => app(LastlinkHandlerService::class)->handle($evento),
+            default    => throw new RuntimeException("Fonte desconhecida: {$evento->fonte}"),
+        };
     }
 
     public function listar(array $filtros): LengthAwarePaginator

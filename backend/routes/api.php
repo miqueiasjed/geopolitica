@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
+use App\Http\Controllers\Api\Admin\AdminWebhookTokenController;
 use App\Http\Controllers\Api\Admin\AdminAiTestController;
 use App\Http\Controllers\Api\Admin\AdminSuporteController;
 use App\Http\Controllers\Api\Admin\AdminPlanoController;
@@ -148,6 +149,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/assinantes/importar/{id}/status', [ImportarAssinantesController::class, 'status']);
     Route::get('/webhook-eventos', [AdminWebhookController::class, 'index']);
     Route::delete('/webhook-eventos', [AdminWebhookController::class, 'destroyBulk']);
+    Route::post('/webhook-eventos/{webhookEvento}/reprocessar', [AdminWebhookController::class, 'reprocessar']);
+
+    Route::get('/webhook-tokens', [AdminWebhookTokenController::class, 'index']);
+    Route::post('/webhook-tokens', [AdminWebhookTokenController::class, 'store']);
+    Route::patch('/webhook-tokens/{webhookToken}/toggle', [AdminWebhookTokenController::class, 'toggle']);
+    Route::delete('/webhook-tokens/{webhookToken}', [AdminWebhookTokenController::class, 'destroy']);
 
     Route::get('/conteudos', [AdminConteudoController::class, 'index']);
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);

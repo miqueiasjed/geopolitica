@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReceberWebhookHotmartRequest;
 use App\Services\HotmartHandlerService;
+use App\Services\WebhookTokenService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -11,6 +12,7 @@ class WebhookHotmartController extends Controller
 {
     public function __construct(
         private readonly HotmartHandlerService $hotmartHandlerService,
+        private readonly WebhookTokenService $webhookTokenService,
     ) {
     }
 
@@ -19,13 +21,11 @@ class WebhookHotmartController extends Controller
         $payload = $request->validated() + $request->all();
         $evento = $this->hotmartHandlerService->registrarEvento($payload);
 
-        if ($request->header('x-hotmart-webhook-token') !== config('services.hotmart.webhook_token')) {
-            $evento->forceFill([
-                'erro' => 'Token de webhook invalido.',
-            ])->save();
+        if (! $this->webhookTokenService->validar('hotmart', $request->header('x-hotmart-webhook-token'))) {
+            $evento->forceFill(['erro' => 'Token de webhook invalido.'])->save();
 
             Log::warning('Tentativa de webhook Hotmart com token invalido.', [
-                'evento_id' => $evento->id,
+                'evento_id'  => $evento->id,
                 'event_type' => $evento->event_type,
             ]);
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Assinante;
 use App\Models\User;
+use App\Models\WebhookToken;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -20,11 +21,17 @@ class HotmartAddonTest extends TestCase
         $this->seed(RolesSeeder::class);
 
         config([
-            'services.hotmart.webhook_token' => 'segredo-teste',
-            'app.frontend_url'               => 'http://localhost:5173',
-            'addons.hotmart_products'        => [
+            'app.frontend_url'        => 'http://localhost:5173',
+            'addons.hotmart_products' => [
                 'ADDON_TEST_PRODUCT_ID' => 'elections',
             ],
+        ]);
+
+        WebhookToken::create([
+            'fonte'     => 'hotmart',
+            'descricao' => 'Teste',
+            'token'     => 'segredo-teste',
+            'ativo'     => true,
         ]);
 
         Mail::fake();

@@ -13,6 +13,7 @@ import {
   IdCardIcon,
   ClockIcon,
   GlobeIcon as PaisesIcon,
+  LockClosedIcon,
   MixIcon,
   LayersIcon,
   ChatBubbleIcon,
@@ -31,6 +32,7 @@ const itens = [
   { label: 'Fontes RSS', rota: '/admin/fontes', icone: MixIcon },
   { label: 'B2B / Empresas', rota: '/admin/b2b', icone: FileTextIcon },
   { label: 'Webhook Eventos', rota: '/admin/webhook-eventos', icone: ActivityLogIcon },
+  { label: 'Webhook Tokens', rota: '/admin/webhook-tokens', icone: LockClosedIcon },
   { label: 'Configurações', rota: '/admin/configuracoes', icone: GearIcon },
 ]
 

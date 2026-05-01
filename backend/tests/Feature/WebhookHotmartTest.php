@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\WebhookEvento;
+use App\Models\WebhookToken;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -17,9 +18,13 @@ class WebhookHotmartTest extends TestCase
         parent::setUp();
 
         $this->seed(RolesSeeder::class);
-        config([
-            'services.hotmart.webhook_token' => 'segredo-teste',
-            'app.frontend_url' => 'http://localhost:5173',
+        config(['app.frontend_url' => 'http://localhost:5173']);
+
+        WebhookToken::create([
+            'fonte'     => 'hotmart',
+            'descricao' => 'Teste',
+            'token'     => 'segredo-teste',
+            'ativo'     => true,
         ]);
         Mail::fake();
     }

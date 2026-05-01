@@ -21,11 +21,17 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ExclamationTriangleIcon,
+  ReloadIcon,
   ResetIcon,
   TrashIcon,
 } from '@radix-ui/react-icons'
 import { useState } from 'react'
-import { adminKeys, buscarAdminWebhookEventos, excluirWebhookEventos } from '../../services/admin'
+import {
+  adminKeys,
+  buscarAdminWebhookEventos,
+  excluirWebhookEventos,
+  reprocessarWebhookEvento,
+} from '../../services/admin'
 import { formatarDataCurta, formatarJsonPretty } from '../../utils/formatters'
 import type { AdminWebhookEvento } from '../../types/admin'
 
@@ -69,28 +75,57 @@ function labelProcessamento(processado: boolean, erro: string | null) {
   return processado ? 'Processado' : 'Pendente'
 }
 
-function DetalheEvento({ evento }: { evento: AdminWebhookEvento }) {
+function DetalheEvento({
+  evento,
+  onReprocessar,
+  reprocessando,
+}: {
+  evento: AdminWebhookEvento
+  onReprocessar: () => void
+  reprocessando: boolean
+}) {
   return (
     <Box className="space-y-4 py-2">
-      <Flex gap="6" wrap="wrap">
-        {evento.processado_em && (
-          <Box className="space-y-1">
-            <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
-              Processado em
-            </Text>
-            <Text size="2">{formatarDataCurta(evento.processado_em)}</Text>
-          </Box>
-        )}
-        {evento.hotmart_subscriber_code && (
-          <Box className="space-y-1">
-            <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
-              Subscriber Code
-            </Text>
-            <Text size="2" className="font-mono">
-              {evento.hotmart_subscriber_code}
-            </Text>
-          </Box>
-        )}
+      <Flex gap="6" wrap="wrap" align="start" justify="between">
+        <Flex gap="6" wrap="wrap">
+          {evento.processado_em && (
+            <Box className="space-y-1">
+              <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
+                Processado em
+              </Text>
+              <Text size="2">{formatarDataCurta(evento.processado_em)}</Text>
+            </Box>
+          )}
+          {evento.hotmart_subscriber_code && (
+            <Box className="space-y-1">
+              <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
+                Subscriber Code
+              </Text>
+              <Text size="2" className="font-mono">
+                {evento.hotmart_subscriber_code}
+              </Text>
+            </Box>
+          )}
+          {evento.log_acao && (
+            <Box className="space-y-1">
+              <Text size="1" className="uppercase tracking-[0.24em] text-cyan-100/45">
+                Ação executada
+              </Text>
+              <Text size="2">{evento.log_acao}</Text>
+            </Box>
+          )}
+        </Flex>
+
+        <Button
+          size="2"
+          variant="soft"
+          color="cyan"
+          loading={reprocessando}
+          onClick={onReprocessar}
+        >
+          <ReloadIcon />
+          Reprocessar
+        </Button>
       </Flex>
 
       {evento.erro && (
@@ -149,6 +184,13 @@ export function AdminWebhookEventos() {
     mutationFn: excluirWebhookEventos,
     onSuccess: () => {
       setSelecionados(new Set())
+      queryClient.invalidateQueries({ queryKey: adminKeys.all })
+    },
+  })
+
+  const mutacaoReprocessar = useMutation({
+    mutationFn: reprocessarWebhookEvento,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.all })
     },
   })
@@ -434,7 +476,14 @@ export function AdminWebhookEventos() {
                           expandido ? (
                             <Table.Row key={`${evento.id}-detalhe`} className="bg-cyan-400/5">
                               <Table.Cell colSpan={6}>
-                                <DetalheEvento evento={evento} />
+                                <DetalheEvento
+                                  evento={evento}
+                                  onReprocessar={() => mutacaoReprocessar.mutate(evento.id)}
+                                  reprocessando={
+                                    mutacaoReprocessar.isPending &&
+                                    mutacaoReprocessar.variables === evento.id
+                                  }
+                                />
                               </Table.Cell>
                             </Table.Row>
                           ) : null,

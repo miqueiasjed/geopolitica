@@ -5,6 +5,8 @@ import type {
   AdminConteudosResponse,
   AdminWebhookEvento,
   AdminWebhookEventosFiltros,
+  AdminWebhookToken,
+  CriarWebhookTokenPayload,
   AdminUsuario,
   AdminUsuarioDetalhe,
   AdminUsuariosFiltros,
@@ -44,6 +46,7 @@ export const adminKeys = {
   all: ['admin'] as const,
   assinantes: (filtros: AdminAssinantesFiltros) => [...adminKeys.all, 'assinantes', filtros] as const,
   webhookEventos: (filtros: AdminWebhookEventosFiltros) => [...adminKeys.all, 'webhook-eventos', filtros] as const,
+  webhookTokens: () => [...adminKeys.all, 'webhook-tokens'] as const,
   conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
   usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
@@ -95,6 +98,32 @@ export async function excluirWebhookEventos(ids: number[]): Promise<{ deleted: n
   })
 
   return resposta.data
+}
+
+export async function reprocessarWebhookEvento(id: number): Promise<{ success: boolean }> {
+  const resposta = await api.post<{ success: boolean }>(`/admin/webhook-eventos/${id}/reprocessar`)
+  return resposta.data
+}
+
+// --- Webhook Tokens Admin ---
+
+export async function buscarWebhookTokens(): Promise<AdminWebhookToken[]> {
+  const resposta = await api.get<{ data: AdminWebhookToken[] }>('/admin/webhook-tokens')
+  return resposta.data.data
+}
+
+export async function criarWebhookToken(payload: CriarWebhookTokenPayload): Promise<AdminWebhookToken> {
+  const resposta = await api.post<{ data: AdminWebhookToken }>('/admin/webhook-tokens', payload)
+  return resposta.data.data
+}
+
+export async function toggleWebhookToken(id: number): Promise<AdminWebhookToken> {
+  const resposta = await api.patch<{ data: AdminWebhookToken }>(`/admin/webhook-tokens/${id}/toggle`)
+  return resposta.data.data
+}
+
+export async function excluirWebhookToken(id: number): Promise<void> {
+  await api.delete(`/admin/webhook-tokens/${id}`)
 }
 
 export async function criarConteudo(payload: CriarConteudoPayload): Promise<Conteudo> {
