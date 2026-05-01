@@ -196,6 +196,26 @@ export interface AtualizarPerfilPaisPayload {
   termos_busca: string[]
 }
 
+// --- Webhook Offer → Plano ---
+
+export type PlanoWebhook = 'essencial' | 'pro' | 'reservado'
+
+export interface AdminWebhookOfferPlano {
+  id: number
+  fonte: FonteWebhook
+  offer_id: string
+  descricao: string
+  plano: PlanoWebhook
+  created_at: string
+}
+
+export interface CriarWebhookOfferPlanoPayload {
+  fonte: FonteWebhook
+  offer_id: string
+  descricao: string
+  plano: PlanoWebhook
+}
+
 // --- Webhook Tokens ---
 
 export type FonteWebhook = 'hotmart' | 'lastlink'

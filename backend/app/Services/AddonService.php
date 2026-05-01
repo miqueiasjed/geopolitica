@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assinante;
 use App\Models\AssinanteAddon;
+use App\Models\WebhookOfferPlano;
 
 class AddonService
 {
@@ -69,6 +70,15 @@ class AddonService
 
     public static function resolverPlanoByOferta(string $ofertaId): ?string
     {
+        $registro = WebhookOfferPlano::where('fonte', 'lastlink')
+            ->where('offer_id', $ofertaId)
+            ->value('plano');
+
+        if ($registro !== null) {
+            return $registro;
+        }
+
+        // fallback para config/env legado
         $mapa = config('addons.lastlink_offers');
 
         if (! is_array($mapa)) {

@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AdminAssinanteController;
 use App\Http\Controllers\AdminWebhookController;
 use App\Http\Controllers\Api\Admin\AdminWebhookTokenController;
+use App\Http\Controllers\Api\Admin\AdminWebhookOfferPlanoController;
 use App\Http\Controllers\Api\Admin\AdminAiTestController;
 use App\Http\Controllers\Api\Admin\AdminSuporteController;
 use App\Http\Controllers\Api\Admin\AdminPlanoController;
@@ -155,6 +156,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/webhook-tokens', [AdminWebhookTokenController::class, 'store']);
     Route::patch('/webhook-tokens/{webhookToken}/toggle', [AdminWebhookTokenController::class, 'toggle']);
     Route::delete('/webhook-tokens/{webhookToken}', [AdminWebhookTokenController::class, 'destroy']);
+
+    Route::get('/webhook-offer-planos', [AdminWebhookOfferPlanoController::class, 'index']);
+    Route::post('/webhook-offer-planos', [AdminWebhookOfferPlanoController::class, 'store']);
+    Route::delete('/webhook-offer-planos/{webhookOfferPlano}', [AdminWebhookOfferPlanoController::class, 'destroy']);
 
     Route::get('/conteudos', [AdminConteudoController::class, 'index']);
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);

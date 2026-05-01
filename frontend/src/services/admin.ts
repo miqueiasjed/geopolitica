@@ -5,6 +5,8 @@ import type {
   AdminConteudosResponse,
   AdminWebhookEvento,
   AdminWebhookEventosFiltros,
+  AdminWebhookOfferPlano,
+  CriarWebhookOfferPlanoPayload,
   AdminWebhookToken,
   CriarWebhookTokenPayload,
   AdminUsuario,
@@ -47,6 +49,7 @@ export const adminKeys = {
   assinantes: (filtros: AdminAssinantesFiltros) => [...adminKeys.all, 'assinantes', filtros] as const,
   webhookEventos: (filtros: AdminWebhookEventosFiltros) => [...adminKeys.all, 'webhook-eventos', filtros] as const,
   webhookTokens: () => [...adminKeys.all, 'webhook-tokens'] as const,
+  webhookOfferPlanos: () => [...adminKeys.all, 'webhook-offer-planos'] as const,
   conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
   usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
@@ -124,6 +127,24 @@ export async function toggleWebhookToken(id: number): Promise<AdminWebhookToken>
 
 export async function excluirWebhookToken(id: number): Promise<void> {
   await api.delete(`/admin/webhook-tokens/${id}`)
+}
+
+// --- Webhook Offer → Plano Admin ---
+
+export async function buscarWebhookOfferPlanos(): Promise<AdminWebhookOfferPlano[]> {
+  const resposta = await api.get<{ data: AdminWebhookOfferPlano[] }>('/admin/webhook-offer-planos')
+  return resposta.data.data
+}
+
+export async function criarWebhookOfferPlano(
+  payload: CriarWebhookOfferPlanoPayload,
+): Promise<AdminWebhookOfferPlano> {
+  const resposta = await api.post<{ data: AdminWebhookOfferPlano }>('/admin/webhook-offer-planos', payload)
+  return resposta.data.data
+}
+
+export async function excluirWebhookOfferPlano(id: number): Promise<void> {
+  await api.delete(`/admin/webhook-offer-planos/${id}`)
 }
 
 export async function criarConteudo(payload: CriarConteudoPayload): Promise<Conteudo> {
