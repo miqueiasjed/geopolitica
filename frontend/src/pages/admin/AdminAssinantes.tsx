@@ -5,6 +5,7 @@ import {
   Button,
   Callout,
   Card,
+  Checkbox,
   Dialog,
   Flex,
   Heading,
@@ -29,31 +30,165 @@ import {
   ResetIcon,
   UploadIcon,
 } from '@radix-ui/react-icons'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   adminKeys,
   buscarAdminAssinantes,
+  buscarPlanosAtivos,
   buscarStatusImportacao,
   importarAssinantesLastlink,
   reenviarBoasVindasAssinante,
 } from '../../services/admin'
-import type { ImportacaoAssinantesStatus } from '../../types/admin'
+import type { ImportacaoAssinantesPayload, ImportacaoAssinantesStatus, LinhaImportacaoAssinante } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
 
 const VALOR_TODOS = 'all'
+const SENHA_PADRAO = '12345678'
+
+const CHAVES_IMPORTACAO = {
+  email: ['email', 'e-mail', 'mail', 'e_mail', 'e-mail do membro', 'email do membro'],
+  nome: ['nome', 'name', 'nome completo', 'customer name', 'nome/razão social do membro', 'nome/razao social do membro'],
+  plano: ['plano', 'plan', 'offer', 'offer_code', 'nome da oferta', 'produto', 'produto principal'],
+  status: ['status', 'status da venda', 'subscription_status', 'order_status'],
+  expira_em: ['expira_em', 'data da expiração', 'data da expiracao', 'data de expiração', 'valid_until', 'expires_at'],
+  assinado_em: ['assinado_em', 'data da venda', 'data de assinatura', 'created_at'],
+}
+
+function normalizarChave(chave: string) {
+  return chave.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
+}
+
+function valorDaLinha(linha: Record<string, unknown>, chaves: string[]) {
+  const normalizada = Object.fromEntries(
+    Object.entries(linha).map(([chave, valor]) => [normalizarChave(chave), valor]),
+  )
+
+  for (const chave of chaves) {
+    const valor = normalizada[normalizarChave(chave)]
+
+    if (valor !== undefined && valor !== null && String(valor).trim() !== '') {
+      return String(valor).trim()
+    }
+  }
+
+  return ''
+}
+
+function resolverPlanoInicial(valor: string) {
+  const normalizado = normalizarChave(valor)
+
+  if (['essencial', 'pro', 'reservado'].includes(normalizado)) return normalizado
+  if (normalizado.includes('reservado')) return 'reservado'
+  if (/\bpro\b/.test(normalizado)) return 'pro'
+  if (normalizado.includes('essencial') || normalizado.includes('essential')) return 'essencial'
+
+  return ''
+}
+
+function normalizarData(valor: string) {
+  if (!valor) return ''
+
+  const iso = valor.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (iso) return iso[0]
+
+  const br = valor.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/)
+  if (br) {
+    const [, dia, mes, anoRaw] = br
+    const ano = anoRaw.length === 2 ? `20${anoRaw}` : anoRaw
+    return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`
+  }
+
+  const data = new Date(valor)
+  return Number.isNaN(data.getTime()) ? '' : data.toISOString().slice(0, 10)
+}
+
+function montarLinhaImportacao(linha: Record<string, unknown>, planoPadrao: string): LinhaImportacaoAssinante {
+  const planoRaw = valorDaLinha(linha, CHAVES_IMPORTACAO.plano)
+  const statusRaw = valorDaLinha(linha, CHAVES_IMPORTACAO.status)
+
+  return {
+    email: valorDaLinha(linha, CHAVES_IMPORTACAO.email),
+    nome: valorDaLinha(linha, CHAVES_IMPORTACAO.nome),
+    plano: resolverPlanoInicial(planoRaw) || planoPadrao,
+    status: statusRaw || 'ativo',
+    expira_em: normalizarData(valorDaLinha(linha, CHAVES_IMPORTACAO.expira_em)),
+    assinado_em: normalizarData(valorDaLinha(linha, CHAVES_IMPORTACAO.assinado_em)),
+    origem: linha,
+  }
+}
+
+function linhasDaMatriz(matriz: unknown[][], planoPadrao: string) {
+  const [cabecalhosRaw, ...linhasRaw] = matriz
+  const cabecalhos = (cabecalhosRaw ?? []).map((valor) => String(valor ?? '').trim())
+
+  return linhasRaw
+    .map((valores) =>
+      Object.fromEntries(
+        cabecalhos.map((cabecalho, indice) => [cabecalho || `coluna_${indice + 1}`, valores[indice] ?? '']),
+      ),
+    )
+    .map((linha) => montarLinhaImportacao(linha, planoPadrao))
+    .filter((linha) => linha.email || linha.nome)
+}
+
+function parseCsv(texto: string) {
+  const primeiraLinha = texto.split(/\r?\n/).find((linha) => linha.trim()) ?? ''
+  const separador = (primeiraLinha.match(/;/g)?.length ?? 0) > (primeiraLinha.match(/,/g)?.length ?? 0) ? ';' : ','
+  const linhas: string[][] = []
+  let campo = ''
+  let linha: string[] = []
+  let entreAspas = false
+
+  for (let indice = 0; indice < texto.length; indice += 1) {
+    const char = texto[indice]
+    const proximo = texto[indice + 1]
+
+    if (char === '"' && entreAspas && proximo === '"') {
+      campo += '"'
+      indice += 1
+    } else if (char === '"') {
+      entreAspas = !entreAspas
+    } else if (char === separador && !entreAspas) {
+      linha.push(campo)
+      campo = ''
+    } else if ((char === '\n' || char === '\r') && !entreAspas) {
+      if (char === '\r' && proximo === '\n') indice += 1
+      linha.push(campo)
+      if (linha.some((valor) => valor.trim())) linhas.push(linha)
+      linha = []
+      campo = ''
+    } else {
+      campo += char
+    }
+  }
+
+  linha.push(campo)
+  if (linha.some((valor) => valor.trim())) linhas.push(linha)
+
+  return linhas
+}
 
 function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
   const queryClient = useQueryClient()
   const inputRef = useRef<HTMLInputElement>(null)
   const [arquivo, setArquivo] = useState<File | null>(null)
+  const [linhas, setLinhas] = useState<LinhaImportacaoAssinante[]>([])
+  const [planoPadrao, setPlanoPadrao] = useState('')
+  const [senhaPadrao, setSenhaPadrao] = useState(SENHA_PADRAO)
+  const [enviarEmail, setEnviarEmail] = useState(true)
   const [erro, setErro] = useState('')
   const [importacaoId, setImportacaoId] = useState<string | null>(null)
   const [status, setStatus] = useState<ImportacaoAssinantesStatus | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const planosQuery = useQuery({ queryKey: adminKeys.planosAtivos(), queryFn: buscarPlanosAtivos })
 
   function limpar() {
     setArquivo(null)
+    setLinhas([])
+    setPlanoPadrao('')
+    setSenhaPadrao(SENHA_PADRAO)
+    setEnviarEmail(true)
     setErro('')
     setImportacaoId(null)
     setStatus(null)
@@ -86,7 +221,7 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
   }, [importacaoId, queryClient])
 
   const mutacao = useMutation({
-    mutationFn: (file: File) => importarAssinantesLastlink(file),
+    mutationFn: (payload: ImportacaoAssinantesPayload) => importarAssinantesLastlink(payload),
     onSuccess: (data) => {
       setImportacaoId(data.importacao_id)
     },
@@ -98,6 +233,63 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
 
   const emProgresso = !!importacaoId && !status?.concluido
   const concluido = status?.concluido ?? false
+  const linhasValidas = useMemo(
+    () => linhas.filter((linha) => linha.email.trim() && linha.plano?.trim()),
+    [linhas],
+  )
+  const temLinhasInvalidas = linhasValidas.length !== linhas.length
+
+  async function carregarArquivo(file: File) {
+    setErro('')
+    setArquivo(file)
+
+    try {
+      const extensao = file.name.split('.').pop()?.toLowerCase()
+      const matriz = extensao === 'csv'
+        ? parseCsv(await file.text())
+        : await import('read-excel-file/browser').then((modulo) => modulo.readSheet(file))
+      const linhasMapeadas = linhasDaMatriz(matriz, planoPadrao)
+
+      if (linhasMapeadas.length === 0) {
+        setErro('Nenhum assinante encontrado no arquivo.')
+        setLinhas([])
+        return
+      }
+
+      setLinhas(linhasMapeadas)
+    } catch {
+      setErro('Não foi possível ler o arquivo. Envie um .xlsx ou .csv exportado da Lastlink.')
+      setLinhas([])
+    }
+  }
+
+  function atualizarLinha(indice: number, campo: keyof LinhaImportacaoAssinante, valor: string) {
+    setLinhas((atuais) => atuais.map((linha, i) => (i === indice ? { ...linha, [campo]: valor } : linha)))
+  }
+
+  function aplicarPlanoEmTodas() {
+    if (!planoPadrao) return
+    setLinhas((atuais) => atuais.map((linha) => ({ ...linha, plano: planoPadrao })))
+  }
+
+  function iniciarImportacao() {
+    if (linhasValidas.length === 0) {
+      setErro('Informe pelo menos uma linha com e-mail e plano.')
+      return
+    }
+
+    if (senhaPadrao.trim().length < 8) {
+      setErro('A senha padrão precisa ter pelo menos 8 caracteres.')
+      return
+    }
+
+    mutacao.mutate({
+      plano_padrao: planoPadrao || undefined,
+      senha_padrao: senhaPadrao.trim(),
+      enviar_email: enviarEmail,
+      linhas: linhasValidas,
+    })
+  }
 
   return (
     <Dialog.Root
@@ -106,37 +298,127 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
         if (!v) { limpar(); onFechar() }
       }}
     >
-      <Dialog.Content maxWidth="520px">
+      <Dialog.Content maxWidth="960px">
         <Dialog.Title>Importar assinantes da Lastlink</Dialog.Title>
         <Dialog.Description size="2" mb="4" className="text-zinc-400">
-          Envie o CSV exportado do painel Lastlink. Colunas esperadas: email, nome, plano (ou offer code),
-          status, data de expiração. Separador vírgula ou ponto-e-vírgula.
+          Envie o XLSX ou CSV exportado da Lastlink, revise os campos, escolha o plano e enfileire a importação.
         </Dialog.Description>
 
         <Flex direction="column" gap="4">
           {!importacaoId && (
-            <label className="space-y-1.5">
-              <Text size="2" weight="medium">Arquivo CSV</Text>
-              <div
-                className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-zinc-600 bg-zinc-900/60 px-4 py-5 transition hover:border-cyan-500/60"
-                onClick={() => inputRef.current?.click()}
-              >
-                <UploadIcon className="size-5 text-zinc-500" />
-                <Text size="2" className="text-zinc-400">
-                  {arquivo ? arquivo.name : 'Clique para selecionar o arquivo .csv'}
-                </Text>
-              </div>
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".csv,text/csv"
-                className="hidden"
-                onChange={(e) => {
-                  setErro('')
-                  setArquivo(e.target.files?.[0] ?? null)
-                }}
-              />
-            </label>
+            <>
+              <Flex gap="3" wrap="wrap" align="end">
+                <label className="min-w-[180px] flex-1 space-y-2">
+                  <Text size="2" weight="medium">Plano padrão</Text>
+                  <Select.Root value={planoPadrao || VALOR_TODOS} onValueChange={(valor) => setPlanoPadrao(valor === VALOR_TODOS ? '' : valor)}>
+                    <Select.Trigger placeholder="Escolha um plano" />
+                    <Select.Content>
+                      <Select.Item value={VALOR_TODOS}>Sem plano padrão</Select.Item>
+                      {(planosQuery.data ?? []).map((plano) => (
+                        <Select.Item key={plano.slug} value={plano.slug}>{plano.nome}</Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                </label>
+
+                <label className="min-w-[160px] flex-1 space-y-2">
+                  <Text size="2" weight="medium">Senha padrão</Text>
+                  <TextField.Root
+                    type="text"
+                    value={senhaPadrao}
+                    onChange={(evento) => setSenhaPadrao(evento.target.value)}
+                  />
+                </label>
+
+                <Button type="button" variant="soft" disabled={!planoPadrao || linhas.length === 0} onClick={aplicarPlanoEmTodas}>
+                  Aplicar plano
+                </Button>
+              </Flex>
+
+              <label className="flex items-center gap-2">
+                <Checkbox checked={enviarEmail} onCheckedChange={(valor) => setEnviarEmail(valor === true)} />
+                <Text size="2" className="text-zinc-300">Enviar e-mail de boas-vindas com a senha padrão</Text>
+              </label>
+
+              <label className="space-y-1.5">
+                <Text size="2" weight="medium">Arquivo XLSX ou CSV</Text>
+                <div
+                  className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-zinc-600 bg-zinc-900/60 px-4 py-5 transition hover:border-cyan-500/60"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <UploadIcon className="size-5 text-zinc-500" />
+                  <Text size="2" className="text-zinc-400">
+                    {arquivo ? arquivo.name : 'Clique para selecionar o arquivo .xlsx ou .csv'}
+                  </Text>
+                </div>
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) void carregarArquivo(file)
+                  }}
+                />
+              </label>
+
+              {linhas.length > 0 && (
+                <Flex direction="column" gap="2">
+                  <Flex justify="between" align="center">
+                    <Text size="2" className="text-zinc-400">
+                      {linhasValidas.length} de {linhas.length} linhas prontas para importar
+                    </Text>
+                    {temLinhasInvalidas && (
+                      <Text size="1" color="amber">Linhas sem e-mail ou plano serão ignoradas.</Text>
+                    )}
+                  </Flex>
+
+                  <ScrollArea type="auto" scrollbars="both" className="max-h-[360px] rounded-md border border-zinc-800">
+                    <Table.Root className="min-w-[980px]">
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.ColumnHeaderCell>E-mail</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell>Nome</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell>Plano</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell>Expira em</Table.ColumnHeaderCell>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        {linhas.map((linha, indice) => (
+                          <Table.Row key={`${linha.email}-${indice}`}>
+                            <Table.Cell>
+                              <TextField.Root value={linha.email} onChange={(e) => atualizarLinha(indice, 'email', e.target.value)} />
+                            </Table.Cell>
+                            <Table.Cell>
+                              <TextField.Root value={linha.nome ?? ''} onChange={(e) => atualizarLinha(indice, 'nome', e.target.value)} />
+                            </Table.Cell>
+                            <Table.Cell>
+                              <Select.Root value={linha.plano || VALOR_TODOS} onValueChange={(valor) => atualizarLinha(indice, 'plano', valor === VALOR_TODOS ? '' : valor)}>
+                                <Select.Trigger />
+                                <Select.Content>
+                                  <Select.Item value={VALOR_TODOS}>Escolher</Select.Item>
+                                  {(planosQuery.data ?? []).map((plano) => (
+                                    <Select.Item key={plano.slug} value={plano.slug}>{plano.nome}</Select.Item>
+                                  ))}
+                                </Select.Content>
+                              </Select.Root>
+                            </Table.Cell>
+                            <Table.Cell>
+                              <TextField.Root value={linha.status ?? ''} onChange={(e) => atualizarLinha(indice, 'status', e.target.value)} />
+                            </Table.Cell>
+                            <Table.Cell>
+                              <TextField.Root type="date" value={linha.expira_em ?? ''} onChange={(e) => atualizarLinha(indice, 'expira_em', e.target.value)} />
+                            </Table.Cell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table.Root>
+                  </ScrollArea>
+                </Flex>
+              )}
+            </>
           )}
 
           {emProgresso && (
@@ -188,11 +470,11 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
           </Dialog.Close>
           {!importacaoId && (
             <Button
-              onClick={() => arquivo && mutacao.mutate(arquivo)}
-              disabled={!arquivo || mutacao.isPending}
+              onClick={iniciarImportacao}
+              disabled={linhasValidas.length === 0 || mutacao.isPending}
             >
               {mutacao.isPending ? <Spinner size="1" /> : <UploadIcon />}
-              Importar
+              Enfileirar importação
             </Button>
           )}
         </Flex>
@@ -302,7 +584,7 @@ export function AdminAssinantes() {
             </Badge>
             <Button size="2" variant="soft" onClick={() => setImportando(true)}>
               <UploadIcon />
-              Importar CSV
+              Importar assinantes
             </Button>
           </Flex>
         </Flex>

@@ -24,6 +24,23 @@ export interface ImportacaoAssinantesResponse {
   message: string
 }
 
+export interface LinhaImportacaoAssinante {
+  email: string
+  nome?: string
+  plano?: string
+  status?: string
+  expira_em?: string | null
+  assinado_em?: string | null
+  origem?: Record<string, unknown>
+}
+
+export interface ImportacaoAssinantesPayload {
+  plano_padrao?: string
+  senha_padrao?: string
+  enviar_email?: boolean
+  linhas: LinhaImportacaoAssinante[]
+}
+
 export interface ImportacaoAssinantesStatus {
   total: number
   processados: number

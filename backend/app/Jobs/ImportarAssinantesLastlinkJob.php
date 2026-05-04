@@ -11,13 +11,15 @@ class ImportarAssinantesLastlinkJob implements ShouldQueue
 {
     use Queueable;
 
-    public int $tries   = 3;
+    public int $tries = 3;
+
     public int $timeout = 60;
 
     public function __construct(
-        private readonly array  $linha,
-        private readonly array  $cabecalhos,
+        private readonly array $linha,
         private readonly string $importacaoId,
+        private readonly string $senhaPadrao,
+        private readonly bool $enviarEmail,
     ) {
         $this->onQueue('default');
     }
@@ -25,7 +27,7 @@ class ImportarAssinantesLastlinkJob implements ShouldQueue
     public function handle(ImportacaoAssinantesService $service): void
     {
         try {
-            $service->processarLinha($this->linha, $this->cabecalhos);
+            $service->processarLinha($this->linha, $this->senhaPadrao, $this->enviarEmail);
         } catch (\Throwable $e) {
             $this->registrarErro($e->getMessage());
             Cache::increment("importacao:lastlink:{$this->importacaoId}:erros_count");
@@ -43,7 +45,7 @@ class ImportarAssinantesLastlinkJob implements ShouldQueue
 
     private function registrarErro(string $mensagem): void
     {
-        $key   = "importacao:lastlink:{$this->importacaoId}:erros";
+        $key = "importacao:lastlink:{$this->importacaoId}:erros";
         $erros = Cache::get($key, []);
 
         if (count($erros) < 50) {

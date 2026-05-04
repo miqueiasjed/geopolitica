@@ -14,6 +14,7 @@ import type {
   AdminUsuariosFiltros,
   AtualizarUsuarioPayload,
   CriarUsuarioPayload,
+  ImportacaoAssinantesPayload,
   ImportacaoAssinantesResponse,
   ImportacaoAssinantesStatus,
   PaginacaoLaravel,
@@ -228,12 +229,10 @@ export async function excluirAdminUsuario(id: number): Promise<void> {
 
 // --- Importação Lastlink ---
 
-export async function importarAssinantesLastlink(arquivo: File): Promise<ImportacaoAssinantesResponse> {
-  const form = new FormData()
-  form.append('arquivo', arquivo)
-  const resposta = await api.post<ImportacaoAssinantesResponse>('/admin/assinantes/importar', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+export async function importarAssinantesLastlink(
+  payload: ImportacaoAssinantesPayload,
+): Promise<ImportacaoAssinantesResponse> {
+  const resposta = await api.post<ImportacaoAssinantesResponse>('/admin/assinantes/importar', payload)
   return resposta.data
 }
 
