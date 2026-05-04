@@ -79,9 +79,8 @@ class MarketFetcherService
 
             $registro    = $dados['USDBRL'];
             $bid         = (float) $registro['bid'];
-            $abertura    = (float) $registro['open'];
             $variacaoPct = (float) $registro['pctChange'];
-            $variacaoAbs = $bid - $abertura;
+            $variacaoAbs = (float) $registro['varBid'];
 
             return [
                 'USDBRL=X' => [
@@ -101,15 +100,14 @@ class MarketFetcherService
 
     /**
      * Parseia a resposta da API Spark do Yahoo Finance.
+     * Formato atual: { "SYMBOL": { "close": [...], "chartPreviousClose": float } }
      *
      * @param  array<mixed>  $dados
      * @return array<string, array{valor: float, variacao_pct: float, variacao_abs: float}>
      */
     private function parsearRespostaYahoo(array $dados): array
     {
-        $resultados = $dados['spark']['result'] ?? [];
-
-        if (empty($resultados)) {
+        if (empty($dados)) {
             Log::warning('MarketFetcherService: nenhum resultado retornado pelo Yahoo Finance.');
 
             return [];
@@ -117,25 +115,28 @@ class MarketFetcherService
 
         $cotacoes = [];
 
-        foreach ($resultados as $item) {
-            $simbolo = $item['symbol'] ?? null;
-            $meta    = $item['response'][0]['meta'] ?? null;
-
-            if (! $simbolo || ! $meta) {
+        foreach ($dados as $simbolo => $info) {
+            if (! is_array($info)) {
                 continue;
             }
 
-            $precoAtual    = (float) ($meta['regularMarketPrice'] ?? 0);
-            $precoAnterior = (float) ($meta['chartPreviousClose'] ?? 0);
+            $closes        = $info['close'] ?? [];
+            $precoAnterior = (float) ($info['chartPreviousClose'] ?? $info['previousClose'] ?? 0);
 
-            if ($precoAnterior == 0) {
+            if (empty($closes) || $precoAnterior == 0) {
+                continue;
+            }
+
+            $precoAtual = (float) end($closes);
+
+            if ($precoAtual == 0) {
                 continue;
             }
 
             $variacaoPct = (($precoAtual - $precoAnterior) / $precoAnterior) * 100;
             $variacaoAbs = $precoAtual - $precoAnterior;
 
-            $cotacoes[$simbolo] = [
+            $cotacoes[(string) $simbolo] = [
                 'valor'        => $precoAtual,
                 'variacao_pct' => round($variacaoPct, 4),
                 'variacao_abs' => round($variacaoAbs, 4),

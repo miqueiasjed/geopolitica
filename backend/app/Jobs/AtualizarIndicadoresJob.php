@@ -15,11 +15,6 @@ class AtualizarIndicadoresJob implements ShouldQueue
     public int $timeout = 60;
     public int $backoff = 30;
 
-    public function __construct()
-    {
-        $this->onQueue('redis');
-    }
-
     public function handle(IndicadoresService $indicadoresService): void
     {
         Log::info('AtualizarIndicadoresJob: iniciando atualização de indicadores de mercado.');
