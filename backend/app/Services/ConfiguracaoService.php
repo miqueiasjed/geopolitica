@@ -223,7 +223,7 @@ class ConfiguracaoService
             [
                 'chave'    => 'indicadores_ordem',
                 'label'    => 'Ordem dos indicadores',
-                'descricao'=> 'Símbolos separados por vírgula. Ex: CL=F, BZ=F, USDBRL=X, NG=F, HG=F, ZS=F, ZW=F, ZC=F, KC=F',
+                'descricao'=> 'Ordem de apresentação dos indicadores na barra de mercados',
                 'grupo'    => 'mercado',
                 'tipo'     => 'textarea',
                 'sensivel' => false,

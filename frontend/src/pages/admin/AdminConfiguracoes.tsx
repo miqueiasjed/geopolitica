@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type DragEvent } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon, DragHandleDots2Icon } from '@radix-ui/react-icons'
 import api from '../../lib/axios'
 import type { Configuracao, GrupoConfiguracao, GruposConfiguracao } from '../../types/configuracao'
 import { PromptTestPanel } from '../../components/admin/PromptTestPanel'
@@ -134,6 +134,43 @@ const PROVIDER_LABELS: Record<string, string> = {
   openai: 'GPT (OpenAI)',
 }
 
+const INDICADORES_MERCADO = [
+  { simbolo: 'CL=F', nome: 'Petróleo WTI' },
+  { simbolo: 'BZ=F', nome: 'Petróleo Brent' },
+  { simbolo: 'USDBRL=X', nome: 'USD/BRL' },
+  { simbolo: 'NG=F', nome: 'Gás Natural' },
+  { simbolo: 'HG=F', nome: 'Cobre' },
+  { simbolo: 'ZS=F', nome: 'Soja' },
+  { simbolo: 'ZW=F', nome: 'Trigo' },
+  { simbolo: 'ZC=F', nome: 'Milho' },
+  { simbolo: 'KC=F', nome: 'Café' },
+]
+
+const ORDEM_INDICADORES_PADRAO = INDICADORES_MERCADO.map((indicador) => indicador.simbolo).join(', ')
+
+function parseOrdemIndicadores(valor?: string | null): string[] {
+  const simbolos = (valor || ORDEM_INDICADORES_PADRAO)
+    .split(/[\s,;]+/)
+    .map((simbolo) => simbolo.trim())
+    .filter(Boolean)
+
+  return Array.from(new Set([...simbolos, ...INDICADORES_MERCADO.map((indicador) => indicador.simbolo)]))
+}
+
+function nomeIndicadorMercado(simbolo: string): string {
+  return INDICADORES_MERCADO.find((indicador) => indicador.simbolo === simbolo)?.nome ?? simbolo
+}
+
+function moverItem(lista: string[], origem: number, destino: number): string[] {
+  if (origem === destino || origem < 0 || destino < 0) return lista
+
+  const novaLista = [...lista]
+  const [item] = novaLista.splice(origem, 1)
+  novaLista.splice(destino, 0, item)
+
+  return novaLista
+}
+
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 async function buscarConfiguracoes(): Promise<GruposConfiguracao> {
@@ -159,6 +196,85 @@ interface CampoProps {
   estaExibindoPadrao?: boolean
 }
 
+interface CampoOrdemIndicadoresProps {
+  config: Configuracao
+  valor: string
+  onChange: (chave: string, valor: string) => void
+  defaultValor?: string
+}
+
+function CampoOrdemIndicadores({ config, valor, onChange, defaultValor }: CampoOrdemIndicadoresProps) {
+  const [arrastando, setArrastando] = useState<string | null>(null)
+  const valorAtual = valor || config.valor || defaultValor || ORDEM_INDICADORES_PADRAO
+  const ordem = parseOrdemIndicadores(valorAtual)
+
+  function handleDrop(event: DragEvent<HTMLDivElement>, destino: number) {
+    event.preventDefault()
+
+    const origem = Number(event.dataTransfer.getData('text/plain'))
+    if (!Number.isInteger(origem)) return
+
+    const novaOrdem = moverItem(ordem, origem, destino)
+    onChange(config.chave, novaOrdem.join(', '))
+    setArrastando(null)
+  }
+
+  return (
+    <div className="col-span-full space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-zinc-200">{config.label}</label>
+          {config.configurado ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 font-mono text-[10px] text-green-400">
+              <CheckCircledIcon className="h-3 w-3" />
+              Configurado
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] text-amber-400">
+              <ExclamationTriangleIcon className="h-3 w-3" />
+              Padrão
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {ordem.map((simbolo, index) => (
+          <div
+            key={simbolo}
+            draggable
+            onDragStart={(event) => {
+              event.dataTransfer.effectAllowed = 'move'
+              event.dataTransfer.setData('text/plain', String(index))
+              setArrastando(simbolo)
+            }}
+            onDragEnd={() => setArrastando(null)}
+            onDragOver={(event) => {
+              event.preventDefault()
+              event.dataTransfer.dropEffect = 'move'
+            }}
+            onDrop={(event) => handleDrop(event, index)}
+            className={`flex cursor-grab items-center gap-3 rounded-lg border bg-[#111113] px-3 py-2.5 transition-colors active:cursor-grabbing ${
+              arrastando === simbolo
+                ? 'border-[#C9B882]/50 bg-[#C9B882]/10 opacity-70'
+                : 'border-[#2a2a2e] hover:border-[#C9B882]/35 hover:bg-[#171719]'
+            }`}
+          >
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-[#2a2a2e] bg-[#0d0d0f] font-mono text-[10px] text-zinc-500">
+              {index + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-zinc-100">{nomeIndicadorMercado(simbolo)}</p>
+              <p className="font-mono text-[10px] text-zinc-500">{simbolo}</p>
+            </div>
+            <DragHandleDots2Icon className="h-5 w-5 shrink-0 text-zinc-500" aria-hidden="true" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function Campo({ config, valor, onChange, defaultValor, salvoSucesso, estaExibindoPadrao }: CampoProps) {
   const [visivel, setVisivel] = useState(false)
   const [restaurado, setRestaurado] = useState(false)
@@ -175,6 +291,17 @@ function Campo({ config, valor, onChange, defaultValor, salvoSucesso, estaExibin
     : config.descricao ?? ''
 
   const baseInput = 'w-full rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
+
+  if (config.chave === 'indicadores_ordem') {
+    return (
+      <CampoOrdemIndicadores
+        config={config}
+        valor={valor}
+        onChange={onChange}
+        defaultValor={defaultValor}
+      />
+    )
+  }
 
   const mostrarBotaoRestaurar =
     config.tipo === 'textarea' &&
