@@ -32,12 +32,11 @@ class Indicador extends Model
     }
 
     /**
-     * Retorna os indicadores na ordem fixa de exibição:
-     * Brent → BRL/USD → Gás Natural → Soja → Trigo → Minério de Ferro
+     * Retorna os indicadores na ordem fixa de exibição.
      */
     public function scopePorOrdem(Builder $query): Builder
     {
-        $ordem = ['BZ=F', 'USDBRL=X', 'NG=F', 'ZS=F', 'ZW=F', 'TIO=F'];
+        $ordem = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
 
         return $query->orderByRaw(
             'FIELD(simbolo, ' . implode(', ', array_fill(0, count($ordem), '?')) . ')',

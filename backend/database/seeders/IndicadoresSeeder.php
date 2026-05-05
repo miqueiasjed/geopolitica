@@ -11,6 +11,12 @@ class IndicadoresSeeder extends Seeder
     {
         $indicadores = [
             [
+                'simbolo' => 'CL=F',
+                'nome'    => 'Petróleo WTI',
+                'moeda'   => 'USD',
+                'unidade' => 'USD/barril',
+            ],
+            [
                 'simbolo' => 'BZ=F',
                 'nome'    => 'Petróleo Brent',
                 'moeda'   => 'USD',
@@ -41,10 +47,22 @@ class IndicadoresSeeder extends Seeder
                 'unidade' => 'USD/bushel',
             ],
             [
-                'simbolo' => 'TIO=F',
-                'nome'    => 'Minério de Ferro',
+                'simbolo' => 'HG=F',
+                'nome'    => 'Cobre',
                 'moeda'   => 'USD',
                 'unidade' => 'USD/t',
+            ],
+            [
+                'simbolo' => 'ZC=F',
+                'nome'    => 'Milho',
+                'moeda'   => 'USD',
+                'unidade' => 'USD/bushel',
+            ],
+            [
+                'simbolo' => 'KC=F',
+                'nome'    => 'Café',
+                'moeda'   => 'USD',
+                'unidade' => 'US cents/lb',
             ],
         ];
 

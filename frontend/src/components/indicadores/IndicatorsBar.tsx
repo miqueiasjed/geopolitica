@@ -4,7 +4,7 @@ import { useIndicadorHistorico } from '../../hooks/useIndicadorHistorico'
 import { IndicatorCard } from './IndicatorCard'
 import type { Indicador } from '../../types/indicadores'
 
-const SIMBOLOS_COM_HISTORICO = new Set(['BZ=F', 'USDBRL=X', 'NG=F', 'ZS=F', 'ZW=F', 'TIO=F'])
+const SIMBOLOS_COM_HISTORICO = new Set(['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'])
 
 function formatarTimestamp(ultimaAtualizacao: string | null): string {
   if (!ultimaAtualizacao) return ''
@@ -59,7 +59,7 @@ function SkeletonCards({ prefersReduced }: { prefersReduced: boolean | null }) {
       initial={prefersReduced ? false : 'hidden'}
       animate={prefersReduced ? undefined : 'visible'}
     >
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: 9 }).map((_, i) => (
         <motion.div
           key={i}
           variants={prefersReduced ? undefined : skeletonItemVariants}
@@ -118,7 +118,7 @@ export function IndicatorsBar() {
                 initial={prefersReduced ? false : 'hidden'}
                 animate={prefersReduced ? undefined : 'visible'}
               >
-                {indicadores.slice(0, 6).map((indicador, index) => (
+                {indicadores.map((indicador, index) => (
                   <motion.div
                     key={getIndicadorKey(indicador, index)}
                     className="shrink-0"

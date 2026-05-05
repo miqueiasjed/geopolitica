@@ -16,10 +16,14 @@ class AlphaVantageService
 
     // Símbolos internos → função Alpha Vantage
     private const MAPA_COMMODITIES = [
+        'CL=F' => 'WTI',
         'BZ=F' => 'BRENT',
         'NG=F' => 'NATURAL_GAS',
+        'HG=F' => 'COPPER',
         'ZS=F' => 'SOYBEANS',
         'ZW=F' => 'WHEAT',
+        'ZC=F' => 'CORN',
+        'KC=F' => 'COFFEE',
     ];
 
     private string $apiKey;

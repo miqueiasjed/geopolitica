@@ -44,7 +44,7 @@ class MarketFetcherService
 
     /**
      * Busca cotações no Yahoo Finance para os símbolos informados.
-     * Usado como fallback para símbolos sem suporte no Alpha Vantage (ex: TIO=F).
+     * Mantido para cotações pontuais que não existam na Alpha Vantage.
      *
      * @param  array<string>  $simbolos
      * @return array<string, array{valor: float, variacao_pct: float, variacao_abs: float}>

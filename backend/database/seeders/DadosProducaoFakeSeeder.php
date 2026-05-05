@@ -384,12 +384,15 @@ class DadosProducaoFakeSeeder extends Seeder
     private function seedIndicadores(): void
     {
         $indicadores = [
+            ['CL=F', 80.12, 'USD', 'USD/barril', 1.24, 0.98],
             ['BZ=F', 86.42, 'USD', 'USD/barril', 1.84, 1.56],
             ['USDBRL=X', 5.2381, 'BRL', 'R$/USD', -0.42, -0.022],
             ['NG=F', 3.18, 'USD', 'USD/MMBtu', 2.91, 0.09],
+            ['HG=F', 9340.00, 'USD', 'USD/t', 0.88, 81.50],
             ['ZS=F', 1198.25, 'USD', 'USD/bushel', -0.63, -7.58],
             ['ZW=F', 642.75, 'USD', 'USD/bushel', 1.12, 7.10],
-            ['TIO=F', 108.40, 'USD', 'USD/t', -1.37, -1.50],
+            ['ZC=F', 462.30, 'USD', 'USD/bushel', -0.37, -1.72],
+            ['KC=F', 232.75, 'USD', 'US cents/lb', 1.05, 2.42],
         ];
 
         foreach ($indicadores as [$simbolo, $valor, $moeda, $unidade, $variacaoPct, $variacaoAbs]) {
@@ -646,12 +649,15 @@ class DadosProducaoFakeSeeder extends Seeder
     private function nomeIndicador(string $simbolo): string
     {
         return match ($simbolo) {
+            'CL=F' => 'Petróleo WTI',
             'BZ=F' => 'Petróleo Brent',
             'USDBRL=X' => 'Câmbio BRL/USD',
             'NG=F' => 'Gás Natural',
+            'HG=F' => 'Cobre',
             'ZS=F' => 'Soja',
             'ZW=F' => 'Trigo',
-            'TIO=F' => 'Minério de Ferro',
+            'ZC=F' => 'Milho',
+            'KC=F' => 'Café',
             default => $simbolo,
         };
     }

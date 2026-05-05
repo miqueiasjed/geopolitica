@@ -65,6 +65,6 @@ class AdminConfiguracaoTest extends TestCase
         $this->postJson('/api/admin/configuracoes/testar-mercado')
             ->assertOk()
             ->assertJsonPath('ok', true)
-            ->assertJsonCount(5, 'cotacoes');
+            ->assertJsonCount(9, 'cotacoes');
     }
 }

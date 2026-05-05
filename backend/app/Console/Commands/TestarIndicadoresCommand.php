@@ -24,7 +24,7 @@ class TestarIndicadoresCommand extends Command
         }
 
         if ($this->option('limpar-cache')) {
-            $simbolos = ['BZ=F', 'NG=F', 'ZS=F', 'ZW=F'];
+            $simbolos = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
             foreach ($simbolos as $s) {
                 \Illuminate\Support\Facades\Cache::forget("alpha:cotacao:{$s}");
                 \Illuminate\Support\Facades\Cache::forget("alpha:historico:{$s}");
@@ -38,7 +38,7 @@ class TestarIndicadoresCommand extends Command
         $this->info('API Key encontrada. Testando conexão com o Alpha Vantage...');
         $this->newLine();
 
-        $simbolos = ['BZ=F', 'NG=F', 'ZS=F', 'ZW=F'];
+        $simbolos = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
         $cotacoes = $alpha->buscarCotacoes($simbolos);
 
         if (empty($cotacoes)) {

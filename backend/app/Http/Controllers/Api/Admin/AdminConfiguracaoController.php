@@ -70,7 +70,7 @@ class AdminConfiguracaoController extends Controller
 
         $alpha = new AlphaVantageService($apiKey);
 
-        $cotacoes = $alpha->buscarCotacoes(['BZ=F', 'NG=F', 'ZS=F', 'ZW=F']);
+        $cotacoes = $alpha->buscarCotacoes(['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F']);
         $cambio   = $alpha->buscarCambio('USD', 'BRL');
 
         if (! empty($cambio)) {
@@ -85,10 +85,14 @@ class AdminConfiguracaoController extends Controller
         }
 
         $nomes = [
+            'CL=F'    => 'WTI',
             'BZ=F'    => 'Brent',
             'NG=F'    => 'Gás Natural',
+            'HG=F'    => 'Cobre',
             'ZS=F'    => 'Soja',
             'ZW=F'    => 'Trigo',
+            'ZC=F'    => 'Milho',
+            'KC=F'    => 'Café',
             'USDBRL=X'=> 'USD/BRL',
         ];
 

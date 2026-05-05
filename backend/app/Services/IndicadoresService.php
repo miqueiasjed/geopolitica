@@ -26,14 +26,11 @@ class IndicadoresService
         Log::info('IndicadoresService: iniciando atualização de todos os indicadores.');
 
         // Alpha Vantage: commodities com suporte nativo
-        $simbolosAlpha = ['BZ=F', 'NG=F', 'ZS=F', 'ZW=F'];
+        $simbolosAlpha = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
         $cotacoesAlpha = $this->marketFetcher->buscarAlphaVantage($simbolosAlpha);
         $cotacaoCambio = $this->marketFetcher->buscarCambioAlphaVantage();
 
-        // Yahoo Finance: fallback para Iron Ore (sem suporte no Alpha Vantage)
-        $cotacaoFerro = $this->marketFetcher->buscarYahooFinance(['TIO=F']);
-
-        $todasCotacoes = array_merge($cotacoesAlpha, $cotacaoCambio, $cotacaoFerro);
+        $todasCotacoes = array_merge($cotacoesAlpha, $cotacaoCambio);
 
         if (empty($todasCotacoes)) {
             Log::warning('IndicadoresService: nenhuma cotação retornada. Atualização abortada.');
