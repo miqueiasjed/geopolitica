@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CheckCircledIcon, Cross2Icon, Pencil1Icon, PlusIcon, Link2Icon } from '@radix-ui/react-icons'
 import {
   fetchPlanos,
+  fetchRoles,
   atualizarRecurso,
   atualizarPlano,
   criarPlano,
@@ -506,6 +507,13 @@ function CardPlano({ plano }: { plano: Plano }) {
   const [editandoRole, setEditandoRole] = useState(false)
   const [roleLocal, setRoleLocal] = useState(plano.role ?? '')
 
+  const { data: roles } = useQuery({
+    queryKey: adminPlanosKeys.roles(),
+    queryFn: fetchRoles,
+    staleTime: 60_000,
+    enabled: editandoRole,
+  })
+
   const salvarRole = useMutation({
     mutationFn: () =>
       atualizarPlano(plano.id, {
@@ -513,7 +521,7 @@ function CardPlano({ plano }: { plano: Plano }) {
         descricao: plano.descricao,
         preco: Number(plano.preco),
         lastlink_url: plano.lastlink_url,
-        role: roleLocal.trim() || null,
+        role: roleLocal || null,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
@@ -580,13 +588,18 @@ function CardPlano({ plano }: { plano: Plano }) {
           </div>
           {editandoRole ? (
             <div className="mt-2 space-y-2">
-              <input
-                type="text"
+              <select
                 value={roleLocal}
                 onChange={(e) => setRoleLocal(e.target.value)}
-                placeholder={`assinante_${plano.slug}`}
-                className={`${baseInput} w-full`}
-              />
+                className={`${baseInput} w-full cursor-pointer`}
+              >
+                <option value="" className="bg-[#111113]">— nenhuma —</option>
+                {roles?.map((r) => (
+                  <option key={r.role} value={r.role} className="bg-[#111113]">
+                    {r.label} ({r.role})
+                  </option>
+                ))}
+              </select>
               <div className="flex gap-2">
                 <button
                   type="button"

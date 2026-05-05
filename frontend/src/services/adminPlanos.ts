@@ -17,11 +17,18 @@ export interface Plano {
   recursos: Record<string, PlanoRecursoItem>
 }
 
+export interface RoleItem {
+  role: string
+  label: string
+  assinante: boolean
+}
+
 // ─── Query keys ───────────────────────────────────────────────────────────────
 
 export const adminPlanosKeys = {
   all: ['admin', 'planos'] as const,
   lista: () => [...adminPlanosKeys.all] as const,
+  roles: () => ['admin', 'roles'] as const,
 }
 
 // ─── Funções de API ───────────────────────────────────────────────────────────
@@ -44,6 +51,11 @@ export async function atualizarPlano(
   dados: { nome: string; descricao: string | null; preco: number; lastlink_url: string | null; role: string | null },
 ): Promise<void> {
   await api.put(`/admin/planos/${planoId}`, dados)
+}
+
+export async function fetchRoles(): Promise<RoleItem[]> {
+  const res = await api.get<{ data: RoleItem[] }>('/admin/usuarios/roles')
+  return res.data.data
 }
 
 export async function criarPlano(dados: {
