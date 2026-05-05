@@ -18,7 +18,7 @@ import {
 import { ChevronLeftIcon } from '@radix-ui/react-icons'
 import { AdminEditor } from '../../components/biblioteca/AdminEditor'
 import { criarConteudo } from '../../services/admin'
-import type { TipoConteudo, PlanoMinimo, VerticalConteudo } from '../../types/biblioteca'
+import type { TipoConteudo, VerticalConteudo } from '../../types/biblioteca'
 
 const VALOR_SEM_VERTICAL = 'core'
 
@@ -37,7 +37,11 @@ export function AdminNovoConteudo() {
   const [regiao, setRegiao] = useState('')
   const [tags, setTags] = useState('')
   const [resumo, setResumo] = useState('')
-  const [planoMinimo, setPlanoMinimo] = useState<PlanoMinimo>('essencial')
+  const PLANO_POR_TIPO: Record<TipoConteudo, string> = {
+    briefing: 'Essencial',
+    mapa: 'Pró',
+    tese: 'Reservado',
+  }
   const [verticalConteudo, setVerticalConteudo] = useState<VerticalConteudo | typeof VALOR_SEM_VERTICAL>(
     VALOR_SEM_VERTICAL,
   )
@@ -88,7 +92,6 @@ export function AdminNovoConteudo() {
       regiao: regiao.trim() || undefined,
       tags: tagsArray.length > 0 ? tagsArray : undefined,
       resumo: resumo.trim() || undefined,
-      plano_minimo: planoMinimo,
       vertical_conteudo: verticalConteudo === VALOR_SEM_VERTICAL ? null : verticalConteudo,
       corpo,
       publicado,
@@ -238,23 +241,18 @@ export function AdminNovoConteudo() {
                 />
               </label>
 
-              {/* Plano mínimo */}
-              <label className="space-y-2">
+              {/* Plano mínimo — definido automaticamente pelo tipo */}
+              <Flex direction="column" gap="1">
                 <Text size="2" weight="medium">
                   Plano mínimo para acesso
                 </Text>
-                <Select.Root
-                  value={planoMinimo}
-                  onValueChange={(valor) => setPlanoMinimo(valor as PlanoMinimo)}
-                >
-                  <Select.Trigger className="w-full" />
-                  <Select.Content>
-                    <Select.Item value="essencial">Essencial</Select.Item>
-                    <Select.Item value="pro">Pro</Select.Item>
-                    <Select.Item value="reservado">Reservado</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-              </label>
+                <Text size="2" color="gray">
+                  Definido automaticamente pelo tipo:{' '}
+                  <Text size="2" weight="bold" color="blue">
+                    {PLANO_POR_TIPO[tipo]}
+                  </Text>
+                </Text>
+              </Flex>
 
               {/* Vertical de conteúdo */}
               <label className="space-y-2">

@@ -105,9 +105,16 @@ class ConteudoService
         return $conteudo;
     }
 
+    private const PLANO_POR_TIPO = [
+        'briefing' => 'essencial',
+        'mapa'     => 'pro',
+        'tese'     => 'reservado',
+    ];
+
     public function criar(array $dados): Conteudo
     {
-        $dados['slug'] = Conteudo::gerarSlug($dados['titulo']);
+        $dados['slug']         = Conteudo::gerarSlug($dados['titulo']);
+        $dados['plano_minimo'] = self::PLANO_POR_TIPO[$dados['tipo']];
 
         return Conteudo::create($dados);
     }
@@ -116,6 +123,10 @@ class ConteudoService
     {
         if (($dados['publicado'] ?? false) && $conteudo->publicado_em === null) {
             $dados['publicado_em'] = now();
+        }
+
+        if (isset($dados['tipo'])) {
+            $dados['plano_minimo'] = self::PLANO_POR_TIPO[$dados['tipo']];
         }
 
         $conteudo->update($dados);

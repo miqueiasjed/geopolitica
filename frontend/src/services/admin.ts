@@ -28,7 +28,7 @@ import type {
   CriarSourcePayload,
   AtualizarSourcePayload,
 } from '../types/admin'
-import type { TipoConteudo, PlanoMinimo, VerticalConteudo, Conteudo } from '../types/biblioteca'
+import type { TipoConteudo, VerticalConteudo, Conteudo } from '../types/biblioteca'
 import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
 
 export interface CriarConteudoPayload {
@@ -38,7 +38,6 @@ export interface CriarConteudoPayload {
   regiao?: string
   tags?: string[]
   resumo?: string
-  plano_minimo: PlanoMinimo
   vertical_conteudo?: VerticalConteudo | null
   corpo: string
   publicado: boolean

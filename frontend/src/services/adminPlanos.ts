@@ -48,7 +48,15 @@ export async function atualizarRecurso(
 
 export async function atualizarPlano(
   planoId: number,
-  dados: { nome: string; descricao: string | null; preco: number; lastlink_url: string | null; role: string | null },
+  dados: {
+    nome: string
+    descricao: string | null
+    preco: number
+    ordem?: number
+    ativo?: boolean
+    lastlink_url: string | null
+    role: string | null
+  },
 ): Promise<void> {
   await api.put(`/admin/planos/${planoId}`, dados)
 }

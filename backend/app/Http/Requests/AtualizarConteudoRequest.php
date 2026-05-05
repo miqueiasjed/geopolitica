@@ -28,7 +28,6 @@ class AtualizarConteudoRequest extends FormRequest
                 'string',
                 'max:255',
             ],
-            'plano_minimo'  => ['nullable', 'string', 'in:essencial,pro,reservado'],
             'publicado'     => ['nullable', 'boolean'],
         ];
     }

@@ -28,7 +28,6 @@ class CriarConteudoRequest extends FormRequest
                 'string',
                 'max:255',
             ],
-            'plano_minimo'  => ['required', 'string', 'in:essencial,pro,reservado'],
             'publicado'     => ['boolean'],
         ];
     }

@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CheckCircledIcon, Cross2Icon, Pencil1Icon, PlusIcon, Link2Icon } from '@radix-ui/react-icons'
+import {
+  CheckCircledIcon,
+  Cross2Icon,
+  Pencil1Icon,
+  PlusIcon,
+  Link2Icon,
+} from '@radix-ui/react-icons'
 import {
   fetchPlanos,
   fetchRoles,
@@ -11,648 +17,539 @@ import {
 } from '../../services/adminPlanos'
 import type { Plano, PlanoRecursoItem } from '../../services/adminPlanos'
 
-// ─── Labels humanizados dos recursos ─────────────────────────────────────────
+// ─── Constantes ───────────────────────────────────────────────────────────────
 
 const LABELS: Record<string, string> = {
-  chat_diario_limite: 'Chat (por dia)',
-  relatorio_mensal_limite: 'Relatórios IA (por mês)',
-  feed_historico_dias: 'Histórico do Feed (dias)',
-  feed_paginacao_limite: 'Feed — Itens por Página',
-  conteudo_historico_dias: 'Conteúdo (histórico dias)',
-  paises_seguidos_limite: 'Países Seguidos (limite)',
-  biblioteca_acesso: 'Acesso à Biblioteca',
-  monitor_eleitoral: 'Monitor Eleitoral',
-  monitor_guerra: 'Monitor de Guerra',
-  risk_score: 'Risk Score de Portfólio',
-  alertas_nivel: 'Nível de Alertas',
+  chat_diario_limite:       'Chat (por dia)',
+  relatorio_mensal_limite:  'Relatórios IA (por mês)',
+  feed_historico_dias:      'Histórico do Feed (dias)',
+  feed_paginacao_limite:    'Feed — Itens por Página',
+  conteudo_historico_dias:  'Conteúdo — Histórico (dias)',
+  conteudo_nivel_maximo:    'Conteúdo — Nível',
+  paises_seguidos_limite:   'Países Seguidos',
+  biblioteca_acesso:        'Biblioteca',
+  monitor_eleitoral:        'Monitor Eleitoral',
+  monitor_guerra:           'Monitor de Guerra',
+  risk_score:               'Risk Score',
+  alertas_nivel:            'Nível de Alertas',
 }
 
-// ─── Tipos de recurso inferidos pela chave ────────────────────────────────────
+const COR: Record<string, { text: string; border: string; bg: string }> = {
+  essencial: { text: 'text-amber-400',  border: 'border-amber-500/20',  bg: 'bg-amber-500/5'  },
+  pro:       { text: 'text-cyan-400',   border: 'border-cyan-500/20',   bg: 'bg-cyan-500/5'   },
+  reservado: { text: 'text-purple-400', border: 'border-purple-500/20', bg: 'bg-purple-500/5' },
+}
+
+function cor(slug: string) {
+  return COR[slug] ?? { text: 'text-zinc-300', border: 'border-zinc-700/40', bg: 'bg-zinc-800/10' }
+}
+
+// ─── Tipos de recurso ─────────────────────────────────────────────────────────
 
 type TipoRecurso = 'boolean' | 'numero' | 'alertas_nivel'
 
 function inferirTipo(chave: string): TipoRecurso {
+  if (chave === 'alertas_nivel') return 'alertas_nivel'
   if (
     chave.includes('acesso') ||
     chave.includes('monitor') ||
     chave.includes('risk_score') ||
     chave.includes('biblioteca')
-  ) {
-    return 'boolean'
-  }
-  if (chave.includes('_limite') || chave.includes('_dias')) {
-    return 'numero'
-  }
-  if (chave === 'alertas_nivel') {
-    return 'alertas_nivel'
-  }
+  ) return 'boolean'
+  if (chave.includes('_limite') || chave.includes('_dias')) return 'numero'
   return 'boolean'
 }
 
 // ─── Badge de valor ───────────────────────────────────────────────────────────
 
-interface BadgeValorProps {
-  valor: PlanoRecursoItem
-  chave: string
-}
+function BadgeValor({ valor, chave }: { valor: PlanoRecursoItem | undefined; chave: string }) {
+  if (valor === undefined) return <span className="text-zinc-700 text-xs">—</span>
 
-function BadgeValor({ valor, chave }: BadgeValorProps) {
   if (valor === null) {
     return (
-      <span className="inline-flex items-center rounded-full bg-green-500/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-green-400">
-        Ilimitado
+      <span className="inline-flex items-center rounded-full bg-green-500/10 px-2 py-0.5 font-mono text-[11px] text-green-400">
+        ∞ ilimitado
       </span>
     )
   }
 
-  if (valor === 'false') {
-    return (
-      <span className="inline-flex items-center rounded-full bg-zinc-700/50 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-500">
-        Desativado
-      </span>
-    )
-  }
+  if (valor === 'false') return <span className="font-mono text-xs text-zinc-600">Não</span>
 
   if (valor === 'true') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-green-400">
-        <CheckCircledIcon className="h-3 w-3" />
-        Ativo
+      <span className="inline-flex items-center gap-1 text-green-400">
+        <CheckCircledIcon className="h-3.5 w-3.5" />
+        <span className="font-mono text-xs">Sim</span>
       </span>
     )
   }
 
   if (chave.includes('_dias')) {
     return (
-      <span className="font-mono text-sm font-semibold text-zinc-200">
-        {valor} <span className="text-xs text-zinc-500">dias</span>
+      <span className="font-mono text-sm text-zinc-200">
+        {valor}<span className="ml-1 text-[11px] text-zinc-500">dias</span>
       </span>
     )
   }
 
-  if (chave.includes('_limite')) {
-    return (
-      <span className="font-mono text-sm font-semibold text-zinc-200">
-        {valor} <span className="text-xs text-zinc-500">/dia</span>
-      </span>
-    )
-  }
-
-  return (
-    <span className="font-mono text-sm text-zinc-200">{valor}</span>
-  )
+  return <span className="font-mono text-sm text-zinc-200">{valor}</span>
 }
 
-// ─── Editor inline de recurso ─────────────────────────────────────────────────
+// ─── Editor inline de célula ─────────────────────────────────────────────────
 
-interface EditorRecursoProps {
+const INPUT_SM =
+  'rounded border border-zinc-700 bg-[#0d0d0f] px-2 py-1 font-mono text-xs text-zinc-200 outline-none focus:border-[#C9B882]/50'
+
+interface EditorCelulaProps {
   planoId: number
   chave: string
   valor: PlanoRecursoItem
-  tipo: TipoRecurso
   onConcluir: () => void
 }
 
-function EditorRecurso({ planoId, chave, valor, tipo, onConcluir }: EditorRecursoProps) {
+function EditorCelula({ planoId, chave, valor, onConcluir }: EditorCelulaProps) {
   const queryClient = useQueryClient()
-
-  const [valorLocal, setValorLocal] = useState<string>(valor ?? '')
+  const tipo = inferirTipo(chave)
+  const [valorLocal, setValorLocal] = useState<string>(valor ?? (tipo === 'boolean' ? 'false' : ''))
   const [ilimitado, setIlimitado] = useState(valor === null)
-  const [erroLocal, setErroLocal] = useState<string | null>(null)
 
   const mutation = useMutation({
-    mutationFn: () =>
-      atualizarRecurso(
-        planoId,
-        chave,
-        tipo === 'boolean' ? (valorLocal === 'true' ? 'true' : 'false') : (ilimitado ? null : valorLocal),
-      ),
+    mutationFn: () => {
+      const v =
+        tipo === 'boolean'
+          ? valorLocal === 'true' ? 'true' : 'false'
+          : tipo === 'numero' && ilimitado
+            ? null
+            : valorLocal
+      return atualizarRecurso(planoId, chave, v)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
       onConcluir()
     },
-    onError: () => {
-      setErroLocal('Erro ao salvar. Tente novamente.')
-    },
   })
 
-  const baseInput =
-    'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-1.5 font-mono text-sm text-zinc-200 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
-
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-2 min-w-[130px]">
       {tipo === 'boolean' && (
-        <div className="flex items-center gap-3">
-          <label className="font-mono text-xs text-zinc-400">Valor:</label>
-          <select
-            value={valorLocal}
-            onChange={(e) => setValorLocal(e.target.value)}
-            className={`${baseInput} cursor-pointer`}
-          >
-            <option value="true" className="bg-[#111113]">Ativo (true)</option>
-            <option value="false" className="bg-[#111113]">Desativado (false)</option>
-          </select>
-        </div>
+        <select
+          value={valorLocal}
+          onChange={(e) => setValorLocal(e.target.value)}
+          className={`${INPUT_SM} cursor-pointer`}
+        >
+          <option value="true"  className="bg-[#0d0d0f]">Sim</option>
+          <option value="false" className="bg-[#0d0d0f]">Não</option>
+        </select>
       )}
 
       {tipo === 'numero' && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-1.5 cursor-pointer">
             <input
               type="checkbox"
-              id={`ilimitado-${planoId}-${chave}`}
               checked={ilimitado}
-              onChange={(e) => {
-                setIlimitado(e.target.checked)
-                if (e.target.checked) setValorLocal('')
-              }}
-              className="h-3.5 w-3.5 cursor-pointer accent-[#C9B882]"
+              onChange={(e) => { setIlimitado(e.target.checked); if (e.target.checked) setValorLocal('') }}
+              className="accent-[#C9B882] h-3 w-3"
             />
-            <label
-              htmlFor={`ilimitado-${planoId}-${chave}`}
-              className="cursor-pointer font-mono text-xs text-zinc-400"
-            >
-              Ilimitado (null)
-            </label>
-          </div>
+            <span className="font-mono text-[10px] text-zinc-500">Ilimitado</span>
+          </label>
           {!ilimitado && (
             <input
               type="number"
               value={valorLocal}
               onChange={(e) => setValorLocal(e.target.value)}
               min={0}
-              className={`${baseInput} w-24`}
-              placeholder="0"
+              className={`${INPUT_SM} w-20`}
             />
           )}
         </div>
       )}
 
       {tipo === 'alertas_nivel' && (
-        <div className="flex items-center gap-3">
-          <label className="font-mono text-xs text-zinc-400">Nível:</label>
-          <select
-            value={valorLocal}
-            onChange={(e) => setValorLocal(e.target.value)}
-            className={`${baseInput} cursor-pointer`}
-          >
-            <option value="medium" className="bg-[#111113]">medium</option>
-            <option value="medium,high" className="bg-[#111113]">medium,high</option>
-            <option value="all" className="bg-[#111113]">all</option>
-          </select>
-        </div>
+        <select
+          value={valorLocal}
+          onChange={(e) => setValorLocal(e.target.value)}
+          className={`${INPUT_SM} cursor-pointer`}
+        >
+          <option value="medium"       className="bg-[#0d0d0f]">Médio</option>
+          <option value="medium,high"  className="bg-[#0d0d0f]">Médio + Alto</option>
+          <option value="all"          className="bg-[#0d0d0f]">Todos</option>
+        </select>
       )}
 
-      {erroLocal && (
-        <p className="font-mono text-[11px] text-red-400">{erroLocal}</p>
-      )}
-
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           disabled={mutation.isPending}
           onClick={() => mutation.mutate()}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1 rounded border border-[#C9B882]/30 bg-[#C9B882]/10 px-2 py-0.5 font-mono text-[10px] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:opacity-50"
         >
-          {mutation.isPending ? (
-            <>
-              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-              </svg>
-              Salvando…
-            </>
-          ) : (
-            <>
-              <CheckCircledIcon className="h-3 w-3" />
-              Salvar
-            </>
-          )}
+          {mutation.isPending ? '…' : 'Salvar'}
         </button>
         <button
           type="button"
           onClick={onConcluir}
-          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700/50 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+          className="rounded border border-zinc-700/50 p-0.5 text-zinc-500 hover:text-zinc-300"
         >
           <Cross2Icon className="h-3 w-3" />
-          Cancelar
         </button>
       </div>
     </div>
   )
 }
 
-// ─── Linha de recurso ─────────────────────────────────────────────────────────
+// ─── Célula da tabela ─────────────────────────────────────────────────────────
 
-interface LinhaRecursoProps {
+interface CelulaRecursoProps {
   planoId: number
   chave: string
-  valor: PlanoRecursoItem
+  valor: PlanoRecursoItem | undefined
 }
 
-function LinhaRecurso({ planoId, chave, valor }: LinhaRecursoProps) {
+function CelulaRecurso({ planoId, chave, valor }: CelulaRecursoProps) {
   const [editando, setEditando] = useState(false)
-  const tipo = inferirTipo(chave)
-  const label = LABELS[chave] ?? chave
 
-  return (
-    <div
-      className={`rounded-lg border p-3 transition-colors ${
-        editando
-          ? 'border-[#C9B882]/25 bg-[#C9B882]/5'
-          : 'border-[#1e1e20] bg-[#0d0d0f] hover:border-zinc-700/60'
-      }`}
-    >
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <div className="space-y-0.5">
-          <p className="font-mono text-xs font-medium text-zinc-200">{label}</p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-600">{chave}</p>
-        </div>
-        {!editando && (
-          <button
-            type="button"
-            onClick={() => setEditando(true)}
-            aria-label={`Editar recurso ${label}`}
-            className="rounded-md p-1 text-zinc-600 transition-colors hover:bg-white/5 hover:text-zinc-300"
-          >
-            <Pencil1Icon className="h-3.5 w-3.5" />
-          </button>
-        )}
-      </div>
-
-      {editando ? (
-        <EditorRecurso
+  if (editando) {
+    return (
+      <td className="px-4 py-3 align-top bg-[#C9B882]/3 border-l border-[#1e1e20]">
+        <EditorCelula
           planoId={planoId}
           chave={chave}
-          valor={valor}
-          tipo={tipo}
+          valor={valor ?? (inferirTipo(chave) === 'boolean' ? 'false' : '0')}
           onConcluir={() => setEditando(false)}
         />
-      ) : (
-        <BadgeValor valor={valor} chave={chave} />
-      )}
-    </div>
-  )
-}
-
-// ─── Adicionar recurso ───────────────────────────────────────────────────────
-
-interface AdicionarRecursoProps {
-  plano: Plano
-}
-
-function AdicionarRecurso({ plano }: AdicionarRecursoProps) {
-  const queryClient = useQueryClient()
-  const [aberto, setAberto] = useState(false)
-  const [chaveSelecionada, setChaveSelecionada] = useState('')
-  const [valorLocal, setValorLocal] = useState('false')
-  const [ilimitado, setIlimitado] = useState(false)
-  const [erro, setErro] = useState<string | null>(null)
-
-  const chavesDisponiveis = Object.keys(LABELS).filter(
-    (chave) => !(chave in plano.recursos),
-  )
-
-  const tipo = chaveSelecionada ? inferirTipo(chaveSelecionada) : 'boolean'
-
-  function abrirForm() {
-    const primeira = chavesDisponiveis[0] ?? ''
-    setChaveSelecionada(primeira)
-    setValorLocal(inferirTipo(primeira) === 'boolean' ? 'false' : '')
-    setIlimitado(false)
-    setErro(null)
-    setAberto(true)
-  }
-
-  function trocarChave(chave: string) {
-    setChaveSelecionada(chave)
-    setValorLocal(inferirTipo(chave) === 'boolean' ? 'false' : '')
-    setIlimitado(false)
-  }
-
-  const mutation = useMutation({
-    mutationFn: () => {
-      let valor: string | null
-      if (tipo === 'boolean') {
-        valor = valorLocal === 'true' ? 'true' : 'false'
-      } else if (tipo === 'numero') {
-        valor = ilimitado ? null : valorLocal
-      } else {
-        valor = valorLocal
-      }
-      return atualizarRecurso(plano.id, chaveSelecionada, valor)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
-      setAberto(false)
-    },
-    onError: () => setErro('Erro ao salvar. Tente novamente.'),
-  })
-
-  if (chavesDisponiveis.length === 0) return null
-
-  const baseInput =
-    'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-1.5 font-mono text-sm text-zinc-200 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
-
-  if (!aberto) {
-    return (
-      <button
-        type="button"
-        onClick={abrirForm}
-        className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-800 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-600 transition-colors hover:border-zinc-600 hover:text-zinc-400"
-      >
-        <PlusIcon className="h-3.5 w-3.5" />
-        Adicionar recurso
-      </button>
+      </td>
     )
   }
 
   return (
-    <div className="rounded-lg border border-[#C9B882]/20 bg-[#C9B882]/5 p-3 space-y-3">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#C9B882]/70">Novo recurso</p>
-
-      {/* Seletor de chave */}
-      <div className="space-y-1">
-        <label className="font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-500">Recurso</label>
-        <select
-          value={chaveSelecionada}
-          onChange={(e) => trocarChave(e.target.value)}
-          className={`${baseInput} w-full cursor-pointer`}
-        >
-          {chavesDisponiveis.map((chave) => (
-            <option key={chave} value={chave} className="bg-[#111113]">
-              {LABELS[chave]} ({chave})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Editor por tipo */}
-      {tipo === 'boolean' && (
-        <div className="flex items-center gap-3">
-          <label className="font-mono text-xs text-zinc-400">Valor:</label>
-          <select
-            value={valorLocal}
-            onChange={(e) => setValorLocal(e.target.value)}
-            className={`${baseInput} cursor-pointer`}
-          >
-            <option value="true" className="bg-[#111113]">Ativo (true)</option>
-            <option value="false" className="bg-[#111113]">Desativado (false)</option>
-          </select>
-        </div>
-      )}
-
-      {tipo === 'numero' && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id={`novo-ilimitado-${plano.id}`}
-              checked={ilimitado}
-              onChange={(e) => { setIlimitado(e.target.checked); if (e.target.checked) setValorLocal('') }}
-              className="h-3.5 w-3.5 cursor-pointer accent-[#C9B882]"
-            />
-            <label htmlFor={`novo-ilimitado-${plano.id}`} className="cursor-pointer font-mono text-xs text-zinc-400">
-              Ilimitado (null)
-            </label>
-          </div>
-          {!ilimitado && (
-            <input
-              type="number"
-              value={valorLocal}
-              onChange={(e) => setValorLocal(e.target.value)}
-              min={0}
-              className={`${baseInput} w-24`}
-              placeholder="0"
-            />
-          )}
-        </div>
-      )}
-
-      {tipo === 'alertas_nivel' && (
-        <div className="flex items-center gap-3">
-          <label className="font-mono text-xs text-zinc-400">Nível:</label>
-          <select
-            value={valorLocal}
-            onChange={(e) => setValorLocal(e.target.value)}
-            className={`${baseInput} cursor-pointer`}
-          >
-            <option value="medium" className="bg-[#111113]">medium</option>
-            <option value="medium,high" className="bg-[#111113]">medium,high</option>
-            <option value="all" className="bg-[#111113]">all</option>
-          </select>
-        </div>
-      )}
-
-      {erro && <p className="font-mono text-[11px] text-red-400">{erro}</p>}
-
+    <td className="px-4 py-3 border-l border-[#1e1e20] group">
       <div className="flex items-center gap-2">
+        <BadgeValor valor={valor} chave={chave} />
         <button
           type="button"
-          disabled={mutation.isPending || !chaveSelecionada}
-          onClick={() => mutation.mutate()}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => setEditando(true)}
+          className="opacity-0 group-hover:opacity-100 transition-opacity rounded p-0.5 text-zinc-600 hover:text-zinc-300 hover:bg-white/5"
+          aria-label="Editar"
         >
-          {mutation.isPending ? (
-            <>
-              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-              </svg>
-              Salvando…
-            </>
-          ) : (
-            <><PlusIcon className="h-3 w-3" />Adicionar</>
-          )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setAberto(false)}
-          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700/50 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
-        >
-          <Cross2Icon className="h-3 w-3" />
-          Cancelar
+          {valor === undefined ? <PlusIcon className="h-3 w-3" /> : <Pencil1Icon className="h-3 w-3" />}
         </button>
       </div>
+    </td>
+  )
+}
+
+// ─── Tabela comparativa de recursos ──────────────────────────────────────────
+
+function TabelaRecursos({ planos }: { planos: Plano[] }) {
+  const todasAsChaves = Array.from(
+    new Set([
+      ...Object.keys(LABELS),
+      ...planos.flatMap((p) => Object.keys(p.recursos)),
+    ]),
+  )
+
+  return (
+    <div className="overflow-x-auto rounded-xl border border-[#1e1e20]">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-[#1e1e20] bg-[#080809]">
+            <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 w-52">
+              Recurso
+            </th>
+            {planos.map((plano) => {
+              const c = cor(plano.slug)
+              return (
+                <th
+                  key={plano.id}
+                  className={`px-4 py-3 text-left font-mono text-[11px] font-semibold border-l border-[#1e1e20] ${c.text}`}
+                >
+                  {plano.nome}
+                </th>
+              )
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {todasAsChaves.map((chave, idx) => (
+            <tr
+              key={chave}
+              className={`border-b border-[#111113] transition-colors hover:bg-[#111115] ${idx % 2 === 0 ? 'bg-[#0d0d0f]' : 'bg-[#0a0a0b]'}`}
+            >
+              <td className="px-4 py-3">
+                <p className="text-xs text-zinc-300 font-medium leading-tight">
+                  {LABELS[chave] ?? chave}
+                </p>
+                <p className="font-mono text-[9px] text-zinc-700 mt-0.5">{chave}</p>
+              </td>
+              {planos.map((plano) => (
+                <CelulaRecurso
+                  key={plano.id}
+                  planoId={plano.id}
+                  chave={chave}
+                  valor={plano.recursos[chave]}
+                />
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
 
-// ─── Card de plano ────────────────────────────────────────────────────────────
+// ─── Card de resumo do plano ─────────────────────────────────────────────────
 
-const COR_SLUG: Record<string, string> = {
-  essencial: 'text-amber-400',
-  pro: 'text-cyan-400',
-  reservado: 'text-purple-400',
+interface CardResumoplanoProps {
+  plano: Plano
+  onEditar: (plano: Plano) => void
 }
 
-const BORDA_SLUG: Record<string, string> = {
-  essencial: 'border-amber-500/20',
-  pro: 'border-cyan-500/20',
-  reservado: 'border-purple-500/20',
-}
-
-const HEADER_SLUG: Record<string, string> = {
-  essencial: 'bg-amber-500/5',
-  pro: 'bg-cyan-500/5',
-  reservado: 'bg-purple-500/5',
-}
-
-function CardPlano({ plano }: { plano: Plano }) {
-  const queryClient = useQueryClient()
-  const corSlug = COR_SLUG[plano.slug] ?? 'text-zinc-300'
-  const bordaSlug = BORDA_SLUG[plano.slug] ?? 'border-[#1e1e20]'
-  const headerSlug = HEADER_SLUG[plano.slug] ?? ''
-
-  const totalRecursos = Object.keys(plano.recursos).length
-
-  const [editandoRole, setEditandoRole] = useState(false)
-  const [roleLocal, setRoleLocal] = useState(plano.role ?? '')
-
-  const { data: roles } = useQuery({
-    queryKey: adminPlanosKeys.roles(),
-    queryFn: fetchRoles,
-    staleTime: 60_000,
-    enabled: editandoRole,
-  })
-
-  const salvarRole = useMutation({
-    mutationFn: () =>
-      atualizarPlano(plano.id, {
-        nome: plano.nome,
-        descricao: plano.descricao,
-        preco: Number(plano.preco),
-        lastlink_url: plano.lastlink_url,
-        role: roleLocal || null,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
-      setEditandoRole(false)
-    },
-  })
-
-  const baseInput =
-    'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-1.5 font-mono text-sm text-zinc-200 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
+function CardResumoplano({ plano, onEditar }: CardResumoplanoProps) {
+  const c = cor(plano.slug)
 
   return (
-    <div className={`flex flex-col rounded-xl border ${bordaSlug} overflow-hidden`}>
-      <div className={`border-b ${bordaSlug} ${headerSlug} px-5 py-4`}>
+    <div className={`rounded-xl border ${c.border} overflow-hidden`}>
+      <div className={`${c.bg} border-b ${c.border} px-4 py-3`}>
         <div className="flex items-start justify-between gap-2">
-          <div className="space-y-0.5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-zinc-500">Plano</p>
-            <h2 className={`text-lg font-semibold ${corSlug}`}>{plano.nome}</h2>
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-zinc-500">{plano.slug}</p>
+            <h3 className={`text-base font-semibold ${c.text}`}>{plano.nome}</h3>
+            {plano.descricao && (
+              <p className="mt-0.5 text-xs text-zinc-500 leading-tight">{plano.descricao}</p>
+            )}
           </div>
-          <div className="text-right">
-            <p className="font-mono text-lg font-semibold text-zinc-200">
+          <div className="text-right flex-shrink-0">
+            <p className="font-mono text-base font-semibold text-zinc-200">
               R$ {Number(plano.preco).toFixed(2)}
             </p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-600">/mês</p>
+            <p className="font-mono text-[9px] text-zinc-600">/mês</p>
           </div>
         </div>
+      </div>
 
-        {plano.descricao && (
-          <p className="mt-2 text-xs text-zinc-500">{plano.descricao}</p>
-        )}
+      <div className="px-4 py-3 bg-[#0a0a0b] space-y-3">
+        <div className="flex flex-wrap gap-1.5">
+          {plano.ativo ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 font-mono text-[10px] text-green-400">
+              <CheckCircledIcon className="h-2.5 w-2.5" /> Ativo
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[10px] text-red-400">
+              Inativo
+            </span>
+          )}
 
-        {/* Link Lastlink */}
-        <div className="mt-3">
+          {plano.role && (
+            <span className="inline-flex items-center rounded-full bg-zinc-700/40 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
+              {plano.role}
+            </span>
+          )}
+
           {plano.lastlink_url ? (
             <a
               href={plano.lastlink_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-blue-400 transition-colors hover:bg-blue-500/20"
+              className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 font-mono text-[10px] text-blue-400 hover:bg-blue-500/15 transition-colors"
             >
-              <Link2Icon className="h-3 w-3" />
-              Lastlink vinculado
+              <Link2Icon className="h-2.5 w-2.5" /> Lastlink
             </a>
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-800/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-zinc-600">
-              <Link2Icon className="h-3 w-3" />
-              Sem link Lastlink
+            <span className="inline-flex items-center gap-1 rounded-full bg-zinc-800/50 px-2 py-0.5 font-mono text-[10px] text-zinc-600">
+              <Link2Icon className="h-2.5 w-2.5" /> Sem link
             </span>
           )}
         </div>
 
-        {/* Perfil (role) */}
-        <div className="mt-3 rounded-lg border border-[#1e1e20] bg-[#0d0d0f] px-3 py-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">Perfil liberado</p>
-            {!editandoRole && (
-              <button
-                type="button"
-                onClick={() => { setRoleLocal(plano.role ?? ''); setEditandoRole(true) }}
-                className="rounded p-0.5 text-zinc-600 transition-colors hover:text-zinc-300"
-              >
-                <Pencil1Icon className="h-3 w-3" />
-              </button>
-            )}
+        <button
+          type="button"
+          onClick={() => onEditar(plano)}
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-700/50 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-200"
+        >
+          <Pencil1Icon className="h-3 w-3" />
+          Editar plano
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Modal de edição do plano ────────────────────────────────────────────────
+
+interface ModalEditarPlanoProps {
+  plano: Plano
+  onFechar: () => void
+}
+
+const CAMPO =
+  'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 font-mono text-sm text-zinc-200 outline-none w-full transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20 placeholder:text-zinc-600'
+
+function ModalEditarPlano({ plano, onFechar }: ModalEditarPlanoProps) {
+  const queryClient = useQueryClient()
+  const c = cor(plano.slug)
+
+  const [form, setForm] = useState({
+    nome:         plano.nome,
+    descricao:    plano.descricao ?? '',
+    preco:        String(plano.preco),
+    ordem:        String(plano.ordem),
+    ativo:        plano.ativo,
+    lastlink_url: plano.lastlink_url ?? '',
+    role:         plano.role ?? '',
+  })
+  const [erro, setErro] = useState<string | null>(null)
+
+  const { data: roles } = useQuery({
+    queryKey: adminPlanosKeys.roles(),
+    queryFn: fetchRoles,
+    staleTime: 60_000,
+  })
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      atualizarPlano(plano.id, {
+        nome:         form.nome.trim(),
+        descricao:    form.descricao.trim() || null,
+        preco:        parseFloat(form.preco) || 0,
+        ordem:        parseInt(form.ordem) || 0,
+        ativo:        form.ativo,
+        lastlink_url: form.lastlink_url.trim() || null,
+        role:         form.role.trim() || null,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
+      onFechar()
+    },
+    onError: (e: unknown) => {
+      setErro(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Erro ao salvar.',
+      )
+    },
+  })
+
+  function set(campo: string, valor: string | boolean) {
+    setForm((prev) => ({ ...prev, [campo]: valor }))
+    setErro(null)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl border border-[#2a2a2e] bg-[#0d0d0f] shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className={`flex items-center justify-between border-b border-[#1e1e20] px-6 py-4 ${c.bg}`}>
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C9B882]/70">Editar Plano</p>
+            <h2 className={`text-base font-semibold ${c.text}`}>{plano.nome}</h2>
           </div>
-          {editandoRole ? (
-            <div className="mt-2 space-y-2">
-              <select
-                value={roleLocal}
-                onChange={(e) => setRoleLocal(e.target.value)}
-                className={`${baseInput} w-full cursor-pointer`}
-              >
-                <option value="" className="bg-[#111113]">— nenhuma —</option>
-                {roles?.map((r) => (
-                  <option key={r.role} value={r.role} className="bg-[#111113]">
-                    {r.label} ({r.role})
-                  </option>
-                ))}
-              </select>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  disabled={salvarRole.isPending}
-                  onClick={() => salvarRole.mutate()}
-                  className="inline-flex items-center gap-1 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#C9B882] disabled:opacity-50"
-                >
-                  {salvarRole.isPending ? 'Salvando…' : 'Salvar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditandoRole(false)}
-                  className="inline-flex items-center gap-1 rounded-full border border-zinc-700/50 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-500"
-                >
-                  Cancelar
-                </button>
-              </div>
+          <button
+            type="button"
+            onClick={onFechar}
+            className="rounded-md p-1.5 text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+          >
+            <Cross2Icon className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="space-y-4 px-6 py-5">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Nome</label>
+              <input type="text" value={form.nome} onChange={(e) => set('nome', e.target.value)} className={CAMPO} />
             </div>
-          ) : (
-            <p className="mt-1 font-mono text-[11px] text-zinc-300">
-              {plano.role ?? <span className="text-zinc-600">não configurado</span>}
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Preço (R$)</label>
+              <input type="number" value={form.preco} onChange={(e) => set('preco', e.target.value)} min={0} step="0.01" className={CAMPO} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Ordem</label>
+              <input type="number" value={form.ordem} onChange={(e) => set('ordem', e.target.value)} min={0} className={CAMPO} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Status</label>
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2">
+                <input
+                  type="checkbox"
+                  checked={form.ativo}
+                  onChange={(e) => set('ativo', e.target.checked)}
+                  className="h-3.5 w-3.5 accent-[#C9B882]"
+                />
+                <span className="font-mono text-sm text-zinc-300">Plano ativo</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Descrição</label>
+            <textarea
+              value={form.descricao}
+              onChange={(e) => set('descricao', e.target.value)}
+              rows={2}
+              placeholder="Opcional"
+              className={`${CAMPO} resize-none`}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Perfil (role)</label>
+            <select value={form.role} onChange={(e) => set('role', e.target.value)} className={`${CAMPO} cursor-pointer`}>
+              <option value="" className="bg-[#111113]">— nenhuma —</option>
+              {roles?.map((r) => (
+                <option key={r.role} value={r.role} className="bg-[#111113]">
+                  {r.label} ({r.role})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+              URL Lastlink <span className="text-zinc-600 normal-case">(opcional)</span>
+            </label>
+            <input
+              type="url"
+              value={form.lastlink_url}
+              onChange={(e) => set('lastlink_url', e.target.value)}
+              placeholder="https://..."
+              className={CAMPO}
+            />
+          </div>
+
+          {erro && (
+            <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">
+              {erro}
             </p>
           )}
         </div>
 
-        <div className="mt-2 flex items-center gap-3">
-          <span className="inline-flex items-center rounded-full bg-zinc-800/80 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
-            {totalRecursos} recursos
-          </span>
-          {!plano.ativo && (
-            <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-red-400">
-              Plano inativo
-            </span>
-          )}
+        <div className="flex items-center justify-end gap-2 border-t border-[#1e1e20] px-6 py-4">
+          <button
+            type="button"
+            onClick={onFechar}
+            className="rounded-full border border-zinc-700/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            disabled={mutation.isPending || !form.nome || !form.preco}
+            onClick={() => mutation.mutate()}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {mutation.isPending ? (
+              <>
+                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+                Salvando…
+              </>
+            ) : (
+              'Salvar alterações'
+            )}
+          </button>
         </div>
-      </div>
-
-      <div className="flex flex-1 flex-col gap-2 bg-[#0a0a0b] p-4">
-        {Object.entries(plano.recursos).length === 0 ? (
-          <p className="py-4 text-center font-mono text-xs text-zinc-600">
-            Nenhum recurso configurado
-          </p>
-        ) : (
-          Object.entries(plano.recursos).map(([chave, valor]) => (
-            <LinhaRecurso
-              key={chave}
-              planoId={plano.id}
-              chave={chave}
-              valor={valor}
-            />
-          ))
-        )}
-        <AdicionarRecurso plano={plano} />
       </div>
     </div>
   )
@@ -665,31 +562,23 @@ interface ModalCriarPlanoProps {
   onCriado: () => void
 }
 
-const CAMPO = 'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 font-mono text-sm text-zinc-200 outline-none w-full transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20 placeholder:text-zinc-600'
-
 function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
   const queryClient = useQueryClient()
 
   const [form, setForm] = useState({
-    slug: '',
-    nome: '',
-    descricao: '',
-    preco: '',
-    ordem: '',
-    ativo: true,
-    lastlink_url: '',
+    slug: '', nome: '', descricao: '', preco: '', ordem: '', ativo: true, lastlink_url: '',
   })
   const [erro, setErro] = useState<string | null>(null)
 
   const mutation = useMutation({
     mutationFn: () =>
       criarPlano({
-        slug: form.slug.trim(),
-        nome: form.nome.trim(),
-        descricao: form.descricao.trim() || null,
-        preco: parseFloat(form.preco) || 0,
-        ordem: parseInt(form.ordem) || 0,
-        ativo: form.ativo,
+        slug:         form.slug.trim(),
+        nome:         form.nome.trim(),
+        descricao:    form.descricao.trim() || null,
+        preco:        parseFloat(form.preco) || 0,
+        ordem:        parseInt(form.ordem) || 0,
+        ativo:        form.ativo,
         lastlink_url: form.lastlink_url.trim() || null,
       }),
     onSuccess: () => {
@@ -697,10 +586,9 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
       onCriado()
     },
     onError: (e: unknown) => {
-      const msg =
-        (e as { response?: { data?: { message?: string } } })?.response?.data?.message
-        ?? 'Erro ao criar plano.'
-      setErro(msg)
+      setErro(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Erro ao criar plano.',
+      )
     },
   })
 
@@ -712,24 +600,17 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-2xl border border-[#2a2a2e] bg-[#0d0d0f] shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-[#1e1e20] px-6 py-4">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C9B882]/70">admin</p>
             <h2 className="text-base font-semibold text-white">Novo Plano</h2>
           </div>
-          <button
-            type="button"
-            onClick={onFechar}
-            className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
-          >
+          <button type="button" onClick={onFechar} className="rounded-md p-1.5 text-zinc-500 hover:bg-white/5 hover:text-zinc-200">
             <Cross2Icon className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Form */}
         <div className="space-y-4 px-6 py-5">
-          {/* Slug + Nome */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Slug *</label>
@@ -740,111 +621,54 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
                 placeholder="ex: premium"
                 className={CAMPO}
               />
-              <p className="font-mono text-[10px] text-zinc-600">Apenas letras minúsculas, números, - e _</p>
+              <p className="font-mono text-[10px] text-zinc-600">Minúsculas, números, - e _</p>
             </div>
             <div className="space-y-1.5">
               <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Nome *</label>
-              <input
-                type="text"
-                value={form.nome}
-                onChange={(e) => set('nome', e.target.value)}
-                placeholder="ex: Premium"
-                className={CAMPO}
-              />
+              <input type="text" value={form.nome} onChange={(e) => set('nome', e.target.value)} placeholder="ex: Premium" className={CAMPO} />
             </div>
           </div>
 
-          {/* Preço + Ordem */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Preço (R$) *</label>
-              <input
-                type="number"
-                value={form.preco}
-                onChange={(e) => set('preco', e.target.value)}
-                min={0}
-                step="0.01"
-                placeholder="0.00"
-                className={CAMPO}
-              />
+              <input type="number" value={form.preco} onChange={(e) => set('preco', e.target.value)} min={0} step="0.01" placeholder="0.00" className={CAMPO} />
             </div>
             <div className="space-y-1.5">
-              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Ordem *</label>
-              <input
-                type="number"
-                value={form.ordem}
-                onChange={(e) => set('ordem', e.target.value)}
-                min={0}
-                placeholder="0"
-                className={CAMPO}
-              />
+              <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Ordem</label>
+              <input type="number" value={form.ordem} onChange={(e) => set('ordem', e.target.value)} min={0} placeholder="0" className={CAMPO} />
             </div>
           </div>
 
-          {/* Descrição */}
           <div className="space-y-1.5">
             <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">Descrição</label>
-            <textarea
-              value={form.descricao}
-              onChange={(e) => set('descricao', e.target.value)}
-              rows={2}
-              placeholder="Descrição opcional do plano"
-              className={`${CAMPO} resize-none`}
-            />
+            <textarea value={form.descricao} onChange={(e) => set('descricao', e.target.value)} rows={2} placeholder="Opcional" className={`${CAMPO} resize-none`} />
           </div>
 
-          {/* Lastlink URL */}
           <div className="space-y-1.5">
-            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
-              URL Lastlink <span className="text-zinc-600">(opcional)</span>
-            </label>
-            <input
-              type="url"
-              value={form.lastlink_url}
-              onChange={(e) => set('lastlink_url', e.target.value)}
-              placeholder="https://..."
-              className={CAMPO}
-            />
-            <p className="font-mono text-[10px] text-zinc-600">
-              Quando preenchida, alunos que comprarem por esse link serão vinculados automaticamente a este plano.
-            </p>
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">URL Lastlink <span className="text-zinc-600 normal-case">(opcional)</span></label>
+            <input type="url" value={form.lastlink_url} onChange={(e) => set('lastlink_url', e.target.value)} placeholder="https://..." className={CAMPO} />
           </div>
 
-          {/* Ativo */}
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="ativo-novo-plano"
-              checked={form.ativo}
-              onChange={(e) => set('ativo', e.target.checked)}
-              className="h-4 w-4 cursor-pointer accent-[#C9B882]"
-            />
-            <label htmlFor="ativo-novo-plano" className="cursor-pointer font-mono text-sm text-zinc-300">
-              Plano ativo
-            </label>
-          </div>
+          <label className="flex cursor-pointer items-center gap-2">
+            <input type="checkbox" checked={form.ativo} onChange={(e) => set('ativo', e.target.checked)} className="h-4 w-4 accent-[#C9B882]" />
+            <span className="font-mono text-sm text-zinc-300">Plano ativo</span>
+          </label>
 
           {erro && (
-            <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">
-              {erro}
-            </p>
+            <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">{erro}</p>
           )}
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-end gap-2 border-t border-[#1e1e20] px-6 py-4">
-          <button
-            type="button"
-            onClick={onFechar}
-            className="rounded-full border border-zinc-700/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
-          >
+          <button type="button" onClick={onFechar} className="rounded-full border border-zinc-700/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 hover:border-zinc-600 hover:text-zinc-300">
             Cancelar
           </button>
           <button
             type="button"
             disabled={mutation.isPending || !form.slug || !form.nome || !form.preco}
             onClick={() => mutation.mutate()}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {mutation.isPending ? (
               <>
@@ -854,10 +678,7 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
                 Criando…
               </>
             ) : (
-              <>
-                <PlusIcon className="h-3 w-3" />
-                Criar Plano
-              </>
+              <><PlusIcon className="h-3 w-3" />Criar Plano</>
             )}
           </button>
         </div>
@@ -869,7 +690,8 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export function AdminPlanos() {
-  const [modalAberto, setModalAberto] = useState(false)
+  const [planoEditando, setPlanoEditando] = useState<Plano | null>(null)
+  const [modalCriarAberto, setModalCriarAberto] = useState(false)
 
   const { data: planos, isLoading, isError } = useQuery({
     queryKey: adminPlanosKeys.lista(),
@@ -881,46 +703,28 @@ export function AdminPlanos() {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
-            admin
-          </p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">admin</p>
           <h1 className="text-2xl font-semibold tracking-tight text-white">Planos &amp; Recursos</h1>
           <p className="text-sm text-zinc-400">
-            Gerencie os planos disponíveis e configure os recursos e limites de cada um.
+            Configure os planos e compare os recursos disponíveis em cada um.
           </p>
         </div>
-
-        <div className="flex items-start gap-3">
-          {!isLoading && planos && (
-            <div className="flex-shrink-0 rounded-xl border border-[#1e1e20] bg-[#111113] px-4 py-3 text-center">
-              <p className="font-mono text-xl font-semibold text-white">{planos.length}</p>
-              <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                planos
-              </p>
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => setModalAberto(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-[#C9B882]/25 bg-[#C9B882]/8 px-4 py-3 font-mono text-sm text-[#C9B882] transition-colors hover:bg-[#C9B882]/15"
-          >
-            <PlusIcon className="h-4 w-4" />
-            Novo Plano
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setModalCriarAberto(true)}
+          className="inline-flex items-center gap-2 rounded-xl border border-[#C9B882]/25 bg-[#C9B882]/8 px-4 py-3 font-mono text-sm text-[#C9B882] transition-colors hover:bg-[#C9B882]/15"
+        >
+          <PlusIcon className="h-4 w-4" />
+          Novo Plano
+        </button>
       </div>
 
       {isLoading && (
         <div className="grid gap-4 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-96 animate-pulse rounded-xl border border-[#1e1e20] bg-[#0d0d0f]"
-              aria-hidden="true"
-            />
+            <div key={i} className="h-40 animate-pulse rounded-xl border border-[#1e1e20] bg-[#0d0d0f]" aria-hidden="true" />
           ))}
         </div>
       )}
@@ -932,18 +736,23 @@ export function AdminPlanos() {
       )}
 
       {planosOrdenados.length > 0 && (
-        <div className="grid gap-4 lg:grid-cols-3">
-          {planosOrdenados.map((plano) => (
-            <CardPlano key={plano.id} plano={plano} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {planosOrdenados.map((plano) => (
+              <CardResumoplano key={plano.id} plano={plano} onEditar={setPlanoEditando} />
+            ))}
+          </div>
+
+          <TabelaRecursos planos={planosOrdenados} />
+        </>
       )}
 
-      {modalAberto && (
-        <ModalCriarPlano
-          onFechar={() => setModalAberto(false)}
-          onCriado={() => setModalAberto(false)}
-        />
+      {planoEditando && (
+        <ModalEditarPlano plano={planoEditando} onFechar={() => setPlanoEditando(null)} />
+      )}
+
+      {modalCriarAberto && (
+        <ModalCriarPlano onFechar={() => setModalCriarAberto(false)} onCriado={() => setModalCriarAberto(false)} />
       )}
     </div>
   )
