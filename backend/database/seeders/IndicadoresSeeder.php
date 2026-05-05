@@ -35,10 +35,10 @@ class IndicadoresSeeder extends Seeder
                 'unidade' => 'USD/MMBtu',
             ],
             [
-                'simbolo' => 'ZS=F',
-                'nome'    => 'Soja',
+                'simbolo' => 'ALI=F',
+                'nome'    => 'Alumínio',
                 'moeda'   => 'USD',
-                'unidade' => 'USD/bushel',
+                'unidade' => 'USD/t',
             ],
             [
                 'simbolo' => 'ZW=F',

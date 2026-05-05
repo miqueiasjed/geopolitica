@@ -140,7 +140,7 @@ const INDICADORES_MERCADO = [
   { simbolo: 'USDBRL=X', nome: 'USD/BRL' },
   { simbolo: 'NG=F', nome: 'Gás Natural' },
   { simbolo: 'HG=F', nome: 'Cobre' },
-  { simbolo: 'ZS=F', nome: 'Soja' },
+  { simbolo: 'ALI=F', nome: 'Alumínio' },
   { simbolo: 'ZW=F', nome: 'Trigo' },
   { simbolo: 'ZC=F', nome: 'Milho' },
   { simbolo: 'KC=F', nome: 'Café' },
@@ -152,7 +152,7 @@ function parseOrdemIndicadores(valor?: string | null): string[] {
   const simbolos = (valor || ORDEM_INDICADORES_PADRAO)
     .split(/[\s,;]+/)
     .map((simbolo) => simbolo.trim())
-    .filter(Boolean)
+    .filter((simbolo) => INDICADORES_MERCADO.some((indicador) => indicador.simbolo === simbolo))
 
   return Array.from(new Set([...simbolos, ...INDICADORES_MERCADO.map((indicador) => indicador.simbolo)]))
 }

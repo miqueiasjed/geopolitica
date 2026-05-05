@@ -13,7 +13,8 @@ class IndicadoresService
     private const CHAVE_CACHE   = 'indicadores:lista:v2';
     private const TTL_CACHE_MIN = 5;
     private const DIAS_HISTORICO = 8;
-    private const ORDEM_PADRAO = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
+    private const ORDEM_PADRAO = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'];
+    private const SIMBOLOS_PERMITIDOS = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'];
 
     public function __construct(
         private readonly MarketFetcherService $marketFetcher
@@ -28,7 +29,7 @@ class IndicadoresService
         Log::info('IndicadoresService: iniciando atualização de todos os indicadores.');
 
         // Alpha Vantage: commodities com suporte nativo
-        $simbolosAlpha = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
+        $simbolosAlpha = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'];
         $cotacoesAlpha = $this->marketFetcher->buscarAlphaVantage($simbolosAlpha);
         $cotacaoCambio = $this->marketFetcher->buscarCambioAlphaVantage();
 
@@ -130,7 +131,7 @@ class IndicadoresService
 
         $ordem = collect(preg_split('/[\s,;]+/', $valor) ?: [])
             ->map(fn (string $simbolo) => trim($simbolo))
-            ->filter()
+            ->filter(fn (string $simbolo) => in_array($simbolo, self::SIMBOLOS_PERMITIDOS, true))
             ->unique()
             ->values()
             ->all();

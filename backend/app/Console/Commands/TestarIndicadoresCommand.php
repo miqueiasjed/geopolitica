@@ -24,7 +24,7 @@ class TestarIndicadoresCommand extends Command
         }
 
         if ($this->option('limpar-cache')) {
-            $simbolos = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
+            $simbolos = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'];
             foreach ($simbolos as $s) {
                 \Illuminate\Support\Facades\Cache::forget("alpha:cotacao:{$s}");
                 \Illuminate\Support\Facades\Cache::forget("alpha:historico:{$s}");
@@ -38,7 +38,7 @@ class TestarIndicadoresCommand extends Command
         $this->info('API Key encontrada. Testando conexão com o Alpha Vantage...');
         $this->newLine();
 
-        $simbolos = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
+        $simbolos = ['CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'];
         $cotacoes = $alpha->buscarCotacoes($simbolos);
 
         if (empty($cotacoes)) {
@@ -56,6 +56,11 @@ class TestarIndicadoresCommand extends Command
                 number_format($c['variacao_abs'], 4),
             ])->values()->all()
         );
+
+        $faltando = array_values(array_diff($simbolos, array_keys($cotacoes)));
+        if (! empty($faltando)) {
+            $this->warn('Sem dados retornados para: ' . implode(', ', $faltando));
+        }
 
         $this->newLine();
         $this->info('Testando câmbio USD/BRL...');

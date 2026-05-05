@@ -14,16 +14,16 @@ class AlphaVantageService
     private const TTL_HISTORICO_H  = 6;
     private const TTL_FUNDAMENTOS_H = 24;
 
-    // Símbolos internos → função Alpha Vantage
+    // Símbolos internos → função e intervalo Alpha Vantage.
     private const MAPA_COMMODITIES = [
-        'CL=F' => 'WTI',
-        'BZ=F' => 'BRENT',
-        'NG=F' => 'NATURAL_GAS',
-        'HG=F' => 'COPPER',
-        'ZS=F' => 'SOYBEANS',
-        'ZW=F' => 'WHEAT',
-        'ZC=F' => 'CORN',
-        'KC=F' => 'COFFEE',
+        'CL=F'  => ['funcao' => 'WTI', 'intervalo' => 'daily'],
+        'BZ=F'  => ['funcao' => 'BRENT', 'intervalo' => 'daily'],
+        'NG=F'  => ['funcao' => 'NATURAL_GAS', 'intervalo' => 'daily'],
+        'HG=F'  => ['funcao' => 'COPPER', 'intervalo' => 'daily'],
+        'ALI=F' => ['funcao' => 'ALUMINUM', 'intervalo' => 'monthly'],
+        'ZW=F'  => ['funcao' => 'WHEAT', 'intervalo' => 'monthly'],
+        'ZC=F'  => ['funcao' => 'CORN', 'intervalo' => 'monthly'],
+        'KC=F'  => ['funcao' => 'COFFEE', 'intervalo' => 'monthly'],
     ];
 
     private string $apiKey;
@@ -92,14 +92,15 @@ class AlphaVantageService
             return [];
         }
 
-        $funcao = self::MAPA_COMMODITIES[$simbolo];
+        $funcao = self::MAPA_COMMODITIES[$simbolo]['funcao'];
+        $intervalo = self::MAPA_COMMODITIES[$simbolo]['intervalo'];
         $chave  = "alpha:historico:{$simbolo}";
 
         if (Cache::has($chave)) {
             return Cache::get($chave);
         }
 
-        $serie = $this->fetchSerie($funcao);
+        $serie = $this->fetchSerie($funcao, $intervalo);
 
         if (! empty($serie)) {
             Cache::put($chave, $serie, now()->addHours(self::TTL_HISTORICO_H));
@@ -137,8 +138,9 @@ class AlphaVantageService
             return Cache::get($chave);
         }
 
-        $funcao = self::MAPA_COMMODITIES[$simbolo];
-        $serie  = $this->fetchSerie($funcao);
+        $funcao = self::MAPA_COMMODITIES[$simbolo]['funcao'];
+        $intervalo = self::MAPA_COMMODITIES[$simbolo]['intervalo'];
+        $serie  = $this->fetchSerie($funcao, $intervalo);
 
         if (count($serie) < 2) {
             return null;
@@ -168,12 +170,12 @@ class AlphaVantageService
      *
      * @return array<int, array{date: string, value: string}>
      */
-    private function fetchSerie(string $funcao): array
+    private function fetchSerie(string $funcao, string $intervalo): array
     {
         try {
             $resposta = Http::timeout(15)->get(self::BASE_URL, [
                 'function' => $funcao,
-                'interval' => 'daily',
+                'interval' => $intervalo,
                 'apikey'   => $this->apiKey,
             ]);
 

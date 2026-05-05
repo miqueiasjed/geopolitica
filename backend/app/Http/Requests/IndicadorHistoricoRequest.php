@@ -14,7 +14,7 @@ class IndicadorHistoricoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'simbolo' => ['required', 'string', 'in:CL=F,BZ=F,USDBRL=X,NG=F,HG=F,ZS=F,ZW=F,ZC=F,KC=F'],
+            'simbolo' => ['required', 'string', 'in:CL=F,BZ=F,USDBRL=X,NG=F,HG=F,ALI=F,ZW=F,ZC=F,KC=F'],
         ];
     }
 

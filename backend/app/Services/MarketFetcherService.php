@@ -16,7 +16,7 @@ class MarketFetcherService
 
     /**
      * Busca cotações via Alpha Vantage para os símbolos informados.
-     * Suporta: BZ=F (Brent), NG=F (Gás Natural), ZS=F (Soja), ZW=F (Trigo).
+     * Suporta as commodities mapeadas no AlphaVantageService.
      *
      * @param  array<string>  $simbolos
      * @return array<string, array{valor: float, variacao_pct: float, variacao_abs: float}>

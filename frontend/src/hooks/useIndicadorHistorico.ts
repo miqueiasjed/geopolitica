@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '../lib/axios'
 import type { IndicadorHistoricoItem, IndicadorHistoricoResponse } from '../types/indicadores'
 
-const SIMBOLOS_PERMITIDOS = new Set(['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'])
+const SIMBOLOS_PERMITIDOS = new Set(['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'])
 
 export const indicadorHistoricoKeys = {
   all: ['indicador-historico'] as const,

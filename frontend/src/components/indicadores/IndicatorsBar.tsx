@@ -4,7 +4,7 @@ import { useIndicadorHistorico } from '../../hooks/useIndicadorHistorico'
 import { IndicatorCard } from './IndicatorCard'
 import type { Indicador } from '../../types/indicadores'
 
-const SIMBOLOS_COM_HISTORICO = new Set(['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'])
+const SIMBOLOS_COM_HISTORICO = new Set(['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'])
 
 function formatarTimestamp(ultimaAtualizacao: string | null): string {
   if (!ultimaAtualizacao) return ''

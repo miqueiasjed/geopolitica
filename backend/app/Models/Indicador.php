@@ -36,7 +36,7 @@ class Indicador extends Model
      */
     public function scopePorOrdem(Builder $query): Builder
     {
-        $ordem = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
+        $ordem = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ALI=F', 'ZW=F', 'ZC=F', 'KC=F'];
 
         return $query->orderByRaw(
             'FIELD(simbolo, ' . implode(', ', array_fill(0, count($ordem), '?')) . ')',
