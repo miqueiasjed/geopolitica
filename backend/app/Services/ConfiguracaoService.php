@@ -180,6 +180,25 @@ class ConfiguracaoService
         }
 
         Cache::forget(self::CACHE_KEY);
+        $this->carregarNoConfig();
+    }
+
+    public function obterValor(string $chave): mixed
+    {
+        if (! array_key_exists($chave, self::MAPA_CONFIG)) {
+            return null;
+        }
+
+        $registro = Configuracao::where('chave', $chave)->first();
+        $valor = $registro?->valor_decriptado;
+
+        if ($valor !== null) {
+            return $registro->tipo === 'numero'
+                ? (int) $valor
+                : $valor;
+        }
+
+        return Config::get(self::MAPA_CONFIG[$chave]);
     }
 
     /**

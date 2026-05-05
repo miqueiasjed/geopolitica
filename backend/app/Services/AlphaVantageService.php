@@ -24,9 +24,9 @@ class AlphaVantageService
 
     private string $apiKey;
 
-    public function __construct()
+    public function __construct(?string $apiKey = null)
     {
-        $this->apiKey = (string) config('services.alphavantage.api_key', '');
+        $this->apiKey = (string) ($apiKey ?? config('services.alphavantage.api_key', ''));
     }
 
     /**

@@ -8,7 +8,7 @@ class IndicadorHistorico extends Model
 {
     protected $table = 'indicadores_historico';
 
-    public $timestamps = false;
+    public const UPDATED_AT = null;
 
     protected $fillable = [
         'simbolo',

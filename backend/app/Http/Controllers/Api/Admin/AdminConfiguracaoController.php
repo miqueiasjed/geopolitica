@@ -57,9 +57,9 @@ class AdminConfiguracaoController extends Controller
         ]);
     }
 
-    public function testarMercado(AlphaVantageService $alpha): JsonResponse
+    public function testarMercado(): JsonResponse
     {
-        $apiKey = config('services.alphavantage.api_key', '');
+        $apiKey = (string) $this->service->obterValor('alpha_vantage_api_key');
 
         if (empty($apiKey)) {
             return response()->json([
@@ -67,6 +67,8 @@ class AdminConfiguracaoController extends Controller
                 'mensagem' => 'API Key não configurada. Salve a chave antes de testar.',
             ], 422);
         }
+
+        $alpha = new AlphaVantageService($apiKey);
 
         $cotacoes = $alpha->buscarCotacoes(['BZ=F', 'NG=F', 'ZS=F', 'ZW=F']);
         $cambio   = $alpha->buscarCambio('USD', 'BRL');
