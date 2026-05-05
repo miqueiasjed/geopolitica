@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Configuracao;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Crypt;
 
 class ConfiguracaoService
 {
@@ -160,14 +161,21 @@ class ConfiguracaoService
                     ]
                 );
             } else {
-                $registro = Configuracao::firstOrNew(['chave' => $chave]);
-                $registro->grupo     = $def['grupo'];
-                $registro->label     = $def['label'];
-                $registro->descricao = $def['descricao'] ?? null;
-                $registro->tipo      = $def['tipo'];
-                $registro->sensivel  = $def['sensivel'];
-                $registro->save();
-                $registro->setValor(trim((string) $valor));
+                $valorFinal = $def['sensivel']
+                    ? Crypt::encryptString(trim((string) $valor))
+                    : trim((string) $valor);
+
+                Configuracao::updateOrCreate(
+                    ['chave' => $chave],
+                    [
+                        'valor'     => $valorFinal,
+                        'grupo'     => $def['grupo'],
+                        'label'     => $def['label'],
+                        'descricao' => $def['descricao'] ?? null,
+                        'tipo'      => $def['tipo'],
+                        'sensivel'  => $def['sensivel'],
+                    ]
+                );
             }
         }
 
