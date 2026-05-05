@@ -15,7 +15,7 @@ export function useIndicadores() {
   const query = useQuery({
     queryKey: indicadoresKeys.all,
     queryFn: fetchIndicadores,
-    refetchInterval: 15 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
     refetchIntervalInBackground: true,
   })
 

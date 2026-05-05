@@ -56,6 +56,7 @@ class AlphaVantageService
 
     /**
      * Retorna cotação do câmbio (ex: USD → BRL) com cache de 5 minutos.
+     * Falhas não são cacheadas.
      *
      * @return array{valor: float, variacao_pct: float, variacao_abs: float}|null
      */
@@ -63,9 +64,17 @@ class AlphaVantageService
     {
         $chave = "alpha:cotacao:forex:{$de}{$para}";
 
-        return Cache::remember($chave, now()->addMinutes(self::TTL_COTACAO_MIN), function () use ($de, $para) {
-            return $this->fetchForex($de, $para);
-        });
+        if (Cache::has($chave)) {
+            return Cache::get($chave);
+        }
+
+        $resultado = $this->fetchForex($de, $para);
+
+        if ($resultado !== null) {
+            Cache::put($chave, $resultado, now()->addMinutes(self::TTL_COTACAO_MIN));
+        }
+
+        return $resultado;
     }
 
     /**
@@ -82,9 +91,17 @@ class AlphaVantageService
         $funcao = self::MAPA_COMMODITIES[$simbolo];
         $chave  = "alpha:historico:{$simbolo}";
 
-        return Cache::remember($chave, now()->addHours(self::TTL_HISTORICO_H), function () use ($funcao) {
-            return $this->fetchSerie($funcao);
-        });
+        if (Cache::has($chave)) {
+            return Cache::get($chave);
+        }
+
+        $serie = $this->fetchSerie($funcao);
+
+        if (! empty($serie)) {
+            Cache::put($chave, $serie, now()->addHours(self::TTL_HISTORICO_H));
+        }
+
+        return $serie;
     }
 
     /**
@@ -106,32 +123,39 @@ class AlphaVantageService
     /**
      * Busca a cotação mais recente de uma commodity, usando cache de 5 min.
      * Calcula variação com base nos dois últimos pontos da série diária.
+     * Falhas não são cacheadas — a próxima chamada tentará novamente.
      */
     private function cotacaoComCache(string $simbolo): ?array
     {
         $chave = "alpha:cotacao:{$simbolo}";
 
-        return Cache::remember($chave, now()->addMinutes(self::TTL_COTACAO_MIN), function () use ($simbolo) {
-            $funcao = self::MAPA_COMMODITIES[$simbolo];
-            $serie  = $this->fetchSerie($funcao);
+        if (Cache::has($chave)) {
+            return Cache::get($chave);
+        }
 
-            if (count($serie) < 2) {
-                return null;
-            }
+        $funcao = self::MAPA_COMMODITIES[$simbolo];
+        $serie  = $this->fetchSerie($funcao);
 
-            $atual    = (float) ($serie[0]['value'] ?? 0);
-            $anterior = (float) ($serie[1]['value'] ?? 0);
+        if (count($serie) < 2) {
+            return null;
+        }
 
-            if ($atual == 0.0 || $anterior == 0.0) {
-                return null;
-            }
+        $atual    = (float) ($serie[0]['value'] ?? 0);
+        $anterior = (float) ($serie[1]['value'] ?? 0);
 
-            return [
-                'valor'        => $atual,
-                'variacao_pct' => round((($atual - $anterior) / $anterior) * 100, 4),
-                'variacao_abs' => round($atual - $anterior, 4),
-            ];
-        });
+        if ($atual == 0.0 || $anterior == 0.0) {
+            return null;
+        }
+
+        $resultado = [
+            'valor'        => $atual,
+            'variacao_pct' => round((($atual - $anterior) / $anterior) * 100, 4),
+            'variacao_abs' => round($atual - $anterior, 4),
+        ];
+
+        Cache::put($chave, $resultado, now()->addMinutes(self::TTL_COTACAO_MIN));
+
+        return $resultado;
     }
 
     /**
@@ -254,42 +278,50 @@ class AlphaVantageService
     {
         $chave = "alpha:historico:forex:{$de}{$para}";
 
-        return Cache::remember($chave, now()->addHours(self::TTL_HISTORICO_H), function () use ($de, $para) {
-            try {
-                $resposta = Http::timeout(15)->get(self::BASE_URL, [
-                    'function'    => 'FX_DAILY',
-                    'from_symbol' => $de,
-                    'to_symbol'   => $para,
-                    'outputsize'  => 'compact',
-                    'apikey'      => $this->apiKey,
-                ]);
+        if (Cache::has($chave)) {
+            return Cache::get($chave);
+        }
 
-                if ($resposta->failed()) {
-                    return [];
-                }
+        try {
+            $resposta = Http::timeout(15)->get(self::BASE_URL, [
+                'function'    => 'FX_DAILY',
+                'from_symbol' => $de,
+                'to_symbol'   => $para,
+                'outputsize'  => 'compact',
+                'apikey'      => $this->apiKey,
+            ]);
 
-                $dados = $resposta->json();
-                $serie = $dados['Time Series FX (Daily)'] ?? [];
-
-                $resultado = [];
-                foreach ($serie as $data => $valores) {
-                    $resultado[] = [
-                        'date'  => $data,
-                        'close' => $valores['4. close'] ?? '0',
-                    ];
-                }
-
-                usort($resultado, fn ($a, $b) => strcmp($b['date'], $a['date']));
-
-                return $resultado;
-            } catch (\Throwable $e) {
-                Log::warning("AlphaVantageService: exceção ao buscar FX_DAILY {$de}/{$para}.", [
-                    'erro' => $e->getMessage(),
-                ]);
-
+            if ($resposta->failed()) {
                 return [];
             }
-        });
+
+            $dados = $resposta->json();
+            $serie = $dados['Time Series FX (Daily)'] ?? [];
+
+            if (empty($serie)) {
+                return [];
+            }
+
+            $resultado = [];
+            foreach ($serie as $data => $valores) {
+                $resultado[] = [
+                    'date'  => $data,
+                    'close' => $valores['4. close'] ?? '0',
+                ];
+            }
+
+            usort($resultado, fn ($a, $b) => strcmp($b['date'], $a['date']));
+
+            Cache::put($chave, $resultado, now()->addHours(self::TTL_HISTORICO_H));
+
+            return $resultado;
+        } catch (\Throwable $e) {
+            Log::warning("AlphaVantageService: exceção ao buscar FX_DAILY {$de}/{$para}.", [
+                'erro' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
     }
 
     /**
