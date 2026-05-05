@@ -52,7 +52,7 @@ export function EleicaoFilterBar({ filtros, onChange }: EleicaoFilterBarProps) {
               className={`rounded-full px-3 py-1.5 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
                 ativa
                   ? 'border border-current/30 bg-current/10'
-                  : 'border border-transparent text-zinc-500 hover:text-zinc-300'
+                  : 'border border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
               }`}
               style={
                 ativa && cor

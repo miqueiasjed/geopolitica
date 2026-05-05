@@ -7,7 +7,7 @@ import api from '../../lib/axios'
 
 interface RelatorioResumo {
   id: string
-  topico: string
+  topic: string
   title: string
   word_count: number
   created_at: string
@@ -21,14 +21,18 @@ interface RelatoriosResponse {
   data: RelatorioResumo[]
 }
 
+interface RelatorioDetalheResponse {
+  data: RelatorioDetalhe
+}
+
 async function fetchRelatorios(): Promise<RelatorioResumo[]> {
   const res = await api.get<RelatoriosResponse>('/relatorios')
   return res.data.data ?? res.data
 }
 
 async function fetchRelatorio(id: string): Promise<RelatorioDetalhe> {
-  const res = await api.get<RelatorioDetalhe>(`/relatorios/${id}`)
-  return res.data
+  const res = await api.get<RelatorioDetalheResponse>(`/relatorios/${id}`)
+  return res.data.data
 }
 
 function SkeletonCard() {
@@ -146,9 +150,9 @@ export function RelatoriosIA() {
                       {formatarData(rel.created_at)}
                     </p>
                     <p className="truncate text-sm font-medium text-zinc-100">
-                      {rel.title ?? rel.topico}
+                      {rel.title ?? rel.topic}
                     </p>
-                    <p className="line-clamp-1 text-xs text-zinc-500">{rel.topico}</p>
+                    <p className="line-clamp-1 text-xs text-zinc-500">{rel.topic}</p>
                   </div>
                   <div className="flex flex-shrink-0 items-center gap-2">
                     {rel.word_count > 0 && (
@@ -183,7 +187,7 @@ export function RelatoriosIA() {
                       <div className="flex justify-center py-8" aria-label="Carregando relatório">
                         <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-[#BFFF3C]" />
                       </div>
-                    ) : relatorioDetalhe ? (
+                    ) : relatorioDetalhe?.body ? (
                       <div className="prose prose-invert max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-li:text-zinc-300 prose-a:text-[#BFFF3C]">
                         <ReactMarkdown>{relatorioDetalhe.body}</ReactMarkdown>
                       </div>

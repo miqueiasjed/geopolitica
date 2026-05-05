@@ -47,29 +47,33 @@ function EventoItem({ event }: { event: EventoPais }) {
   const nivelTensao = event.impact_label ?? 'MONITORAR'
 
   return (
-    <motion.article
-      variants={itemVariants}
-      className="rounded-xl border border-[#1e1e20] bg-[#111113] p-4 transition-colors hover:border-[#BFFF3C]/30"
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex flex-col items-start gap-2 min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${corNivelTensao(nivelTensao)}`}>
-              {nivelTensao}
-            </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">{publishedAt}</span>
+    <motion.div variants={itemVariants}>
+      <Link
+        to={`/dashboard/feed/${event.id}`}
+        className="group block rounded-xl border border-[#1e1e20] bg-[#111113] p-4 transition-colors hover:border-[#BFFF3C]/30"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex flex-col items-start gap-2 min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${corNivelTensao(nivelTensao)}`}>
+                {nivelTensao}
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">{publishedAt}</span>
+            </div>
+
+            <p className="line-clamp-2 text-sm font-medium text-white">{event.titulo}</p>
+
+            {event.descricao && (
+              <p className="line-clamp-3 text-xs leading-5 text-zinc-400">
+                {event.descricao}
+              </p>
+            )}
           </div>
 
-          <p className="line-clamp-2 text-sm font-medium text-white">{event.titulo}</p>
-
-          {event.descricao && (
-            <p className="line-clamp-3 text-xs leading-5 text-zinc-400">
-              {event.descricao}
-            </p>
-          )}
+          <ArrowRightIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-700 transition-colors group-hover:text-[#BFFF3C]" />
         </div>
-      </div>
-    </motion.article>
+      </Link>
+    </motion.div>
   )
 }
 

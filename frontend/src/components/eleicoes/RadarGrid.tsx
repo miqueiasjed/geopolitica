@@ -17,22 +17,18 @@ export function RadarGrid({ eleicoes, onEleicaoClick }: RadarGridProps) {
   )
 
   return (
-    <div className="overflow-x-auto">
-      <div className="grid min-w-[900px] grid-cols-12">
+    <div className="-mx-1 overflow-x-auto sm:mx-0">
+      <div className="grid min-w-[720px] grid-cols-12">
         {/* Header dos meses */}
         {MESES_ABREV.map((mes, index) => {
           const eAtual = index === mesAtual
           return (
             <div
               key={mes}
-              className={`border-b border-zinc-800 px-2 py-2 text-center font-mono text-xs uppercase tracking-[0.16em] ${
+              className={`border-b border-zinc-800 px-1 py-2 text-center font-mono text-[11px] uppercase tracking-[0.14em] ${
                 eAtual ? 'text-[#BFFF3C]' : 'text-zinc-500'
               } ${index > 0 ? 'border-l border-zinc-800' : ''}`}
-              style={
-                eAtual
-                  ? { borderBottom: '2px solid #BFFF3C' }
-                  : undefined
-              }
+              style={eAtual ? { borderBottom: '2px solid #BFFF3C' } : undefined}
             >
               {mes}
             </div>
@@ -45,18 +41,23 @@ export function RadarGrid({ eleicoes, onEleicaoClick }: RadarGridProps) {
           return (
             <div
               key={index}
-              className={`flex min-h-[120px] flex-col gap-2 p-2 ${
+              className={`flex min-h-[140px] flex-col gap-1.5 p-1.5 ${
                 index > 0 ? 'border-l border-zinc-800/60' : ''
               } ${eAtual ? 'border-l border-r' : ''}`}
               style={
                 eAtual
-                  ? { borderLeftColor: '#BFFF3C', borderRightColor: '#BFFF3C', borderLeftWidth: index > 0 ? '1px' : '0', borderRightWidth: '1px' }
+                  ? {
+                      borderLeftColor: '#BFFF3C',
+                      borderRightColor: '#BFFF3C',
+                      borderLeftWidth: index > 0 ? '1px' : '0',
+                      borderRightWidth: '1px',
+                    }
                   : undefined
               }
             >
               {lista.length === 0 ? (
-                <p className="my-auto text-center font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-700">
-                  Sem eleições
+                <p className="my-auto text-center font-mono text-[9px] uppercase tracking-[0.12em] text-zinc-800">
+                  —
                 </p>
               ) : (
                 lista.map((eleicao) => (

@@ -9,7 +9,8 @@ function Sparkline({ historico, positivo }: SparklineProps) {
   if (historico.length === 0) return null
 
   const largura = 46
-  const altura = 18
+  const altura = 20
+  const padding = 2
 
   const valores = historico
     .map((item) => Number(item.valor))
@@ -22,15 +23,28 @@ function Sparkline({ historico, positivo }: SparklineProps) {
   const intervalo = maxValor - minValor
 
   const pontos = valores.map((valor, index) => {
-    const x = (index / (valores.length - 1)) * largura
+    const x = padding + (index / (valores.length - 1)) * (largura - padding * 2)
     const y =
       intervalo === 0
-        ? altura / 2
-        : altura - ((valor - minValor) / intervalo) * altura
-    return `${x},${y}`
+        ? padding + (altura - padding * 2) / 2
+        : padding + (altura - padding * 2) - ((valor - minValor) / intervalo) * (altura - padding * 2)
+    return { x, y }
   })
 
+  const linePath = pontos.reduce((acc, ponto, i) => {
+    if (i === 0) return `M ${ponto.x},${ponto.y}`
+    const prev = pontos[i - 1]
+    const cx = (prev.x + ponto.x) / 2
+    return `${acc} C ${cx},${prev.y} ${cx},${ponto.y} ${ponto.x},${ponto.y}`
+  }, '')
+
+  const ultimo = pontos[pontos.length - 1]
+  const primeiro = pontos[0]
+  const areaPath = `${linePath} L ${ultimo.x},${altura} L ${primeiro.x},${altura} Z`
+
   const cor = positivo ? '#2dd66f' : '#fb7185'
+  const corArea = positivo ? '#2dd66f' : '#fb7185'
+  const idGradiente = `grad-${positivo ? 'pos' : 'neg'}`
 
   return (
     <svg
@@ -40,8 +54,15 @@ function Sparkline({ historico, positivo }: SparklineProps) {
       className="shrink-0"
       aria-hidden="true"
     >
-      <polyline
-        points={pontos.join(' ')}
+      <defs>
+        <linearGradient id={idGradiente} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={corArea} stopOpacity={0.25} />
+          <stop offset="100%" stopColor={corArea} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill={`url(#${idGradiente})`} />
+      <path
+        d={linePath}
         fill="none"
         stroke={cor}
         strokeWidth={1.5}
@@ -129,7 +150,7 @@ export function IndicatorCard({ indicador, historico }: IndicatorCardProps) {
         {temSparkline ? (
           <Sparkline historico={historico} positivo={positivo} />
         ) : (
-          <div className="h-[18px] w-[46px]" aria-hidden="true" />
+          <div className="h-[20px] w-[46px]" aria-hidden="true" />
         )}
       </div>
     </article>

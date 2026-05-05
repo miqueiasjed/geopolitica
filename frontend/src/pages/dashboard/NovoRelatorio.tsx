@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
+import { useQueryClient } from '@tanstack/react-query'
 import { useGerarRelatorio } from '../../hooks/useGerarRelatorio'
 import { ExportPdfButton } from '../../components/ExportPdfButton'
 
@@ -15,6 +16,7 @@ const SUGESTOES_TEMA = [
 export function NovoRelatorio() {
   const prefersReduced = useReducedMotion()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const {
     topico,
@@ -176,7 +178,10 @@ export function NovoRelatorio() {
                 <ExportPdfButton tipo="report" id={relatorioId} label="Exportar PDF" />
                 <button
                   type="button"
-                  onClick={() => navigate('/dashboard/relatorios')}
+                  onClick={() => {
+                    void queryClient.invalidateQueries({ queryKey: ['relatorios'] })
+                    navigate('/dashboard/relatorios')
+                  }}
                   className="flex items-center gap-1.5 rounded-full border border-zinc-800 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-200"
                 >
                   Ver histórico

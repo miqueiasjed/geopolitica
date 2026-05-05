@@ -74,7 +74,7 @@ function RadarEleicoesConteudo() {
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="space-y-8 text-zinc-200"
     >
-      <div>
+      <div className="space-y-6">
         {/* Header */}
         <div className="space-y-1">
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/75">
@@ -87,13 +87,13 @@ function RadarEleicoesConteudo() {
         </div>
 
         {/* Filtros + contadores */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <EleicaoFilterBar filtros={filtros} onChange={setFiltros} />
           {!isLoading && <ContadoresRelevancia eleicoes={eleicoes} />}
         </div>
 
         {/* Grade de eleições */}
-        <div className="rounded-lg border border-zinc-800 bg-[#111318] p-4">
+        <div className="rounded-xl border border-zinc-800 bg-[#111318] p-3 sm:p-5">
           {isLoading ? (
             <SkeletonGrid />
           ) : (
