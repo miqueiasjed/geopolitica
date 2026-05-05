@@ -247,7 +247,15 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
       const extensao = file.name.split('.').pop()?.toLowerCase()
       const matriz = extensao === 'csv'
         ? parseCsv(await file.text())
-        : await import('read-excel-file/browser').then((modulo) => modulo.readSheet(file))
+        : await import('xlsx').then(async (XLSX) => {
+            const buf = await file.arrayBuffer()
+            const wb = XLSX.read(buf, { type: 'buffer', cellDates: true })
+            const ws = wb.Sheets[wb.SheetNames[0]]
+            const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: null })
+            return rows.map((row) =>
+              row.map((cell) => (cell instanceof Date ? cell.toISOString().slice(0, 10) : cell)),
+            )
+          })
       const linhasMapeadas = linhasDaMatriz(matriz, planoPadrao)
 
       if (linhasMapeadas.length === 0) {
