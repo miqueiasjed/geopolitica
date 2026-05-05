@@ -155,7 +155,7 @@ export function AdminFontes() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#C9B882]/60">Painel admin</p>
-            <h1 className="text-3xl font-semibold tracking-tight text-white">Fontes RSS</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">Fontes RSS</h1>
             <p className="text-sm text-zinc-400">
               Gerencie as fontes de notícias coletadas pelo pipeline de IA.
             </p>

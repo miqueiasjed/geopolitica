@@ -38,7 +38,7 @@ export function ChatBriefings() {
     <div className="flex flex-col gap-6">
       {/* Cabeçalho */}
       <div>
-        <h1 className="text-xl font-semibold text-zinc-100">Chat com os Briefings</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Chat com os Briefings</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Pergunte sobre qualquer evento, país ou crise geopolítica
         </p>

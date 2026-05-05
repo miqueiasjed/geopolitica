@@ -44,7 +44,7 @@ export function NovoRelatorio() {
         <p className="font-mono text-[10px] uppercase tracking-widest text-[#BFFF3C]/70">
           Geopolítica para Investidores
         </p>
-        <h1 className="font-serif text-xl font-semibold text-white">
+        <h1 className="font-serif text-3xl font-bold text-white sm:text-4xl">
           Relatório Personalizado por IA
         </h1>
       </div>

@@ -165,7 +165,7 @@ export function UsoPage() {
         <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
           admin · ia
         </p>
-        <h1 className="text-2xl font-semibold text-white">Painel de Uso da IA</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Painel de Uso da IA</h1>
         <p className="text-sm text-zinc-400">
           Monitoramento de chamadas, tokens e custo estimado por período.
         </p>

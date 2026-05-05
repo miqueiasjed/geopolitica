@@ -803,7 +803,7 @@ export function AdminPlanos() {
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
             admin
           </p>
-          <h1 className="text-2xl font-semibold text-white">Planos &amp; Recursos</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Planos &amp; Recursos</h1>
           <p className="text-sm text-zinc-400">
             Gerencie os planos disponíveis e configure os recursos e limites de cada um.
           </p>

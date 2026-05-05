@@ -180,7 +180,7 @@ export function MonitorEleitoral() {
     >
       <div className="space-y-1">
         <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">VERTICAIS</p>
-        <h1 className="font-serif text-3xl font-bold text-[#F7F7F2]">Monitor Eleitoral</h1>
+        <h1 className="font-serif text-3xl font-bold text-white sm:text-4xl">Monitor Eleitoral</h1>
         <p className="text-sm text-zinc-500">Eleições globais com impacto para investidores</p>
       </div>
 

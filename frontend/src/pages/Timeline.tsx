@@ -34,7 +34,7 @@ export function Timeline() {
       {/* Título */}
       <div>
         <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/70">linha do tempo</p>
-        <h1 className="text-2xl font-bold text-[#F7F7F2] sm:text-3xl">Linha do Tempo de Crises</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Linha do Tempo de Crises</h1>
         <p className="text-[#6B7280] text-sm mt-1">Crises geopolíticas históricas e eventos ativos</p>
       </div>
 

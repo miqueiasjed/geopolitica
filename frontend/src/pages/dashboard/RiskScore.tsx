@@ -206,7 +206,7 @@ function RiskScoreContent({ prefersReduced }: { prefersReduced: boolean }) {
         <p className="font-mono text-[10px] uppercase tracking-widest text-[#BFFF3C]/60">
           Geopolítica para Investidores
         </p>
-        <h1 className="mt-1 font-serif text-xl font-bold text-white">Risk Score de Portfólio</h1>
+        <h1 className="mt-1 font-serif text-3xl font-bold text-white sm:text-4xl">Risk Score de Portfólio</h1>
       </div>
 
       {/* ── Formulário de ativos ─────────────────────────────────────────── */}

@@ -521,7 +521,7 @@ export function AdminConfiguracoes() {
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
             admin
           </p>
-          <h1 className="text-2xl font-semibold text-white">Configurações da Plataforma</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Configurações da Plataforma</h1>
           <p className="text-sm text-zinc-400">
             Gerencie credenciais, provedores de IA e prompts sem editar o servidor.
           </p>

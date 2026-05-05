@@ -256,7 +256,7 @@ export function AdminSuporte() {
     <div className="space-y-6">
       <div>
         <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#C9B882]/60">Admin</p>
-        <h1 className="mt-0.5 text-xl font-semibold text-zinc-100">Suporte — Inbox</h1>
+        <h1 className="mt-0.5 text-2xl font-semibold tracking-tight text-white">Suporte — Inbox</h1>
       </div>
 
       <AnimatePresence mode="wait">

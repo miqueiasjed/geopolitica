@@ -98,7 +98,7 @@ export function RelatoriosIA() {
           <p className="font-mono text-[10px] uppercase tracking-widest text-[#BFFF3C]/70">
             Inteligência Artificial
           </p>
-          <h1 className="font-serif text-xl font-semibold text-white">Relatórios</h1>
+          <h1 className="font-serif text-3xl font-bold text-white sm:text-4xl">Relatórios</h1>
         </div>
         <button
           type="button"

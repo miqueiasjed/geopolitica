@@ -80,7 +80,7 @@ function RadarEleicoesConteudo() {
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/75">
             Módulo Geopolítico
           </p>
-          <h1 className="text-3xl font-bold text-[#F7F7F2]">Radar de Eleições</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Radar de Eleições</h1>
           <p className="text-sm text-zinc-500">
             Mapeamento de eleições globais e seu impacto nos investimentos
           </p>

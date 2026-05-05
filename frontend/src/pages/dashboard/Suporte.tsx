@@ -341,7 +341,7 @@ export function Suporte() {
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#BFFF3C]/60">
               Central
             </p>
-            <h1 className="mt-1 text-2xl font-black text-white">Suporte</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Suporte</h1>
             <p className="mt-1 text-sm text-zinc-500">
               Envie suas dúvidas ou problemas. Nossa equipe responderá em breve.
             </p>
