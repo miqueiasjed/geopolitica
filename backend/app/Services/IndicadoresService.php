@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class IndicadoresService
 {
     private const CHAVE_CACHE   = 'indicadores:lista:v2';
-    private const TTL_CACHE_MIN = 15;
+    private const TTL_CACHE_MIN = 5;
     private const DIAS_HISTORICO = 8;
 
     public function __construct(
@@ -25,12 +25,15 @@ class IndicadoresService
     {
         Log::info('IndicadoresService: iniciando atualização de todos os indicadores.');
 
-        $simbolosYahoo = ['BZ=F', 'NG=F', 'ZS=F', 'ZW=F', 'TIO=F'];
+        // Alpha Vantage: commodities com suporte nativo
+        $simbolosAlpha = ['BZ=F', 'NG=F', 'ZS=F', 'ZW=F'];
+        $cotacoesAlpha = $this->marketFetcher->buscarAlphaVantage($simbolosAlpha);
+        $cotacaoCambio = $this->marketFetcher->buscarCambioAlphaVantage();
 
-        $cotacoesYahoo = $this->marketFetcher->buscarYahooFinance($simbolosYahoo);
-        $cotacaoCambio = $this->marketFetcher->buscarCambioBCB();
+        // Yahoo Finance: fallback para Iron Ore (sem suporte no Alpha Vantage)
+        $cotacaoFerro = $this->marketFetcher->buscarYahooFinance(['TIO=F']);
 
-        $todasCotacoes = array_merge($cotacoesYahoo, $cotacaoCambio);
+        $todasCotacoes = array_merge($cotacoesAlpha, $cotacaoCambio, $cotacaoFerro);
 
         if (empty($todasCotacoes)) {
             Log::warning('IndicadoresService: nenhuma cotação retornada. Atualização abortada.');

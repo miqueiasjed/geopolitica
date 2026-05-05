@@ -10,8 +10,41 @@ class MarketFetcherService
     private const URL_YAHOO = 'https://query1.finance.yahoo.com/v8/finance/spark';
     private const URL_CAMBIO = 'https://economia.awesomeapi.com.br/json/last/USD-BRL';
 
+    public function __construct(
+        private readonly AlphaVantageService $alphaVantage
+    ) {}
+
+    /**
+     * Busca cotações via Alpha Vantage para os símbolos informados.
+     * Suporta: BZ=F (Brent), NG=F (Gás Natural), ZS=F (Soja), ZW=F (Trigo).
+     *
+     * @param  array<string>  $simbolos
+     * @return array<string, array{valor: float, variacao_pct: float, variacao_abs: float}>
+     */
+    public function buscarAlphaVantage(array $simbolos): array
+    {
+        return $this->alphaVantage->buscarCotacoes($simbolos);
+    }
+
+    /**
+     * Busca câmbio USD/BRL via Alpha Vantage.
+     *
+     * @return array<string, array{valor: float, variacao_pct: float, variacao_abs: float}>
+     */
+    public function buscarCambioAlphaVantage(): array
+    {
+        $cotacao = $this->alphaVantage->buscarCambio('USD', 'BRL');
+
+        if ($cotacao === null) {
+            return [];
+        }
+
+        return ['USDBRL=X' => $cotacao];
+    }
+
     /**
      * Busca cotações no Yahoo Finance para os símbolos informados.
+     * Usado como fallback para símbolos sem suporte no Alpha Vantage (ex: TIO=F).
      *
      * @param  array<string>  $simbolos
      * @return array<string, array{valor: float, variacao_pct: float, variacao_abs: float}>

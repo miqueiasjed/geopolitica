@@ -23,6 +23,7 @@ const PROMPTS_EXIGE_JSON = new Set([
 // ─── Labels dos grupos ────────────────────────────────────────────────────────
 
 const LABEL_GRUPO: Record<GrupoConfiguracao, string> = {
+  mercado:    '📈 Mercado & Cotações',
   ia:         '🤖 IA & Provedores',
   email:      '📧 E-mail',
   pagamentos: '💳 Pagamentos',
@@ -32,7 +33,7 @@ const LABEL_GRUPO: Record<GrupoConfiguracao, string> = {
   prompts:    '✍️ Prompts de IA',
 }
 
-const ORDEM_GRUPOS: GrupoConfiguracao[] = ['ia', 'prompts', 'alertas', 'email', 'pagamentos', 'seguranca', 'geral']
+const ORDEM_GRUPOS: GrupoConfiguracao[] = ['mercado', 'ia', 'prompts', 'alertas', 'email', 'pagamentos', 'seguranca', 'geral']
 
 const PROVIDER_LABELS: Record<string, string> = {
   claude: 'Claude (Anthropic)',

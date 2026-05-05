@@ -1,6 +1,6 @@
 export type TipoConfiguracao = 'texto' | 'senha' | 'numero' | 'select' | 'textarea'
 
-export type GrupoConfiguracao = 'ia' | 'email' | 'pagamentos' | 'seguranca' | 'alertas' | 'geral' | 'prompts'
+export type GrupoConfiguracao = 'mercado' | 'ia' | 'email' | 'pagamentos' | 'seguranca' | 'alertas' | 'geral' | 'prompts'
 
 export interface Configuracao {
   chave: string

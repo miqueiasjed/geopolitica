@@ -15,6 +15,8 @@ class ConfiguracaoService
      * Mapeamento chave_db → caminho Laravel config.
      */
     private const MAPA_CONFIG = [
+        // Mercado / Alpha Vantage
+        'alpha_vantage_api_key'       => 'services.alphavantage.api_key',
         // Claude
         'claude_api_key'              => 'claude.api_key',
         'claude_model'                => 'claude.model',
@@ -180,6 +182,15 @@ class ConfiguracaoService
     public function definicoes(): array
     {
         return [
+            // ── Mercado / Alpha Vantage ───────────────────────────────────
+            [
+                'chave'    => 'alpha_vantage_api_key',
+                'label'    => 'Alpha Vantage — API Key',
+                'descricao'=> 'Chave do plano premium Alpha Vantage para cotações de commodities e câmbio',
+                'grupo'    => 'mercado',
+                'tipo'     => 'senha',
+                'sensivel' => true,
+            ],
             // ── IA / Provedor ─────────────────────────────────────────────
             [
                 'chave'    => 'ia_provider',

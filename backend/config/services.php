@@ -22,6 +22,10 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'alphavantage' => [
+        'api_key' => env('ALPHA_VANTAGE_API_KEY', ''),
+    ],
+
     'hotmart' => [
         'webhook_token' => env('HOTMART_WEBHOOK_TOKEN'),
     ],
