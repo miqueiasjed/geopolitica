@@ -107,6 +107,8 @@ return [
         ),
     ],
 
+    'indicadores_ordem' => env('INDICADORES_ORDEM', 'CL=F, BZ=F, USDBRL=X, NG=F, HG=F, ZS=F, ZW=F, ZC=F, KC=F'),
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver

@@ -43,6 +43,7 @@ class AdminConfiguracaoController extends Controller
         $defaults['convergencia_janela_horas']  = (string) config('app.convergencia_janela_horas', 72);
         $defaults['limite_chat_essencial']      = (string) config('app.limite_chat_essencial', 5);
         $defaults['limite_chat_pro']            = (string) config('app.limite_chat_pro', 20);
+        $defaults['indicadores_ordem']          = (string) config('app.indicadores_ordem', 'CL=F, BZ=F, USDBRL=X, NG=F, HG=F, ZS=F, ZW=F, ZC=F, KC=F');
 
         return response()->json(['data' => $defaults]);
     }

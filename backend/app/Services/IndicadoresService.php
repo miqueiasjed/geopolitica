@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Indicador;
 use App\Models\IndicadorHistorico;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -12,6 +13,7 @@ class IndicadoresService
     private const CHAVE_CACHE   = 'indicadores:lista:v2';
     private const TTL_CACHE_MIN = 5;
     private const DIAS_HISTORICO = 8;
+    private const ORDEM_PADRAO = ['CL=F', 'BZ=F', 'USDBRL=X', 'NG=F', 'HG=F', 'ZS=F', 'ZW=F', 'ZC=F', 'KC=F'];
 
     public function __construct(
         private readonly MarketFetcherService $marketFetcher
@@ -89,8 +91,7 @@ class IndicadoresService
         return Cache::remember(
             self::CHAVE_CACHE,
             now()->addMinutes(self::TTL_CACHE_MIN),
-            fn () => Indicador::porOrdem()
-                ->get()
+            fn () => $this->ordenarIndicadores(Indicador::all())
                 ->map(fn (Indicador $indicador) => [
                     'id'             => $indicador->id,
                     'simbolo'        => $indicador->simbolo,
@@ -104,6 +105,45 @@ class IndicadoresService
                 ])
                 ->all()
         );
+    }
+
+    /**
+     * @param Collection<int, Indicador> $indicadores
+     * @return Collection<int, Indicador>
+     */
+    private function ordenarIndicadores(Collection $indicadores): Collection
+    {
+        $ordem = $this->ordemConfigurada();
+        $posicoes = array_flip($ordem);
+
+        return $indicadores
+            ->sortBy(fn (Indicador $indicador) => $posicoes[$indicador->simbolo] ?? PHP_INT_MAX)
+            ->values();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function ordemConfigurada(): array
+    {
+        $valor = (string) config('app.indicadores_ordem', implode(', ', self::ORDEM_PADRAO));
+
+        $ordem = collect(preg_split('/[\s,;]+/', $valor) ?: [])
+            ->map(fn (string $simbolo) => trim($simbolo))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($ordem)) {
+            return self::ORDEM_PADRAO;
+        }
+
+        return collect($ordem)
+            ->merge(self::ORDEM_PADRAO)
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**

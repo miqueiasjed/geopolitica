@@ -18,6 +18,7 @@ class ConfiguracaoService
     private const MAPA_CONFIG = [
         // Mercado / Alpha Vantage
         'alpha_vantage_api_key'       => 'services.alphavantage.api_key',
+        'indicadores_ordem'           => 'app.indicadores_ordem',
         // Claude
         'claude_api_key'              => 'claude.api_key',
         'claude_model'                => 'claude.model',
@@ -180,6 +181,7 @@ class ConfiguracaoService
         }
 
         Cache::forget(self::CACHE_KEY);
+        Cache::forget('indicadores:lista:v2');
         $this->carregarNoConfig();
     }
 
@@ -217,6 +219,14 @@ class ConfiguracaoService
                 'grupo'    => 'mercado',
                 'tipo'     => 'senha',
                 'sensivel' => true,
+            ],
+            [
+                'chave'    => 'indicadores_ordem',
+                'label'    => 'Ordem dos indicadores',
+                'descricao'=> 'Símbolos separados por vírgula. Ex: CL=F, BZ=F, USDBRL=X, NG=F, HG=F, ZS=F, ZW=F, ZC=F, KC=F',
+                'grupo'    => 'mercado',
+                'tipo'     => 'textarea',
+                'sensivel' => false,
             ],
             // ── IA / Provedor ─────────────────────────────────────────────
             [
