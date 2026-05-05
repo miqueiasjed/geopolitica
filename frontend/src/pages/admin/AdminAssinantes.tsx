@@ -702,9 +702,9 @@ export function AdminAssinantes() {
                   <Select.Trigger placeholder="Todos os planos" />
                   <Select.Content>
                     <Select.Item value={VALOR_TODOS}>Todos os planos</Select.Item>
-                    <Select.Item value="essencial">Essencial</Select.Item>
-                    <Select.Item value="pro">Pro</Select.Item>
-                    <Select.Item value="reservado">Reservado</Select.Item>
+                    {(planosQuery.data ?? []).map((p) => (
+                      <Select.Item key={p.slug} value={p.slug}>{p.nome}</Select.Item>
+                    ))}
                   </Select.Content>
                 </Select.Root>
               </label>
