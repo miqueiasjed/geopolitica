@@ -5,6 +5,100 @@ import api from '../../lib/axios'
 import type { Configuracao, GrupoConfiguracao, GruposConfiguracao } from '../../types/configuracao'
 import { PromptTestPanel } from '../../components/admin/PromptTestPanel'
 
+// ─── Tipos para teste de mercado ──────────────────────────────────────────────
+
+interface CotacaoTeste {
+  simbolo: string
+  nome: string
+  valor: number
+  variacao_pct: number
+}
+
+interface RespostaTesteMercado {
+  ok: boolean
+  cotacoes?: CotacaoTeste[]
+  mensagem?: string
+}
+
+async function testarConexaoMercado(): Promise<RespostaTesteMercado> {
+  const res = await api.post<RespostaTesteMercado>('/admin/configuracoes/testar-mercado')
+  return res.data
+}
+
+// ─── Painel de teste Alpha Vantage ────────────────────────────────────────────
+
+function TesteAlphaVantage() {
+  const [resultado, setResultado] = useState<RespostaTesteMercado | null>(null)
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: testarConexaoMercado,
+    onSuccess: (data) => setResultado(data),
+    onError: (err: any) => {
+      const msg = err?.response?.data?.mensagem ?? 'Erro inesperado ao testar a conexão.'
+      setResultado({ ok: false, mensagem: msg })
+    },
+  })
+
+  return (
+    <div className="mx-5 mb-5 space-y-3">
+      <div className="h-px bg-[#1e1e20]" />
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+          — Testar conexão
+        </p>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() => mutate()}
+          className="inline-flex items-center gap-2 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isPending ? (
+            <>
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              Testando...
+            </>
+          ) : (
+            'Testar API'
+          )}
+        </button>
+      </div>
+
+      {resultado && (
+        resultado.ok ? (
+          <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-4">
+            <p className="mb-3 flex items-center gap-2 text-xs font-medium text-green-400">
+              <CheckCircledIcon className="h-4 w-4" />
+              Conexão estabelecida com sucesso
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {resultado.cotacoes?.map((c) => (
+                <div key={c.simbolo} className="rounded-md border border-[#1e1e20] bg-[#0d0d0f] px-3 py-2">
+                  <p className="font-mono text-[10px] text-zinc-500">{c.nome}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-zinc-100">
+                    {c.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                  </p>
+                  <p className={`font-mono text-[10px] ${c.variacao_pct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {c.variacao_pct >= 0 ? '+' : ''}{c.variacao_pct.toFixed(2)}%
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3">
+            <p className="flex items-center gap-2 text-xs text-red-400">
+              <ExclamationTriangleIcon className="h-4 w-4 shrink-0" />
+              {resultado.mensagem}
+            </p>
+          </div>
+        )
+      )}
+    </div>
+  )
+}
+
 // ─── API: defaults ────────────────────────────────────────────────────────────
 
 async function buscarDefaults(): Promise<Record<string, string>> {
@@ -387,6 +481,8 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
           ))}
         </div>
       )}
+
+      {grupo === 'mercado' && <TesteAlphaVantage />}
     </div>
   )
 }

@@ -175,6 +175,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     // Configurações da plataforma
     Route::get('/configuracoes/defaults', [AdminConfiguracaoController::class, 'defaults']);
+    Route::post('/configuracoes/testar-mercado', [AdminConfiguracaoController::class, 'testarMercado']);
     Route::get('/configuracoes', [AdminConfiguracaoController::class, 'index']);
     Route::patch('/configuracoes', [AdminConfiguracaoController::class, 'update']);
 

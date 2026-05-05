@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AtualizarConfiguracoesRequest;
+use App\Services\AlphaVantageService;
 use App\Services\ConfiguracaoService;
 use Illuminate\Http\JsonResponse;
 
@@ -53,6 +54,52 @@ class AdminConfiguracaoController extends Controller
         return response()->json([
             'message' => 'Configurações salvas com sucesso.',
             'data'    => $this->service->todos(),
+        ]);
+    }
+
+    public function testarMercado(AlphaVantageService $alpha): JsonResponse
+    {
+        $apiKey = config('services.alphavantage.api_key', '');
+
+        if (empty($apiKey)) {
+            return response()->json([
+                'ok'       => false,
+                'mensagem' => 'API Key não configurada. Salve a chave antes de testar.',
+            ], 422);
+        }
+
+        $cotacoes = $alpha->buscarCotacoes(['BZ=F', 'NG=F', 'ZS=F', 'ZW=F']);
+        $cambio   = $alpha->buscarCambio('USD', 'BRL');
+
+        if (! empty($cambio)) {
+            $cotacoes['USDBRL=X'] = $cambio;
+        }
+
+        if (empty($cotacoes)) {
+            return response()->json([
+                'ok'       => false,
+                'mensagem' => 'A API retornou vazio. Verifique se a chave é válida e o plano está ativo.',
+            ], 422);
+        }
+
+        $nomes = [
+            'BZ=F'    => 'Brent',
+            'NG=F'    => 'Gás Natural',
+            'ZS=F'    => 'Soja',
+            'ZW=F'    => 'Trigo',
+            'USDBRL=X'=> 'USD/BRL',
+        ];
+
+        $resultado = collect($cotacoes)->map(fn ($c, $simbolo) => [
+            'simbolo'      => $simbolo,
+            'nome'         => $nomes[$simbolo] ?? $simbolo,
+            'valor'        => round($c['valor'], 4),
+            'variacao_pct' => round($c['variacao_pct'], 4),
+        ])->values()->all();
+
+        return response()->json([
+            'ok'       => true,
+            'cotacoes' => $resultado,
         ]);
     }
 }
