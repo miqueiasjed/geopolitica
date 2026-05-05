@@ -35,8 +35,8 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
               }
               className={`rounded-full px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
                 active
-                  ? 'border border-[#BFFF3C]/30 bg-[#BFFF3C]/10 text-[#BFFF3C]'
-                  : 'border border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                  ? 'border border-[#BFFF3C]/40 bg-[#BFFF3C]/15 text-[#BFFF3C] shadow-[0_0_12px_rgba(191,255,60,0.15)]'
+                  : 'border border-zinc-700 bg-zinc-800/60 text-zinc-400 hover:border-zinc-500 hover:bg-zinc-700/60 hover:text-zinc-200'
               }`}
             >
               {category.label}

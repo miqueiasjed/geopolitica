@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowLeftIcon, GlobeIcon } from '@radix-ui/react-icons'
+import { ArrowLeftIcon, ArrowRightIcon, GlobeIcon } from '@radix-ui/react-icons'
 import { usePerfilPais } from '../hooks/usePerfilPais'
 import { useEventosPais } from '../hooks/useEventosPais'
 import { useMeusPaises } from '../hooks/useMeusPaises'
@@ -291,21 +291,26 @@ export function PerfilPaisPage() {
               const nivelTensao = evento.impact_label ?? 'MONITORAR'
 
               return (
-                <li
-                  key={evento.id}
-                  className="flex flex-col gap-1.5 rounded-xl border border-[#1e1e20] bg-[#0a0a0b] p-4 sm:flex-row sm:items-start sm:justify-between"
-                >
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm text-zinc-200">{evento.titulo}</p>
-                    <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                      {formatDataRelativa(evento.created_at)}
-                    </p>
-                  </div>
-                  <span
-                    className={`inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${corNivelTensao(nivelTensao)}`}
+                <li key={evento.id}>
+                  <Link
+                    to={`/dashboard/feed/${evento.id}`}
+                    className="group flex flex-col gap-1.5 rounded-xl border border-[#1e1e20] bg-[#0a0a0b] p-4 transition-colors hover:border-[#BFFF3C]/30 sm:flex-row sm:items-start sm:justify-between"
                   >
-                    {nivelTensao}
-                  </span>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm text-zinc-200 group-hover:text-white">{evento.titulo}</p>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                        {formatDataRelativa(evento.created_at)}
+                      </p>
+                    </div>
+                    <div className="flex flex-shrink-0 items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${corNivelTensao(nivelTensao)}`}
+                      >
+                        {nivelTensao}
+                      </span>
+                      <ArrowRightIcon className="h-4 w-4 text-zinc-700 transition-colors group-hover:text-[#BFFF3C]" />
+                    </div>
+                  </Link>
                 </li>
               )
             })}
