@@ -18,6 +18,7 @@ class AtualizarPlanoRequest extends FormRequest
             'descricao'    => ['nullable', 'string', 'max:1000'],
             'preco'        => ['required', 'numeric', 'min:0'],
             'lastlink_url' => ['nullable', 'url', 'max:500'],
+            'role'         => ['nullable', 'string', 'max:100'],
         ];
     }
 }

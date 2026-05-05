@@ -40,6 +40,7 @@ class AdminPlanoController extends Controller
                 'ordem'        => $plano->ordem,
                 'ativo'        => $plano->ativo,
                 'lastlink_url' => $plano->lastlink_url,
+                'role'         => $plano->role,
                 'recursos'     => $recursos,
             ];
         });
@@ -52,10 +53,16 @@ class AdminPlanoController extends Controller
      */
     public function store(CriarPlanoRequest $request): JsonResponse
     {
-        $plano = $this->planoService->criarPlano($request->validated());
+        $dados = $request->validated();
+
+        if (empty($dados['role'])) {
+            $dados['role'] = 'assinante_' . $dados['slug'];
+        }
+
+        $plano = $this->planoService->criarPlano($dados);
 
         Role::firstOrCreate([
-            'name'       => 'assinante_' . $plano->slug,
+            'name'       => $plano->role ?? ('assinante_' . $plano->slug),
             'guard_name' => 'sanctum',
         ]);
 

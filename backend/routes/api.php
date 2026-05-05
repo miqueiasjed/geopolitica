@@ -145,6 +145,8 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('suporte')->group
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
+    Route::patch('/assinantes/plano-em-massa', [AdminAssinanteController::class, 'trocarPlanoBulk']);
+    Route::get('/assinantes/plano-em-massa/{operacaoId}/status', [AdminAssinanteController::class, 'statusTrocaPlano']);
     Route::post('/assinantes/{id}/reenviar-boas-vindas', [AdminAssinanteController::class, 'reenviarBoasVindas']);
     Route::post('/assinantes/importar', [ImportarAssinantesController::class, 'store']);
     Route::get('/assinantes/importar/{id}/status', [ImportarAssinantesController::class, 'status']);
@@ -159,6 +161,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     Route::get('/webhook-offer-planos', [AdminWebhookOfferPlanoController::class, 'index']);
     Route::post('/webhook-offer-planos', [AdminWebhookOfferPlanoController::class, 'store']);
+    Route::patch('/webhook-offer-planos/{webhookOfferPlano}', [AdminWebhookOfferPlanoController::class, 'update']);
     Route::delete('/webhook-offer-planos/{webhookOfferPlano}', [AdminWebhookOfferPlanoController::class, 'destroy']);
 
     Route::get('/conteudos', [AdminConteudoController::class, 'index']);

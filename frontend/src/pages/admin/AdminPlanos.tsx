@@ -4,6 +4,7 @@ import { CheckCircledIcon, Cross2Icon, Pencil1Icon, PlusIcon, Link2Icon } from '
 import {
   fetchPlanos,
   atualizarRecurso,
+  atualizarPlano,
   criarPlano,
   adminPlanosKeys,
 } from '../../services/adminPlanos'
@@ -495,11 +496,33 @@ const HEADER_SLUG: Record<string, string> = {
 }
 
 function CardPlano({ plano }: { plano: Plano }) {
+  const queryClient = useQueryClient()
   const corSlug = COR_SLUG[plano.slug] ?? 'text-zinc-300'
   const bordaSlug = BORDA_SLUG[plano.slug] ?? 'border-[#1e1e20]'
   const headerSlug = HEADER_SLUG[plano.slug] ?? ''
 
   const totalRecursos = Object.keys(plano.recursos).length
+
+  const [editandoRole, setEditandoRole] = useState(false)
+  const [roleLocal, setRoleLocal] = useState(plano.role ?? '')
+
+  const salvarRole = useMutation({
+    mutationFn: () =>
+      atualizarPlano(plano.id, {
+        nome: plano.nome,
+        descricao: plano.descricao,
+        preco: Number(plano.preco),
+        lastlink_url: plano.lastlink_url,
+        role: roleLocal.trim() || null,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
+      setEditandoRole(false)
+    },
+  })
+
+  const baseInput =
+    'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-1.5 font-mono text-sm text-zinc-200 outline-none transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20'
 
   return (
     <div className={`flex flex-col rounded-xl border ${bordaSlug} overflow-hidden`}>
@@ -538,6 +561,54 @@ function CardPlano({ plano }: { plano: Plano }) {
               <Link2Icon className="h-3 w-3" />
               Sem link Lastlink
             </span>
+          )}
+        </div>
+
+        {/* Perfil (role) */}
+        <div className="mt-3 rounded-lg border border-[#1e1e20] bg-[#0d0d0f] px-3 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">Perfil liberado</p>
+            {!editandoRole && (
+              <button
+                type="button"
+                onClick={() => { setRoleLocal(plano.role ?? ''); setEditandoRole(true) }}
+                className="rounded p-0.5 text-zinc-600 transition-colors hover:text-zinc-300"
+              >
+                <Pencil1Icon className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+          {editandoRole ? (
+            <div className="mt-2 space-y-2">
+              <input
+                type="text"
+                value={roleLocal}
+                onChange={(e) => setRoleLocal(e.target.value)}
+                placeholder={`assinante_${plano.slug}`}
+                className={`${baseInput} w-full`}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={salvarRole.isPending}
+                  onClick={() => salvarRole.mutate()}
+                  className="inline-flex items-center gap-1 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#C9B882] disabled:opacity-50"
+                >
+                  {salvarRole.isPending ? 'Salvando…' : 'Salvar'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditandoRole(false)}
+                  className="inline-flex items-center gap-1 rounded-full border border-zinc-700/50 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-zinc-500"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-1 font-mono text-[11px] text-zinc-300">
+              {plano.role ?? <span className="text-zinc-600">não configurado</span>}
+            </p>
           )}
         </div>
 

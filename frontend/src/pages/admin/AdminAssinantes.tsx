@@ -28,6 +28,7 @@ import {
   ExclamationTriangleIcon,
   MagnifyingGlassIcon,
   ResetIcon,
+  UpdateIcon,
   UploadIcon,
 } from '@radix-ui/react-icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -38,7 +39,10 @@ import {
   buscarStatusImportacao,
   importarAssinantesLastlink,
   reenviarBoasVindasAssinante,
+  trocarPlanoEmMassa,
+  buscarStatusTrocaPlano,
 } from '../../services/admin'
+import type { TrocaPlanoStatus } from '../../services/admin'
 import type { ImportacaoAssinantesPayload, ImportacaoAssinantesStatus, LinhaImportacaoAssinante } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
@@ -529,6 +533,7 @@ function badgeColorDoPlano(plano: string) {
 }
 
 export function AdminAssinantes() {
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [plano, setPlano] = useState(VALOR_TODOS)
   const [status, setStatus] = useState(VALOR_TODOS)
@@ -537,6 +542,44 @@ export function AdminAssinantes() {
   const [reenvioFeedback, setReenvioFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
   const [reenvioEmAndamento, setReenvioEmAndamento] = useState<number | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
+
+  const [selecionados, setSelecionados] = useState<Set<number>>(new Set())
+  const [planoMassa, setPlanoMassa] = useState('')
+  const [operacaoAtiva, setOperacaoAtiva] = useState<string | null>(null)
+  const [statusTroca, setStatusTroca] = useState<TrocaPlanoStatus | null>(null)
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const planosQuery = useQuery({ queryKey: adminKeys.planosAtivos(), queryFn: buscarPlanosAtivos })
+
+  useEffect(() => {
+    if (!operacaoAtiva) return
+
+    pollingRef.current = setInterval(async () => {
+      try {
+        const s = await buscarStatusTrocaPlano(operacaoAtiva)
+        setStatusTroca(s)
+
+        if (s.concluido) {
+          clearInterval(pollingRef.current!)
+          queryClient.invalidateQueries({ queryKey: adminKeys.assinantes({}) })
+        }
+      } catch {
+        clearInterval(pollingRef.current!)
+      }
+    }, 1500)
+
+    return () => { if (pollingRef.current) clearInterval(pollingRef.current) }
+  }, [operacaoAtiva, queryClient])
+
+  const mutacaoTrocarPlano = useMutation({
+    mutationFn: () => trocarPlanoEmMassa(Array.from(selecionados), planoMassa),
+    onSuccess: (data) => {
+      setSelecionados(new Set())
+      setPlanoMassa('')
+      setOperacaoAtiva(data.operacao_id)
+      setStatusTroca(null)
+    },
+  })
 
   const mutacaoReenvio = useMutation({
     mutationFn: (id: number) => reenviarBoasVindasAssinante(id),
@@ -572,6 +615,31 @@ export function AdminAssinantes() {
   const total = query.data?.total ?? 0
   const paginaAtual = query.data?.current_page ?? 1
   const ultimaPagina = query.data?.last_page ?? 1
+
+  const idsPagina = assinantes.map((a) => a.id)
+  const todosNaPaginaSelecionados = idsPagina.length > 0 && idsPagina.every((id) => selecionados.has(id))
+  const algunsNaPaginaSelecionados = idsPagina.some((id) => selecionados.has(id))
+
+  function toggleTodosPagina() {
+    setSelecionados((prev) => {
+      const novo = new Set(prev)
+      if (todosNaPaginaSelecionados) {
+        idsPagina.forEach((id) => novo.delete(id))
+      } else {
+        idsPagina.forEach((id) => novo.add(id))
+      }
+      return novo
+    })
+  }
+
+  function toggleAssinante(id: number) {
+    setSelecionados((prev) => {
+      const novo = new Set(prev)
+      if (novo.has(id)) novo.delete(id)
+      else novo.add(id)
+      return novo
+    })
+  }
 
   return (
     <main className="min-h-screen bg-[#0a0a0b] px-6 py-10 text-cyan-50">
@@ -681,6 +749,30 @@ export function AdminAssinantes() {
 
             <Separator size="4" />
 
+            {operacaoAtiva && statusTroca && (
+              <Callout.Root color={statusTroca.concluido ? 'green' : 'cyan'} size="1">
+                <Callout.Icon>
+                  {statusTroca.concluido ? <CheckCircledIcon /> : <Spinner size="1" />}
+                </Callout.Icon>
+                <Flex direction="column" gap="1" className="flex-1">
+                  <Callout.Text>
+                    {statusTroca.concluido
+                      ? `Troca concluída — ${statusTroca.sucesso} atualizado(s)${statusTroca.erros_count > 0 ? `, ${statusTroca.erros_count} com erro` : ''}.`
+                      : `Processando… ${statusTroca.processados} de ${statusTroca.total}`}
+                  </Callout.Text>
+                  {!statusTroca.concluido && (
+                    <Progress value={statusTroca.percentual} className="mt-1" />
+                  )}
+                </Flex>
+                {statusTroca.concluido && (
+                  <Button variant="ghost" size="1" color="green" ml="auto"
+                    onClick={() => { setOperacaoAtiva(null); setStatusTroca(null) }}>
+                    Fechar
+                  </Button>
+                )}
+              </Callout.Root>
+            )}
+
             {reenvioFeedback && (
               <Callout.Root color={reenvioFeedback.tipo === 'sucesso' ? 'green' : 'ruby'} size="1">
                 <Callout.Icon>
@@ -712,6 +804,12 @@ export function AdminAssinantes() {
                 <Table.Root className="min-w-[980px]">
                   <Table.Header>
                     <Table.Row className="border-b border-cyan-400/10">
+                      <Table.ColumnHeaderCell width="40px">
+                        <Checkbox
+                          checked={todosNaPaginaSelecionados ? true : algunsNaPaginaSelecionados ? 'indeterminate' : false}
+                          onCheckedChange={toggleTodosPagina}
+                        />
+                      </Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>E-mail</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Nome</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Plano</Table.ColumnHeaderCell>
@@ -724,7 +822,16 @@ export function AdminAssinantes() {
                   <Table.Body>
                     {assinantes.length > 0 ? (
                       assinantes.map((assinante) => (
-                        <Table.Row key={assinante.id} className="transition-colors hover:bg-cyan-400/5">
+                        <Table.Row
+                          key={assinante.id}
+                          className={`transition-colors hover:bg-cyan-400/5 ${selecionados.has(assinante.id) ? 'bg-cyan-400/8' : ''}`}
+                        >
+                          <Table.Cell>
+                            <Checkbox
+                              checked={selecionados.has(assinante.id)}
+                              onCheckedChange={() => toggleAssinante(assinante.id)}
+                            />
+                          </Table.Cell>
                           <Table.Cell className="text-cyan-50">{assinante.email}</Table.Cell>
                           <Table.Cell>{assinante.name}</Table.Cell>
                           <Table.Cell>
@@ -767,7 +874,7 @@ export function AdminAssinantes() {
                       ))
                     ) : (
                       <Table.Row>
-                        <Table.Cell colSpan={7}>
+                        <Table.Cell colSpan={8}>
                           <Box className="py-10 text-center">
                             <Text size="3" className="text-cyan-100/65">
                               Nenhum assinante encontrado com os filtros atuais.
@@ -814,6 +921,73 @@ export function AdminAssinantes() {
       </div>
 
       <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
+
+      {/* Barra de ação em massa */}
+      {selecionados.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+          <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/20 bg-slate-900/95 px-5 py-3 shadow-2xl shadow-black/50 backdrop-blur">
+            <Text size="2" className="text-cyan-100/80 whitespace-nowrap">
+              <strong className="text-cyan-300">{selecionados.size}</strong> selecionado(s)
+            </Text>
+
+            <Separator orientation="vertical" size="2" />
+
+            <Flex align="center" gap="2">
+              <Text size="2" className="text-cyan-100/60 whitespace-nowrap">Trocar para:</Text>
+              <Select.Root value={planoMassa} onValueChange={setPlanoMassa}>
+                <Select.Trigger placeholder="Selecionar plano" />
+                <Select.Content>
+                  {(planosQuery.data ?? []).map((p) => (
+                    <Select.Item key={p.slug} value={p.slug}>{p.nome}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </Flex>
+
+            <Dialog.Root>
+              <Dialog.Trigger>
+                <Button
+                  size="2"
+                  disabled={!planoMassa || mutacaoTrocarPlano.isPending}
+                >
+                  <UpdateIcon />
+                  Aplicar
+                </Button>
+              </Dialog.Trigger>
+              <Dialog.Content maxWidth="420px">
+                <Dialog.Title>Confirmar troca de plano</Dialog.Title>
+                <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
+                  O plano de <strong>{selecionados.size}</strong> assinante(s) será trocado para{' '}
+                  <strong>{planosQuery.data?.find((p) => p.slug === planoMassa)?.nome ?? planoMassa}</strong>.
+                  As datas de assinatura e término <strong>não serão alteradas</strong>.
+                </Dialog.Description>
+                <Flex gap="3" justify="end">
+                  <Dialog.Close>
+                    <Button variant="soft" color="gray">Cancelar</Button>
+                  </Dialog.Close>
+                  <Dialog.Close>
+                    <Button
+                      loading={mutacaoTrocarPlano.isPending}
+                      onClick={() => mutacaoTrocarPlano.mutate()}
+                    >
+                      Confirmar troca
+                    </Button>
+                  </Dialog.Close>
+                </Flex>
+              </Dialog.Content>
+            </Dialog.Root>
+
+            <Button
+              size="2"
+              variant="ghost"
+              color="gray"
+              onClick={() => { setSelecionados(new Set()); setPlanoMassa('') }}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

@@ -7,6 +7,7 @@ import type {
   AdminWebhookEventosFiltros,
   AdminWebhookOfferPlano,
   CriarWebhookOfferPlanoPayload,
+  AtualizarWebhookOfferPlanoPayload,
   AdminWebhookToken,
   CriarWebhookTokenPayload,
   AdminUsuario,
@@ -87,6 +88,34 @@ export async function buscarAdminAssinantes(
   return resposta.data
 }
 
+export interface TrocaPlanoStatus {
+  total: number
+  processados: number
+  sucesso: number
+  erros_count: number
+  erros: string[]
+  concluido: boolean
+  percentual: number
+}
+
+export async function trocarPlanoEmMassa(
+  ids: number[],
+  plano: string,
+): Promise<{ operacao_id: string; total: number }> {
+  const resposta = await api.patch<{ operacao_id: string; total: number }>(
+    '/admin/assinantes/plano-em-massa',
+    { ids, plano },
+  )
+  return resposta.data
+}
+
+export async function buscarStatusTrocaPlano(operacaoId: string): Promise<TrocaPlanoStatus> {
+  const resposta = await api.get<TrocaPlanoStatus>(
+    `/admin/assinantes/plano-em-massa/${operacaoId}/status`,
+  )
+  return resposta.data
+}
+
 export async function buscarAdminWebhookEventos(
   filtros: AdminWebhookEventosFiltros,
 ): Promise<PaginacaoLaravel<AdminWebhookEvento>> {
@@ -156,6 +185,14 @@ export async function criarWebhookOfferPlano(
   payload: CriarWebhookOfferPlanoPayload,
 ): Promise<AdminWebhookOfferPlano> {
   const resposta = await api.post<{ data: AdminWebhookOfferPlano }>('/admin/webhook-offer-planos', payload)
+  return resposta.data.data
+}
+
+export async function atualizarWebhookOfferPlano(
+  id: number,
+  payload: AtualizarWebhookOfferPlanoPayload,
+): Promise<AdminWebhookOfferPlano> {
+  const resposta = await api.patch<{ data: AdminWebhookOfferPlano }>(`/admin/webhook-offer-planos/${id}`, payload)
   return resposta.data.data
 }
 

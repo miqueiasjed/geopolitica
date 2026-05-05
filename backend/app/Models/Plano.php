@@ -18,6 +18,7 @@ class Plano extends Model
         'ordem',
         'ativo',
         'lastlink_url',
+        'role',
     ];
 
     protected function casts(): array

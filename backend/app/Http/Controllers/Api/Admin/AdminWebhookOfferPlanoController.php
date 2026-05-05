@@ -52,6 +52,27 @@ class AdminWebhookOfferPlanoController extends Controller
         ]], 201);
     }
 
+    public function update(Request $request, WebhookOfferPlano $webhookOfferPlano): JsonResponse
+    {
+        $slugsValidos = Plano::where('ativo', true)->pluck('slug')->toArray();
+
+        $dados = $request->validate([
+            'descricao' => ['required', 'string', 'max:150'],
+            'plano'     => ['required', 'string', Rule::in($slugsValidos)],
+        ]);
+
+        $webhookOfferPlano->update($dados);
+
+        return response()->json(['data' => [
+            'id'         => $webhookOfferPlano->id,
+            'fonte'      => $webhookOfferPlano->fonte,
+            'offer_id'   => $webhookOfferPlano->offer_id,
+            'descricao'  => $webhookOfferPlano->descricao,
+            'plano'      => $webhookOfferPlano->plano,
+            'created_at' => $webhookOfferPlano->created_at?->toIso8601String(),
+        ]]);
+    }
+
     public function destroy(WebhookOfferPlano $webhookOfferPlano): JsonResponse
     {
         $webhookOfferPlano->delete();

@@ -22,6 +22,7 @@ class CriarPlanoRequest extends FormRequest
             'ordem'        => ['required', 'integer', 'min:0'],
             'ativo'        => ['boolean'],
             'lastlink_url' => ['nullable', 'url', 'max:500'],
+            'role'         => ['nullable', 'string', 'max:100'],
         ];
     }
 }

@@ -233,6 +233,11 @@ export interface CriarWebhookOfferPlanoPayload {
   plano: PlanoWebhook
 }
 
+export interface AtualizarWebhookOfferPlanoPayload {
+  descricao: string
+  plano: PlanoWebhook
+}
+
 // --- Webhook Tokens ---
 
 export type FonteWebhook = 'hotmart' | 'lastlink'

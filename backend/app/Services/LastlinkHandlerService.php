@@ -8,6 +8,7 @@ use App\Mail\BoasVindasMail;
 use App\Mail\CancelamentoMail;
 use App\Mail\ReembolsoMail;
 use App\Models\Assinante;
+use App\Models\Plano;
 use App\Models\User;
 use App\Models\WebhookEvento;
 use Illuminate\Support\Facades\Mail;
@@ -387,14 +388,16 @@ class LastlinkHandlerService
 
     private function sincronizarRolePlano(User $usuario, string $plano): void
     {
-        $novaRole = match (true) {
-            str_starts_with($plano, 'essencial') => 'assinante_essencial',
-            str_starts_with($plano, 'pro')       => 'assinante_pro',
-            str_starts_with($plano, 'reservado') => 'assinante_reservado',
-            default                              => throw new RuntimeException("Plano Lastlink não suportado: {$plano}"),
-        };
+        $registro = Plano::where('slug', $plano)->first();
+        $novaRole = $registro?->role ?? ('assinante_' . $plano);
 
-        foreach (self::ROLES_ASSINANTE as $role) {
+        $todasRoles = Plano::pluck('role')
+            ->filter()
+            ->merge(self::ROLES_ASSINANTE)
+            ->unique()
+            ->values();
+
+        foreach ($todasRoles as $role) {
             if ($role !== $novaRole && $usuario->hasRole($role)) {
                 $usuario->removeRole($role);
             }

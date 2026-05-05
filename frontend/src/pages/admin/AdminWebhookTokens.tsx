@@ -16,7 +16,7 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes'
-import { EyeNoneIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
+import { EyeNoneIcon, Pencil1Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
 import { useState } from 'react'
 import {
   adminKeys,
@@ -26,13 +26,16 @@ import {
   toggleWebhookToken,
   buscarWebhookOfferPlanos,
   criarWebhookOfferPlano,
+  atualizarWebhookOfferPlano,
   excluirWebhookOfferPlano,
   buscarPlanosAtivos,
 } from '../../services/admin'
 import { formatarDataCurta } from '../../utils/formatters'
 import type {
+  AdminWebhookOfferPlano,
   CriarWebhookTokenPayload,
   CriarWebhookOfferPlanoPayload,
+  AtualizarWebhookOfferPlanoPayload,
   FonteWebhook,
 } from '../../types/admin'
 
@@ -61,6 +64,9 @@ export function AdminWebhookTokens() {
 
   const [offerDialog, setOfferDialog] = useState(false)
   const [offerForm, setOfferForm] = useState<CriarWebhookOfferPlanoPayload>(OFFER_INICIAL)
+
+  const [editOffer, setEditOffer] = useState<AdminWebhookOfferPlano | null>(null)
+  const [editForm, setEditForm] = useState<AtualizarWebhookOfferPlanoPayload>({ descricao: '', plano: '' })
 
   const tokensQuery = useQuery({ queryKey: adminKeys.webhookTokens(), queryFn: buscarWebhookTokens })
   const offersQuery = useQuery({
@@ -97,15 +103,76 @@ export function AdminWebhookTokens() {
     },
   })
 
+  const editarOffer = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: AtualizarWebhookOfferPlanoPayload }) =>
+      atualizarWebhookOfferPlano(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.webhookOfferPlanos() })
+      setEditOffer(null)
+    },
+  })
+
   const excluirOffer = useMutation({
     mutationFn: excluirWebhookOfferPlano,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.webhookOfferPlanos() }),
   })
 
+  function abrirEdicao(o: AdminWebhookOfferPlano) {
+    setEditOffer(o)
+    setEditForm({ descricao: o.descricao, plano: o.plano })
+  }
+
   const tokens = tokensQuery.data ?? []
   const offers = offersQuery.data ?? []
 
   return (
+    <>
+    {/* Dialog de edição de mapeamento */}
+    <Dialog.Root open={!!editOffer} onOpenChange={(open) => { if (!open) setEditOffer(null) }}>
+      <Dialog.Content maxWidth="480px">
+        <Dialog.Title>Editar mapeamento</Dialog.Title>
+        <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
+          Offer ID <code className="font-mono">{editOffer?.offer_id}</code> — {editOffer?.fonte}
+        </Dialog.Description>
+        <Flex direction="column" gap="4">
+          <label className="space-y-2">
+            <Text size="2" weight="medium">Descrição do produto</Text>
+            <TextField.Root
+              placeholder="ex: Geopolítica para investidores"
+              value={editForm.descricao}
+              onChange={(e) => setEditForm((f) => ({ ...f, descricao: e.target.value }))}
+            />
+          </label>
+          <label className="space-y-2">
+            <Text size="2" weight="medium">Plano</Text>
+            <Select.Root
+              value={editForm.plano}
+              onValueChange={(v) => setEditForm((f) => ({ ...f, plano: v }))}
+            >
+              <Select.Trigger className="w-full" />
+              <Select.Content>
+                {(planosQuery.data ?? []).map((p) => (
+                  <Select.Item key={p.slug} value={p.slug}>{p.nome}</Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </label>
+        </Flex>
+        <Flex gap="3" mt="5" justify="end">
+          <Dialog.Close>
+            <Button variant="soft" color="gray">Cancelar</Button>
+          </Dialog.Close>
+          <Button
+            loading={editarOffer.isPending}
+            disabled={!editForm.descricao.trim() || !editForm.plano}
+            onClick={() => editOffer && editarOffer.mutate({ id: editOffer.id, payload: editForm })}
+          >
+            Salvar alterações
+          </Button>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
+
     <main className="min-h-screen bg-[#0a0a0b] px-6 py-10 text-cyan-50">
       <div className="mx-auto max-w-5xl space-y-10">
 
@@ -356,7 +423,7 @@ export function AdminWebhookTokens() {
                     <Table.ColumnHeaderCell>Produto</Table.ColumnHeaderCell>
                     <Table.ColumnHeaderCell>Plano</Table.ColumnHeaderCell>
                     <Table.ColumnHeaderCell>Criado em</Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell width="48px" />
+                    <Table.ColumnHeaderCell width="80px" />
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -374,23 +441,28 @@ export function AdminWebhookTokens() {
                       </Table.Cell>
                       <Table.Cell><Text size="2">{formatarDataCurta(o.created_at)}</Text></Table.Cell>
                       <Table.Cell>
-                        <AlertDialog.Root>
-                          <AlertDialog.Trigger>
-                            <Button size="1" variant="ghost" color="red"><TrashIcon /></Button>
-                          </AlertDialog.Trigger>
-                          <AlertDialog.Content maxWidth="400px">
-                            <AlertDialog.Title>Remover mapeamento</AlertDialog.Title>
-                            <AlertDialog.Description size="2">
-                              Webhooks com offer <strong>{o.offer_id}</strong> não terão plano identificado.
-                            </AlertDialog.Description>
-                            <Flex gap="3" mt="4" justify="end">
-                              <AlertDialog.Cancel><Button variant="soft" color="gray">Cancelar</Button></AlertDialog.Cancel>
-                              <AlertDialog.Action>
-                                <Button color="red" loading={excluirOffer.isPending} onClick={() => excluirOffer.mutate(o.id)}>Remover</Button>
-                              </AlertDialog.Action>
-                            </Flex>
-                          </AlertDialog.Content>
-                        </AlertDialog.Root>
+                        <Flex gap="1">
+                          <Button size="1" variant="ghost" color="gray" onClick={() => abrirEdicao(o)}>
+                            <Pencil1Icon />
+                          </Button>
+                          <AlertDialog.Root>
+                            <AlertDialog.Trigger>
+                              <Button size="1" variant="ghost" color="red"><TrashIcon /></Button>
+                            </AlertDialog.Trigger>
+                            <AlertDialog.Content maxWidth="400px">
+                              <AlertDialog.Title>Remover mapeamento</AlertDialog.Title>
+                              <AlertDialog.Description size="2">
+                                Webhooks com offer <strong>{o.offer_id}</strong> não terão plano identificado.
+                              </AlertDialog.Description>
+                              <Flex gap="3" mt="4" justify="end">
+                                <AlertDialog.Cancel><Button variant="soft" color="gray">Cancelar</Button></AlertDialog.Cancel>
+                                <AlertDialog.Action>
+                                  <Button color="red" loading={excluirOffer.isPending} onClick={() => excluirOffer.mutate(o.id)}>Remover</Button>
+                                </AlertDialog.Action>
+                              </Flex>
+                            </AlertDialog.Content>
+                          </AlertDialog.Root>
+                        </Flex>
                       </Table.Cell>
                     </Table.Row>
                   ))}
@@ -402,5 +474,6 @@ export function AdminWebhookTokens() {
 
       </div>
     </main>
+    </>
   )
 }
