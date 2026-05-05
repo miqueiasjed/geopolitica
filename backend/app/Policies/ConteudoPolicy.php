@@ -4,38 +4,32 @@ namespace App\Policies;
 
 use App\Models\Conteudo;
 use App\Models\User;
+use App\Services\PlanoService;
 
 class ConteudoPolicy
 {
-    private const HIERARQUIA = [
-        'essencial'  => 1,
-        'pro'        => 2,
-        'reservado'  => 3,
-    ];
+    private const HIERARQUIA_NIVEL  = ['essencial' => 1, 'pro' => 2, 'todos' => 3];
+    private const HIERARQUIA_MINIMO = ['essencial' => 1, 'pro' => 2, 'reservado' => 3];
 
-    private function nivelRole(User $usuario): int
+    public function __construct(private readonly PlanoService $planoService) {}
+
+    private function nivelUsuario(User $usuario): int
     {
-        if ($usuario->hasRole('admin') || $usuario->hasRole('assinante_reservado')) {
-            return 3;
+        if ($usuario->hasRole('admin')) {
+            return 99;
         }
 
-        if ($usuario->hasRole('assinante_pro')) {
-            return 2;
-        }
+        $slugPlano   = $usuario->assinante?->plano ?? 'essencial';
+        $nivelMaximo = $this->planoService->valorRecurso($slugPlano, 'conteudo_nivel_maximo') ?? 'essencial';
 
-        if ($usuario->hasRole('assinante_essencial')) {
-            return 1;
-        }
-
-        return 0;
+        return self::HIERARQUIA_NIVEL[$nivelMaximo] ?? 1;
     }
 
     public function verPublico(User $usuario, Conteudo $conteudo): bool
     {
-        $nivelUsuario = $this->nivelRole($usuario);
-        $nivelExigido = self::HIERARQUIA[$conteudo->plano_minimo] ?? 99;
+        $nivelExigido = self::HIERARQUIA_MINIMO[$conteudo->plano_minimo] ?? 99;
 
-        return $nivelUsuario >= $nivelExigido;
+        return $this->nivelUsuario($usuario) >= $nivelExigido;
     }
 
     public function gerenciarAdmin(User $usuario): bool

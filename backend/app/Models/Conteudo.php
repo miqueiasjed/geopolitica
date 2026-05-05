@@ -38,13 +38,13 @@ class Conteudo extends Model
         return $query->where('publicado', true)->whereNotNull('publicado_em');
     }
 
-    public function scopeAcessivelPor(Builder $query, string $role, ?int $diasHistorico = null): Builder
+    public function scopeAcessivelPor(Builder $query, string $nivelMaximo, ?int $diasHistorico = null): Builder
     {
-        $query = match ($role) {
-            'assinante_essencial'              => $query->where('plano_minimo', 'essencial'),
-            'assinante_pro'                    => $query->whereIn('plano_minimo', ['essencial', 'pro']),
-            'assinante_reservado', 'admin'     => $query,
-            default                            => $query->whereRaw('1 = 0'),
+        $query = match ($nivelMaximo) {
+            'essencial' => $query->where('plano_minimo', 'essencial'),
+            'pro'       => $query->whereIn('plano_minimo', ['essencial', 'pro']),
+            'todos'     => $query,
+            default     => $query->whereRaw('1 = 0'),
         };
 
         if ($diasHistorico !== null) {

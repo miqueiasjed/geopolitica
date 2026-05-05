@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'identificar.tenant'   => \App\Http\Middleware\IdentificarTenantMiddleware::class,
             'forcar.alterar.senha'    => \App\Http\Middleware\ForcarAlteracaoSenha::class,
             'risk_score.acesso'       => \App\Http\Middleware\VerificarAcessoRiskScore::class,
+            'recurso.plano'           => \App\Http\Middleware\VerificarRecursoBooleanoPlano::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

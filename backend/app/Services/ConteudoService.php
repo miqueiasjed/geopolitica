@@ -14,17 +14,20 @@ class ConteudoService
 
     public function listar(array $filtros, User $usuario): array
     {
-        $limite = min((int) ($filtros['limite'] ?? 20), 50);
-        $cursor = (int) ($filtros['cursor'] ?? 0);
-        $role   = $usuario->getRoleNames()->first() ?? 'assinante_essencial';
+        $limite    = min((int) ($filtros['limite'] ?? 20), 50);
+        $cursor    = (int) ($filtros['cursor'] ?? 0);
+        $slugPlano = $usuario->hasRole('admin') ? null : ($usuario->assinante?->plano ?? 'essencial');
 
-        $diasHistorico = $usuario->hasRole('admin')
-            ? null
-            : $this->planoService->limiteInteiro($usuario->assinante?->plano ?? 'essencial', 'conteudo_historico_dias');
+        $nivelMaximo   = $slugPlano
+            ? ($this->planoService->valorRecurso($slugPlano, 'conteudo_nivel_maximo') ?? 'essencial')
+            : 'todos';
+        $diasHistorico = $slugPlano
+            ? $this->planoService->limiteInteiro($slugPlano, 'conteudo_historico_dias')
+            : null;
 
         $query = Conteudo::query()
             ->publicados()
-            ->acessivelPor($role, $diasHistorico)
+            ->acessivelPor($nivelMaximo, $diasHistorico)
             ->when($cursor > 0, fn ($q) => $q->where('id', '>', $cursor))
             ->orderBy('id', 'asc');
 
@@ -82,13 +85,13 @@ class ConteudoService
         }
 
         $slugPlano     = $usuario->assinante?->plano ?? 'essencial';
-        $role          = $usuario->getRoleNames()->first() ?? 'assinante_essencial';
+        $nivelMaximo   = $this->planoService->valorRecurso($slugPlano, 'conteudo_nivel_maximo') ?? 'essencial';
         $diasHistorico = $this->planoService->limiteInteiro($slugPlano, 'conteudo_historico_dias');
 
-        $planosPermitidos = match ($role) {
-            'assinante_pro'                => ['essencial', 'pro'],
-            'assinante_reservado'          => ['essencial', 'pro', 'reservado'],
-            default                        => ['essencial'],
+        $planosPermitidos = match ($nivelMaximo) {
+            'pro'   => ['essencial', 'pro'],
+            'todos' => ['essencial', 'pro', 'reservado'],
+            default => ['essencial'],
         };
 
         if (! in_array($conteudo->plano_minimo, $planosPermitidos, true)) {
