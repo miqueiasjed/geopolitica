@@ -131,7 +131,7 @@ function ThreadAdmin({ ticket, onVoltar }: { ticket: SuporteTicket; onVoltar: ()
       </div>
 
       <div className="space-y-3">
-        {ticketDetalhe?.mensagens.map((msg) => (
+        {ticketDetalhe?.mensagens?.map((msg) => (
           <div
             key={msg.id}
             className={`rounded-xl border p-4 ${
@@ -152,9 +152,9 @@ function ThreadAdmin({ ticket, onVoltar }: { ticket: SuporteTicket; onVoltar: ()
             </div>
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">{msg.corpo}</p>
 
-            {msg.anexos.length > 0 && (
+            {(msg.anexos?.length ?? 0) > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
-                {msg.anexos.map((anexo) => (
+                {msg.anexos?.map((anexo) => (
                   <a
                     key={anexo.id}
                     href={anexo.url}
