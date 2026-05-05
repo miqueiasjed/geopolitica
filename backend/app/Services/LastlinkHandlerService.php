@@ -197,6 +197,17 @@ class LastlinkHandlerService
             }
         }
 
+        // Fallback: product_id pode ter sido mapeado como offer_id no admin
+        $productId = $this->extrairProdutoId($payload);
+
+        if ($productId && $productId !== $ofertaId) {
+            $plano = AddonService::resolverPlanoByOferta($productId);
+
+            if ($plano !== null) {
+                return $plano;
+            }
+        }
+
         return $this->resolverPlanoPorNome($payload);
     }
 
@@ -376,11 +387,11 @@ class LastlinkHandlerService
 
     private function sincronizarRolePlano(User $usuario, string $plano): void
     {
-        $novaRole = match ($plano) {
-            'essencial' => 'assinante_essencial',
-            'pro'       => 'assinante_pro',
-            'reservado' => 'assinante_reservado',
-            default     => throw new RuntimeException("Plano Lastlink não suportado: {$plano}"),
+        $novaRole = match (true) {
+            str_starts_with($plano, 'essencial') => 'assinante_essencial',
+            str_starts_with($plano, 'pro')       => 'assinante_pro',
+            str_starts_with($plano, 'reservado') => 'assinante_reservado',
+            default                              => throw new RuntimeException("Plano Lastlink não suportado: {$plano}"),
         };
 
         foreach (self::ROLES_ASSINANTE as $role) {

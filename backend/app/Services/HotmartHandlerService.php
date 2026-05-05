@@ -326,11 +326,11 @@ class HotmartHandlerService
 
     private function sincronizarRolePlano(User $usuario, string $plano): void
     {
-        $novaRole = match ($plano) {
-            'essencial' => 'assinante_essencial',
-            'pro' => 'assinante_pro',
-            'reservado' => 'assinante_reservado',
-            default => throw new RuntimeException('Plano Hotmart nao suportado: '.$plano),
+        $novaRole = match (true) {
+            str_starts_with($plano, 'essencial') => 'assinante_essencial',
+            str_starts_with($plano, 'pro')       => 'assinante_pro',
+            str_starts_with($plano, 'reservado') => 'assinante_reservado',
+            default                              => throw new RuntimeException('Plano não suportado: '.$plano),
         };
 
         foreach (self::ROLES_ASSINANTE as $role) {

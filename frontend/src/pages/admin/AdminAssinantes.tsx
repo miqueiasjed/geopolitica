@@ -257,7 +257,8 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
       }
 
       setLinhas(linhasMapeadas)
-    } catch {
+    } catch (err) {
+      console.error('[ImportarArquivo] Erro ao ler arquivo:', err)
       setErro('Não foi possível ler o arquivo. Envie um .xlsx ou .csv exportado da Lastlink.')
       setLinhas([])
     }
