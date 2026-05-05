@@ -26,7 +26,7 @@ class MarketFetcherService
             ])->get(self::URL_YAHOO, [
                 'symbols'  => $parametros,
                 'range'    => '1d',
-                'interval' => '15m',
+                'interval' => '1m',
             ]);
 
             if ($resposta->failed()) {
