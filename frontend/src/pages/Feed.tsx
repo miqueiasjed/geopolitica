@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useOutletContext, useSearchParams } from 'react-router-dom'
 import { FilterBar } from '../components/FilterBar'
 import { EventList } from '../components/EventList'
 import { RefetchIndicator } from '../components/RefetchIndicator'
@@ -25,7 +25,11 @@ function formatCountdown(dataUpdatedAt: number, referenceTime: number) {
 
 export function Feed() {
   const { setLastUpdatedLabel } = useOutletContext<DashboardOutletContext>()
-  const [filters, setFilters] = useState<FeedFilters>({})
+  const [searchParams] = useSearchParams()
+  const [filters, setFilters] = useState<FeedFilters>(() => {
+    const regiao = searchParams.get('regiao')
+    return regiao ? { regiao } : {}
+  })
   const [referenceTime, setReferenceTime] = useState(() => Date.now())
   const { events, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, dataUpdatedAt } =
     useFeed(filters)

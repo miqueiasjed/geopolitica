@@ -1,4 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { useAlertas } from '../../hooks/useAlertas'
 import { useMarcarAlertaLido } from '../../hooks/useMarcarAlertaLido'
 import type { Alerta, NivelAlerta } from '../../types/alertas'
@@ -39,43 +40,80 @@ function formatarData(iso: string): string {
 interface AlertaItemProps {
   alerta: Alerta
   prefersReduced: boolean | null
+  onNavegar: (regiao: string) => void
 }
 
-function AlertaItem({ alerta, prefersReduced }: AlertaItemProps) {
+function AlertaItem({ alerta, prefersReduced, onNavegar }: AlertaItemProps) {
   const { marcarLido, isPending } = useMarcarAlertaLido()
   const config = nivelConfig[alerta.nivel]
   const analiseResumida =
     alerta.analise.length > 100 ? `${alerta.analise.slice(0, 100)}...` : alerta.analise
+
+  function handleNavegar() {
+    marcarLido(alerta.id)
+    onNavegar(alerta.regiao)
+  }
 
   return (
     <motion.div
       layout
       exit={prefersReduced ? {} : { opacity: 0, x: 20 }}
       transition={{ duration: 0.2 }}
-      className="rounded-lg border border-zinc-800 bg-zinc-900 p-4"
+      className="group rounded-lg border border-zinc-800 bg-zinc-900 transition-colors hover:border-zinc-700 hover:bg-zinc-800/60"
     >
-      <div className="mb-2 flex items-center gap-2">
-        <span
-          className={`inline-flex items-center rounded px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${config.classes}`}
-        >
-          {config.label}
-        </span>
-        <span className="font-mono text-[11px] text-zinc-500">
-          {alerta.regiao} · {formatarData(alerta.created_at)}
-        </span>
-      </div>
-
-      <p className="mb-1 text-sm font-semibold text-zinc-100">{alerta.titulo}</p>
-      <p className="mb-3 text-xs leading-relaxed text-zinc-400">{analiseResumida}</p>
-
       <button
         type="button"
-        onClick={() => marcarLido(alerta.id)}
-        disabled={isPending}
-        className="inline-flex items-center rounded-full border border-zinc-700 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={handleNavegar}
+        className="w-full cursor-pointer p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]/50 rounded-lg"
+        aria-label={`Ver eventos de ${alerta.regiao}: ${alerta.titulo}`}
       >
-        {isPending ? 'Aguarde...' : 'Marcar como lido'}
+        <div className="mb-2 flex items-center gap-2">
+          <span
+            className={`inline-flex items-center rounded px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${config.classes}`}
+          >
+            {config.label}
+          </span>
+          <span className="font-mono text-[11px] text-zinc-500">
+            {alerta.regiao} · {formatarData(alerta.created_at)}
+          </span>
+        </div>
+
+        <p className="mb-1 text-sm font-semibold text-zinc-100">{alerta.titulo}</p>
+        <p className="mb-3 text-xs leading-relaxed text-zinc-400">{analiseResumida}</p>
+
+        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 transition-colors group-hover:text-[#BFFF3C]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+          Ver eventos
+        </span>
       </button>
+
+      <div className="border-t border-zinc-800 px-4 py-2">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            marcarLido(alerta.id)
+          }}
+          disabled={isPending}
+          className="inline-flex items-center rounded-full border border-zinc-700 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isPending ? 'Aguarde...' : 'Marcar como lido'}
+        </button>
+      </div>
     </motion.div>
   )
 }
@@ -83,6 +121,13 @@ function AlertaItem({ alerta, prefersReduced }: AlertaItemProps) {
 export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
   const prefersReduced = useReducedMotion()
   const { alertas, isLoading } = useAlertas()
+  const navigate = useNavigate()
+
+  function handleNavegar(regiao: string) {
+    const params = new URLSearchParams({ regiao })
+    navigate(`/dashboard/feed?${params.toString()}`)
+    onClose()
+  }
 
   const panelInitial = prefersReduced ? false : { x: '100%' }
   const panelAnimate = { x: 0 }
@@ -171,6 +216,7 @@ export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
                         key={alerta.id}
                         alerta={alerta}
                         prefersReduced={prefersReduced}
+                        onNavegar={handleNavegar}
                       />
                     ))}
                   </AnimatePresence>
