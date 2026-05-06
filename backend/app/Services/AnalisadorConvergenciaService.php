@@ -159,7 +159,13 @@ class AnalisadorConvergenciaService
             'tipo'   => $sinal->tipo_padrao,
         ])->values()->all();
 
+        $eventoId = $sinais
+            ->sortByDesc('analisado_em')
+            ->whereNotNull('event_id')
+            ->value('event_id');
+
         $alerta = AlertaPreditivo::create([
+            'evento_id'    => $eventoId,
             'nivel'        => $nivel,
             'regiao'       => $regiao,
             'titulo'       => $titulo,

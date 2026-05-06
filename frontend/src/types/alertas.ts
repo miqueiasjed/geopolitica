@@ -7,6 +7,7 @@ export interface ResumoSinal {
 
 export interface Alerta {
   id: number
+  evento_id: number | null
   nivel: NivelAlerta
   regiao: string
   titulo: string

@@ -40,7 +40,7 @@ function formatarData(iso: string): string {
 interface AlertaItemProps {
   alerta: Alerta
   prefersReduced: boolean | null
-  onNavegar: (regiao: string) => void
+  onNavegar: (alerta: Alerta) => void
 }
 
 function AlertaItem({ alerta, prefersReduced, onNavegar }: AlertaItemProps) {
@@ -51,7 +51,7 @@ function AlertaItem({ alerta, prefersReduced, onNavegar }: AlertaItemProps) {
 
   function handleNavegar() {
     marcarLido(alerta.id)
-    onNavegar(alerta.regiao)
+    onNavegar(alerta)
   }
 
   return (
@@ -123,9 +123,13 @@ export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
   const { alertas, isLoading } = useAlertas()
   const navigate = useNavigate()
 
-  function handleNavegar(regiao: string) {
-    const params = new URLSearchParams({ regiao })
-    navigate(`/dashboard/feed?${params.toString()}`)
+  function handleNavegar(alerta: Alerta) {
+    if (alerta.evento_id) {
+      navigate(`/dashboard/feed/${alerta.evento_id}`)
+    } else {
+      const params = new URLSearchParams({ regiao: alerta.regiao })
+      navigate(`/dashboard/feed?${params.toString()}`)
+    }
     onClose()
   }
 

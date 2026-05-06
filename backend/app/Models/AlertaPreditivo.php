@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AlertaPreditivo extends Model
@@ -11,6 +12,7 @@ class AlertaPreditivo extends Model
     protected $table = 'alertas_preditivos';
 
     protected $fillable = [
+        'evento_id',
         'nivel',
         'regiao',
         'titulo',
@@ -28,6 +30,11 @@ class AlertaPreditivo extends Model
             'tipos_padrao'  => 'array',
             'notificado_em' => 'datetime',
         ];
+    }
+
+    public function evento(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'evento_id');
     }
 
     public function leituras(): HasMany
