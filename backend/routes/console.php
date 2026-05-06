@@ -40,7 +40,7 @@ Schedule::job(new AtualizarGdeltJob)
     ->withoutOverlapping();
 
 // M04 – Indicadores de Risco: atualiza cotações a cada minuto
-Schedule::job(new AtualizarIndicadoresJob, 'redis')
+Schedule::job(new AtualizarIndicadoresJob)
     ->everyMinute()
     ->withoutOverlapping()
     ->onFailure(fn () => Log::error('AtualizarIndicadoresJob falhou'));
