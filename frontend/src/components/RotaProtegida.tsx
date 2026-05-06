@@ -1,6 +1,8 @@
 import { Box, Card, Flex, Spinner, Text } from '@radix-ui/themes'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+
+const ROTAS_LIBERADAS_INATIVOS = ['/assinatura-inativa', '/perfil']
 
 interface RotaProtegidaProps {
   requiredRole?: string
@@ -8,6 +10,7 @@ interface RotaProtegidaProps {
 
 export function RotaProtegida({ requiredRole }: RotaProtegidaProps) {
   const { isAuthenticated, isLoading, user } = useAuth()
+  const location = useLocation()
 
   if (isLoading) {
     return (
@@ -32,6 +35,15 @@ export function RotaProtegida({ requiredRole }: RotaProtegidaProps) {
 
   if (user?.deve_alterar_senha) {
     return <Navigate to="/alterar-senha-inicial" replace />
+  }
+
+  if (
+    user?.assinante &&
+    !user.assinante.ativo &&
+    user.role !== 'admin' &&
+    !ROTAS_LIBERADAS_INATIVOS.includes(location.pathname)
+  ) {
+    return <Navigate to="/assinatura-inativa" replace />
   }
 
   if (requiredRole && user?.role !== requiredRole) {

@@ -41,6 +41,7 @@ import { NovoRelatorio } from '../pages/dashboard/NovoRelatorio'
 import { RiskScore } from '../pages/dashboard/RiskScore'
 import { Suporte } from '../pages/dashboard/Suporte'
 import { AdminSuporte } from '../pages/admin/AdminSuporte'
+import { AssinaturaInativa } from '../pages/AssinaturaInativa'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -58,6 +59,7 @@ export function AppRouter() {
       <Route path="/convite/:token" element={<AceitarConvitePage />} />
       <Route path="/alterar-senha-inicial" element={<AlterarSenhaInicial />} />
       <Route element={<RotaProtegida />}>
+        <Route path="/assinatura-inativa" element={<AssinaturaInativa />} />
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/feed" element={<Feed />} />
           <Route path="/dashboard/feed/:id" element={<EventDetail />} />
