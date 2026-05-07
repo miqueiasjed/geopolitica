@@ -86,9 +86,13 @@ class ImportacaoAssinantesService
         $assinadoEm = $linha['assinado_em'] ? $this->parseData($linha['assinado_em']) : now()->toDateString();
         $expiraEm = $linha['expira_em'] ? $this->parseData($linha['expira_em']) : null;
 
-        $usuario = User::firstOrNew(['email' => $email]);
+        if (User::where('email', $email)->exists()) {
+            return;
+        }
 
+        $usuario = new User;
         $usuario->forceFill([
+            'email' => $email,
             'name' => $nome,
             'password' => $senhaPadrao,
             'deve_alterar_senha' => true,
