@@ -112,15 +112,15 @@ export function EventDetail() {
         </div>
 
         {/* Análise editorial */}
-        {(event.headline || event.legenda) && (
+        {(event.headline || event.legenda || event.analise_ia || event.resumo) && (
           <div className="rounded-xl border border-[#1e1e20] bg-[#111113] p-5 space-y-4">
             <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#BFFF3C]/60">Análise</p>
             <div className="space-y-4 text-sm leading-7 text-zinc-300">
               {event.headline && (
                 <p className="font-semibold text-white">{event.headline}</p>
               )}
-              {event.legenda && (
-                <p className="whitespace-pre-wrap">{event.legenda}</p>
+              {(event.legenda || event.analise_ia || event.resumo) && (
+                <p className="whitespace-pre-wrap">{event.legenda ?? event.analise_ia ?? event.resumo}</p>
               )}
             </div>
           </div>
