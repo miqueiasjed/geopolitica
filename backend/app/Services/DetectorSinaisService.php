@@ -10,30 +10,47 @@ use Illuminate\Support\Facades\Log;
 
 class DetectorSinaisService
 {
+    private const MAX_EVENTOS_POR_EXECUCAO = 25;
+    private const DELAY_ENTRE_LOTES_MS    = 800_000; // 0.8s
+
     public function detectar(): void
     {
-        $eventos = Event::ultimas48h()
+        $totalPendentes = Event::ultimas48h()
             ->whereNotIn('id', SinalPadrao::select('event_id'))
-            ->get();
+            ->count();
 
         Log::channel('pipeline')->info('[DetectorSinais] Eventos encontrados para análise.', [
-            'total_eventos_nao_analisados' => $eventos->count(),
+            'total_eventos_nao_analisados' => $totalPendentes,
+            'limite_por_execucao' => self::MAX_EVENTOS_POR_EXECUCAO,
         ]);
 
-        if ($eventos->isEmpty()) {
+        if ($totalPendentes === 0) {
             Log::channel('pipeline')->info('[DetectorSinais] Nenhum evento pendente de detecção de sinais.');
 
             return;
         }
 
+        $eventos = Event::ultimas48h()
+            ->whereNotIn('id', SinalPadrao::select('event_id'))
+            ->orderBy('id')
+            ->limit(self::MAX_EVENTOS_POR_EXECUCAO)
+            ->get();
+
         $sinaisAntes = SinalPadrao::count();
 
-        $eventos->chunk(5)->each(fn (Collection $lote) => $this->analisarLote($lote));
+        $lotes = $eventos->chunk(5);
+        foreach ($lotes as $i => $lote) {
+            $this->analisarLote($lote);
+            if ($i < $lotes->count() - 1) {
+                usleep(self::DELAY_ENTRE_LOTES_MS);
+            }
+        }
 
         $sinaisCriados = SinalPadrao::count() - $sinaisAntes;
 
         Log::channel('pipeline')->info('[DetectorSinais] Detecção concluída.', [
             'eventos_processados' => $eventos->count(),
+            'eventos_pendentes_restantes' => max(0, $totalPendentes - $eventos->count()),
             'sinais_criados' => $sinaisCriados,
         ]);
     }
