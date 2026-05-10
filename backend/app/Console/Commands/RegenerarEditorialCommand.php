@@ -11,6 +11,7 @@ class RegenerarEditorialCommand extends Command
 {
     protected $signature = 'feed:regenerar-editorial
                             {--horas=48 : Janela de tempo em horas para buscar eventos}
+                            {--delay=3 : Segundos de pausa entre cada chamada à IA}
                             {--dry-run : Lista os eventos sem gerar editorial}';
 
     protected $description = 'Força a geração de editorial (headline + legenda) para eventos das últimas N horas que falharam ou estão incompletos.';
@@ -18,6 +19,7 @@ class RegenerarEditorialCommand extends Command
     public function handle(EditorialService $editorialService): int
     {
         $horas   = (int) $this->option('horas');
+        $delay   = max(0, (int) $this->option('delay'));
         $dryRun  = (bool) $this->option('dry-run');
         $desde   = now()->subHours($horas);
 
@@ -44,7 +46,7 @@ class RegenerarEditorialCommand extends Command
             return self::SUCCESS;
         }
 
-        $this->info("Eventos pendentes encontrados: {$eventos->count()} (últimas {$horas}h)");
+        $this->info("Eventos pendentes encontrados: {$eventos->count()} (últimas {$horas}h) — delay entre chamadas: {$delay}s");
 
         if ($dryRun) {
             $this->table(
@@ -93,6 +95,10 @@ class RegenerarEditorialCommand extends Command
             }
 
             $bar->advance();
+
+            if ($delay > 0) {
+                sleep($delay);
+            }
         }
 
         $bar->finish();
