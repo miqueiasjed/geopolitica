@@ -79,6 +79,10 @@ class EditorialService
             $legenda = trim($m[1]);
         }
 
+        if ($headline === '' || $legenda === '') {
+            throw new \RuntimeException('Editorial incompleto: headline ou legenda ausentes na resposta da IA.');
+        }
+
         return [
             'headline' => $headline,
             'legenda'  => $legenda,

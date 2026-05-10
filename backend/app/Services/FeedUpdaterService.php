@@ -178,7 +178,9 @@ class FeedUpdaterService
                 'event_id' => $event->id,
             ]);
         } catch (\Throwable $e) {
-            Log::channel('pipeline')->warning('[FeedUpdater] Falha ao gerar editorial — evento salvo sem editorial.', [
+            $event->update(['relevante' => false]);
+
+            Log::channel('pipeline')->warning('[FeedUpdater] Falha ao gerar editorial — evento ocultado do feed.', [
                 'event_id' => $event->id,
                 'erro' => $e->getMessage(),
             ]);
