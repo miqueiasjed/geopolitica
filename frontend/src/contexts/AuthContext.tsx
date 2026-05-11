@@ -5,8 +5,10 @@ import type { UsuarioAutenticado } from '../types/auth'
 import {
   EVENTO_TOKEN_ATUALIZADO,
   obterTokenAutenticacao,
+  obterUsuarioCache,
   removerTokenAutenticacao,
   salvarTokenAutenticacao,
+  salvarUsuarioCache,
 } from '../utils/storage'
 
 interface AuthContextValue {
@@ -22,9 +24,12 @@ interface AuthContextValue {
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UsuarioAutenticado | null>(null)
-  const [token, setToken] = useState<string | null>(() => obterTokenAutenticacao())
-  const [isLoading, setIsLoading] = useState(true)
+  const tokenInicial = obterTokenAutenticacao()
+  const usuarioCacheado = tokenInicial ? obterUsuarioCache<UsuarioAutenticado>() : null
+
+  const [user, setUser] = useState<UsuarioAutenticado | null>(usuarioCacheado)
+  const [token, setToken] = useState<string | null>(tokenInicial)
+  const [isLoading, setIsLoading] = useState(!usuarioCacheado && Boolean(tokenInicial))
 
   async function checkAuth() {
     const tokenAtual = obterTokenAutenticacao()
@@ -39,10 +44,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    setIsLoading(true)
-
     try {
       const usuario = await consultarUsuarioAutenticado()
+
+      salvarUsuarioCache(usuario)
 
       startTransition(() => {
         setToken(tokenAtual)
@@ -63,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const resposta = await loginServico({ email, password })
 
     salvarTokenAutenticacao(resposta.token)
+    salvarUsuarioCache(resposta.user)
 
     startTransition(() => {
       setToken(resposta.token)
