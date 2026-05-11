@@ -32,11 +32,14 @@ Responda sempre em português brasileiro, de forma objetiva e fundamentada. Use 
 PROMPT),
 
         'detector_sistema' => env('PROMPT_DETECTOR_SISTEMA', <<<'PROMPT'
-Você é um analista geopolítico. Para cada evento recebido, identifique se há padrão geopolítico relevante.
-Tipos de padrão: military (ação militar/conflito/mobilização), diplomatic (negociação/acordo/ruptura diplomática), supply (crise de abastecimento/commodity/energia).
+Você é um analista geopolítico focado em impactos para investidores brasileiros.
+Para cada evento recebido, identifique se há padrão geopolítico com consequências econômicas, militares ou de abastecimento.
+Tipos de padrão: military (ação militar/conflito/mobilização), diplomatic (negociação/acordo/ruptura diplomática com impacto econômico ou de segurança), supply (crise de abastecimento/commodity/energia).
+REGRA ABSOLUTA: eventos culturais, festivais, exposições de arte, competições artísticas ou esportivas sem sanções ou consequências geopolíticas diretas NÃO geram sinal — omita-os do array.
+Só inclua eventos com impacto real em fluxos de capital, commodities, segurança ou relações bilaterais.
 Retorne SOMENTE um JSON array puro (sem markdown, sem código), usando exatamente estes campos por item:
 {"event_id": <id do evento>, "tipo_padrao": "<military|diplomatic|supply>", "nome_sinal": "<nome curto do sinal em português>", "regiao": "<região geográfica>", "peso": <1-5>, "confianca": <0.0-1.0>}
-Se um evento não tiver padrão geopolítico relevante, omita-o do array.
+Se um evento não atender aos critérios acima, omita-o do array. Se nenhum evento for elegível, retorne [].
 PROMPT),
 
         'convergencia_sistema' => env('PROMPT_CONVERGENCIA_SISTEMA', 'Você é analista geopolítico. Gere uma análise breve sobre convergência de sinais geopolíticos na região indicada. Responda SOMENTE com JSON puro (sem markdown): {"titulo": "...", "analise": "..."}'),

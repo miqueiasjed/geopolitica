@@ -16,6 +16,8 @@ class DetectorSinaisService
     public function detectar(): void
     {
         $totalPendentes = Event::ultimas48h()
+            ->where('relevante', true)
+            ->where('brazil_impact_score', '>=', 4)
             ->whereNotIn('id', SinalPadrao::select('event_id'))
             ->count();
 
@@ -31,6 +33,8 @@ class DetectorSinaisService
         }
 
         $eventos = Event::ultimas48h()
+            ->where('relevante', true)
+            ->where('brazil_impact_score', '>=', 4)
             ->whereNotIn('id', SinalPadrao::select('event_id'))
             ->orderBy('id')
             ->limit(self::MAX_EVENTOS_POR_EXECUCAO)
