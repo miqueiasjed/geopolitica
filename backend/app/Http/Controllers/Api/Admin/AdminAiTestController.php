@@ -25,4 +25,28 @@ class AdminAiTestController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
+
+    public function testarConexao(AiTestService $service): JsonResponse
+    {
+        try {
+            $resultado = $service->executar(
+                'Você é um assistente de teste.',
+                'Responda apenas com a palavra: OK',
+                20,
+            );
+
+            return response()->json([
+                'ok'         => true,
+                'provider'   => $resultado['provider'],
+                'modelo'     => $resultado['modelo'],
+                'duracao_ms' => $resultado['duracao_ms'],
+                'resposta'   => $resultado['resposta'],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'ok'      => false,
+                'mensagem' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

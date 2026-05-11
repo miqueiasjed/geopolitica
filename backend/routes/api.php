@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Admin\AdminCriseHistoricaController;
 use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
 use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
+use App\Http\Controllers\Api\Admin\AdminEventoSemEditorialController;
 use App\Http\Controllers\Api\Admin\ImportarAssinantesController;
 use App\Http\Controllers\Api\SuporteController;
 use App\Http\Controllers\Api\CarteiraRiscoController;
@@ -182,9 +183,16 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // Relatório de uso de IA
     Route::get('ai/uso', [AdminAiUsoController::class, 'index']);
 
-    // Testes de prompt IA
+    // Testes de prompt e conexão IA
     Route::post('ai/testar-prompt', [AdminAiTestController::class, 'testar'])
         ->middleware('throttle:20,1');
+    Route::post('ai/testar-conexao', [AdminAiTestController::class, 'testarConexao'])
+        ->middleware('throttle:5,1');
+
+    // Eventos sem editorial
+    Route::get('/eventos-sem-editorial', [AdminEventoSemEditorialController::class, 'index']);
+    Route::post('/eventos-sem-editorial/reprocessar', [AdminEventoSemEditorialController::class, 'reprocessar']);
+    Route::get('/eventos-sem-editorial/{operacaoId}/status', [AdminEventoSemEditorialController::class, 'status']);
 
     // Gestão de usuários
     Route::get('/usuarios/roles', [AdminUsuarioController::class, 'roles']);

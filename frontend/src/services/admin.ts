@@ -27,6 +27,10 @@ import type {
   AdminSource,
   CriarSourcePayload,
   AtualizarSourcePayload,
+  EventoSemEditorial,
+  EventosSemEditorialFiltros,
+  ReprocessarEditorialStatus,
+  IniciarReprocessamentoResponse,
 } from '../types/admin'
 import type { TipoConteudo, VerticalConteudo, Conteudo } from '../types/biblioteca'
 import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
@@ -59,6 +63,7 @@ export const adminKeys = {
   crises: () => [...adminKeys.all, 'crises'] as const,
   paises: () => [...adminKeys.all, 'paises'] as const,
   sources: () => [...adminKeys.all, 'sources'] as const,
+  eventosSemEditorial: (filtros: import('../types/admin').EventosSemEditorialFiltros) => [...adminKeys.all, 'eventos-sem-editorial', filtros] as const,
 }
 
 function montarParams<T extends object>(filtros: T) {
@@ -360,4 +365,47 @@ export async function atualizarSource(id: number, payload: AtualizarSourcePayloa
 
 export async function excluirSource(id: number): Promise<void> {
   await api.delete(`/admin/sources/${id}`)
+}
+
+// --- Eventos sem Editorial ---
+
+export async function buscarEventosSemEditorial(
+  filtros: EventosSemEditorialFiltros,
+): Promise<PaginacaoLaravel<EventoSemEditorial>> {
+  const params = new URLSearchParams()
+  if (filtros.tipo && filtros.tipo !== 'todos') params.set('tipo', filtros.tipo)
+  if (filtros.page) params.set('page', String(filtros.page))
+  params.set('per_page', '25')
+  const resposta = await api.get<PaginacaoLaravel<EventoSemEditorial>>('/admin/eventos-sem-editorial', { params })
+  return resposta.data
+}
+
+export async function reprocessarEventosEditoriais(
+  ids: number[],
+  delaySegundos = 8,
+): Promise<IniciarReprocessamentoResponse> {
+  const resposta = await api.post<IniciarReprocessamentoResponse>('/admin/eventos-sem-editorial/reprocessar', {
+    ids,
+    delay_segundos: delaySegundos,
+  })
+  return resposta.data
+}
+
+export async function buscarStatusReprocessamento(operacaoId: string): Promise<ReprocessarEditorialStatus> {
+  const resposta = await api.get<ReprocessarEditorialStatus>(`/admin/eventos-sem-editorial/${operacaoId}/status`)
+  return resposta.data
+}
+
+export interface ResultadoTesteIa {
+  ok: boolean
+  provider?: string
+  modelo?: string
+  duracao_ms?: number
+  resposta?: string
+  mensagem?: string
+}
+
+export async function testarConexaoIa(): Promise<ResultadoTesteIa> {
+  const resposta = await api.post<ResultadoTesteIa>('/admin/ai/testar-conexao')
+  return resposta.data
 }

@@ -17,6 +17,7 @@ import {
   MixIcon,
   LayersIcon,
   ChatBubbleIcon,
+  FileIcon,
 } from '@radix-ui/react-icons'
 
 const itens = [
@@ -30,6 +31,7 @@ const itens = [
   { label: 'Linha do Tempo', rota: '/admin/crises', icone: ClockIcon },
   { label: 'Países Base', rota: '/admin/paises', icone: PaisesIcon },
   { label: 'Fontes RSS', rota: '/admin/fontes', icone: MixIcon },
+  { label: 'Sem Editorial', rota: '/admin/eventos-sem-editorial', icone: FileIcon },
   { label: 'B2B / Empresas', rota: '/admin/b2b', icone: FileTextIcon },
   { label: 'Webhook Eventos', rota: '/admin/webhook-eventos', icone: ActivityLogIcon },
   { label: 'Webhook Tokens', rota: '/admin/webhook-tokens', icone: LockClosedIcon },

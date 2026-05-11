@@ -288,3 +288,41 @@ export interface AtualizarSourcePayload {
   tier?: TierSource
   ativo?: boolean
 }
+
+// --- Eventos sem Editorial ---
+
+export type TipoFiltroEventoSemEditorial = 'todos' | 'sem_headline' | 'sem_analise' | 'sem_resumo'
+
+export interface EventoSemEditorial {
+  id: number
+  titulo: string
+  fonte: string
+  publicado_em: string | null
+  relevante: boolean
+  tem_headline: boolean
+  tem_legenda: boolean
+  tem_analise: boolean
+  tem_resumo: boolean
+}
+
+export interface EventosSemEditorialFiltros {
+  tipo?: TipoFiltroEventoSemEditorial
+  page?: number
+}
+
+export interface ReprocessarEditorialStatus {
+  total: number
+  processados: number
+  sucesso: number
+  erros_count: number
+  erros: string[]
+  concluido: boolean
+  percentual: number
+}
+
+export interface IniciarReprocessamentoResponse {
+  operacao_id: string
+  total: number
+  estimativa_minutos: number
+  delay_segundos: number
+}

@@ -41,6 +41,7 @@ import { NovoRelatorio } from '../pages/dashboard/NovoRelatorio'
 import { RiskScore } from '../pages/dashboard/RiskScore'
 import { Suporte } from '../pages/dashboard/Suporte'
 import { AdminSuporte } from '../pages/admin/AdminSuporte'
+import { AdminEventosSemEditorial } from '../pages/admin/AdminEventosSemEditorial'
 import { AssinaturaInativa } from '../pages/AssinaturaInativa'
 
 function RedirecionamentoInicial() {
@@ -101,6 +102,7 @@ export function AppRouter() {
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
           <Route path="ia/uso" element={<UsoPage />} />
           <Route path="suporte" element={<AdminSuporte />} />
+          <Route path="eventos-sem-editorial" element={<AdminEventosSemEditorial />} />
         </Route>
       </Route>
     </Routes>

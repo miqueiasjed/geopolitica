@@ -4,6 +4,8 @@ import { EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon, 
 import api from '../../lib/axios'
 import type { Configuracao, GrupoConfiguracao, GruposConfiguracao } from '../../types/configuracao'
 import { PromptTestPanel } from '../../components/admin/PromptTestPanel'
+import { testarConexaoIa } from '../../services/admin'
+import type { ResultadoTesteIa } from '../../services/admin'
 
 // ─── Tipos para teste de mercado ──────────────────────────────────────────────
 
@@ -85,6 +87,86 @@ function TesteAlphaVantage() {
                 </div>
               ))}
             </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3">
+            <p className="flex items-center gap-2 text-xs text-red-400">
+              <ExclamationTriangleIcon className="h-4 w-4 shrink-0" />
+              {resultado.mensagem}
+            </p>
+          </div>
+        )
+      )}
+    </div>
+  )
+}
+
+// ─── Painel de teste da API de IA ─────────────────────────────────────────────
+
+function TesteApiIa() {
+  const [resultado, setResultado] = useState<ResultadoTesteIa | null>(null)
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: testarConexaoIa,
+    onSuccess: (data) => setResultado(data),
+    onError: (err: any) => {
+      const msg = err?.response?.data?.mensagem ?? err?.message ?? 'Erro inesperado.'
+      setResultado({ ok: false, mensagem: msg })
+    },
+  })
+
+  return (
+    <div className="mx-5 mb-5 space-y-3">
+      <div className="h-px bg-[#1e1e20]" />
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+          — Testar conexão com a IA
+        </p>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() => mutate()}
+          className="inline-flex items-center gap-2 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isPending ? (
+            <>
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              Testando...
+            </>
+          ) : (
+            'Testar API'
+          )}
+        </button>
+      </div>
+
+      {resultado && (
+        resultado.ok ? (
+          <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-4 space-y-2">
+            <p className="flex items-center gap-2 text-xs font-medium text-green-400">
+              <CheckCircledIcon className="h-4 w-4" />
+              API respondendo corretamente
+            </p>
+            <div className="grid grid-cols-3 gap-2 font-mono text-[11px]">
+              <div className="rounded-md border border-[#1e1e20] bg-[#0d0d0f] px-3 py-2">
+                <p className="text-zinc-500">Provider</p>
+                <p className="mt-0.5 font-semibold text-zinc-200">{resultado.provider}</p>
+              </div>
+              <div className="rounded-md border border-[#1e1e20] bg-[#0d0d0f] px-3 py-2">
+                <p className="text-zinc-500">Modelo</p>
+                <p className="mt-0.5 font-semibold text-zinc-200 truncate">{resultado.modelo}</p>
+              </div>
+              <div className="rounded-md border border-[#1e1e20] bg-[#0d0d0f] px-3 py-2">
+                <p className="text-zinc-500">Latência</p>
+                <p className="mt-0.5 font-semibold text-zinc-200">{resultado.duracao_ms}ms</p>
+              </div>
+            </div>
+            {resultado.resposta && (
+              <p className="font-mono text-[11px] text-zinc-400">
+                Resposta: <span className="text-zinc-200">{resultado.resposta}</span>
+              </p>
+            )}
           </div>
         ) : (
           <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3">
@@ -610,6 +692,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
       )}
 
       {grupo === 'mercado' && <TesteAlphaVantage />}
+      {grupo === 'ia' && <TesteApiIa />}
     </div>
   )
 }
