@@ -72,7 +72,7 @@ class AdminAssinanteService
     public function listar(array $filtros): LengthAwarePaginator
     {
         return Assinante::query()
-            ->with('user')
+            ->with(['user', 'assinanteAddons' => fn ($q) => $q->where('status', 'ativo')])
             ->when(
                 $filtros['search'] ?? null,
                 fn ($query, $search) => $query->whereHas(
@@ -84,6 +84,13 @@ class AdminAssinanteService
             )
             ->when($filtros['plano'] ?? null, fn ($query, $plano) => $query->where('plano', $plano))
             ->when($filtros['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when(
+                $filtros['addon'] ?? null,
+                fn ($query, $addon) => $query->whereHas(
+                    'assinanteAddons',
+                    fn ($q) => $q->where('addon_key', $addon)->where('status', 'ativo')
+                )
+            )
             ->orderByDesc('assinado_em')
             ->paginate(25)
             ->through(fn (Assinante $assinante) => [
@@ -97,6 +104,7 @@ class AdminAssinanteService
                 'assinado_em' => $assinante->assinado_em?->toIso8601String(),
                 'expira_em' => $assinante->expira_em?->toIso8601String(),
                 'hotmart_subscriber_code' => $assinante->hotmart_subscriber_code,
+                'addons' => $assinante->assinanteAddons->pluck('addon_key')->values()->all(),
             ]);
     }
 }

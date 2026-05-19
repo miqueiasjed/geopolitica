@@ -38,6 +38,7 @@ import {
   adminKeys,
   buscarAdminAssinantes,
   buscarPlanosAtivos,
+  buscarProdutos,
   buscarStatusImportacao,
   importarAssinantesLastlink,
   reenviarBoasVindasAssinante,
@@ -539,6 +540,7 @@ export function AdminAssinantes() {
   const [search, setSearch] = useState('')
   const [plano, setPlano] = useState(VALOR_TODOS)
   const [status, setStatus] = useState(VALOR_TODOS)
+  const [addon, setAddon] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
   const [importando, setImportando] = useState(false)
   const [addonsUserId, setAddonsUserId] = useState<number | null>(null)
@@ -553,6 +555,7 @@ export function AdminAssinantes() {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const planosQuery = useQuery({ queryKey: adminKeys.planosAtivos(), queryFn: buscarPlanosAtivos })
+  const produtosQuery = useQuery({ queryKey: adminKeys.produtos(), queryFn: buscarProdutos })
 
   useEffect(() => {
     if (!operacaoAtiva) return
@@ -602,6 +605,7 @@ export function AdminAssinantes() {
       search: searchDebounced.trim() || undefined,
       plano: plano === VALOR_TODOS ? undefined : plano,
       status: status === VALOR_TODOS ? undefined : status,
+      addon: addon === VALOR_TODOS ? undefined : addon,
       page,
     }),
     queryFn: () =>
@@ -609,6 +613,7 @@ export function AdminAssinantes() {
         search: searchDebounced.trim() || undefined,
         plano: plano === VALOR_TODOS ? undefined : plano,
         status: status === VALOR_TODOS ? undefined : status,
+        addon: addon === VALOR_TODOS ? undefined : addon,
         page,
       }),
     placeholderData: (dadosAnteriores) => dadosAnteriores,
@@ -734,6 +739,27 @@ export function AdminAssinantes() {
                 </Select.Root>
               </label>
 
+              <label className="min-w-[180px] space-y-2">
+                <Text size="2" weight="medium">
+                  Addon
+                </Text>
+                <Select.Root
+                  value={addon}
+                  onValueChange={(valor) => {
+                    setAddon(valor)
+                    setPage(1)
+                  }}
+                >
+                  <Select.Trigger placeholder="Todos os addons" />
+                  <Select.Content>
+                    <Select.Item value={VALOR_TODOS}>Todos os addons</Select.Item>
+                    {(produtosQuery.data ?? []).filter((p) => p.ativo).map((p) => (
+                      <Select.Item key={p.chave} value={p.chave}>{p.nome}</Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Root>
+              </label>
+
               <Button
                 size="3"
                 variant="soft"
@@ -742,6 +768,7 @@ export function AdminAssinantes() {
                   setSearch('')
                   setPlano(VALOR_TODOS)
                   setStatus(VALOR_TODOS)
+                  setAddon(VALOR_TODOS)
                   setPage(1)
                 }}
               >
@@ -818,6 +845,7 @@ export function AdminAssinantes() {
                       <Table.ColumnHeaderCell>Plano</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Ativo</Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell>Addons</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Assinado em</Table.ColumnHeaderCell>
                       <Table.ColumnHeaderCell>Ações</Table.ColumnHeaderCell>
                     </Table.Row>
@@ -851,6 +879,21 @@ export function AdminAssinantes() {
                             <Badge color={assinante.ativo ? 'green' : 'gray'} variant="soft">
                               {assinante.ativo ? 'Sim' : 'Nao'}
                             </Badge>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Flex gap="1" wrap="wrap">
+                              {(assinante.addons ?? []).length === 0
+                                ? <Text size="1" className="text-zinc-600">—</Text>
+                                : (assinante.addons ?? []).map((key) => {
+                                    const prod = (produtosQuery.data ?? []).find((p) => p.chave === key)
+                                    return (
+                                      <Badge key={key} size="1" color="violet" variant="soft">
+                                        {prod?.nome ?? key}
+                                      </Badge>
+                                    )
+                                  })
+                              }
+                            </Flex>
                           </Table.Cell>
                           <Table.Cell>{formatarDataCurta(assinante.assinado_em)}</Table.Cell>
                           <Table.Cell>
@@ -889,7 +932,7 @@ export function AdminAssinantes() {
                       ))
                     ) : (
                       <Table.Row>
-                        <Table.Cell colSpan={8}>
+                        <Table.Cell colSpan={9}>
                           <Box className="py-10 text-center">
                             <Text size="3" className="text-cyan-100/65">
                               Nenhum assinante encontrado com os filtros atuais.

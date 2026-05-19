@@ -16,6 +16,15 @@ export interface AdminAssinante {
   status: string
   ativo: boolean
   assinado_em: string | null
+  addons?: string[]
+}
+
+export interface AdminProduto {
+  id: number
+  chave: string
+  nome: string
+  ativo: boolean
+  ordem: number
 }
 
 export interface ImportacaoAssinantesResponse {
@@ -69,6 +78,7 @@ export interface AdminAssinantesFiltros {
   search?: string
   plano?: string
   status?: string
+  addon?: string
   page?: number
 }
 

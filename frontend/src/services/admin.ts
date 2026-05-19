@@ -31,6 +31,7 @@ import type {
   EventosSemEditorialFiltros,
   ReprocessarEditorialStatus,
   IniciarReprocessamentoResponse,
+  AdminProduto,
 } from '../types/admin'
 import type { TipoConteudo, VerticalConteudo, Conteudo } from '../types/biblioteca'
 import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
@@ -56,6 +57,7 @@ export const adminKeys = {
   webhookTokens: () => [...adminKeys.all, 'webhook-tokens'] as const,
   webhookOfferPlanos: () => [...adminKeys.all, 'webhook-offer-planos'] as const,
   planosAtivos: () => [...adminKeys.all, 'planos-ativos'] as const,
+  produtos: () => [...adminKeys.all, 'produtos'] as const,
   conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
   usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
@@ -176,6 +178,13 @@ export interface PlanoOpcao {
 export async function buscarPlanosAtivos(): Promise<PlanoOpcao[]> {
   const resposta = await api.get<{ data: PlanoOpcao[] }>('/admin/planos')
   return resposta.data.data.filter((p) => p.ativo)
+}
+
+// --- Produtos (Addons) ---
+
+export async function buscarProdutos(): Promise<AdminProduto[]> {
+  const resposta = await api.get<AdminProduto[]>('/admin/produtos')
+  return resposta.data
 }
 
 // --- Webhook Offer → Plano Admin ---

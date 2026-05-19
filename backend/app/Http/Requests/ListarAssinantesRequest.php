@@ -17,6 +17,7 @@ class ListarAssinantesRequest extends FormRequest
             'search' => $this->string('search')->trim()->value() ?: null,
             'plano' => $this->string('plano')->trim()->value() ?: null,
             'status' => $this->string('status')->trim()->value() ?: null,
+            'addon' => $this->string('addon')->trim()->value() ?: null,
             'page' => $this->integer('page') ?: 1,
         ]);
     }
@@ -27,6 +28,7 @@ class ListarAssinantesRequest extends FormRequest
             'search' => ['nullable', 'string', 'max:255'],
             'plano' => ['nullable', 'string', 'max:100'],
             'status' => ['nullable', 'string', 'max:100'],
+            'addon' => ['nullable', 'string', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
