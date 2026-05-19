@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             DadosProducaoFakeSeeder::class,
             ConfiguracaoSeeder::class,
             MapaRiscoAtivosSeeder::class,
+            ProdutoSeeder::class,
         ]);
     }
 }

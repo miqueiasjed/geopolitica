@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AssinanteAddon extends Model
 {
     public const ADDON_KEYS = ['elections', 'war'];
-    public const FONTES = ['hotmart', 'lastlink'];
+    public const FONTES = ['hotmart', 'lastlink', 'manual'];
 
     protected $table = 'assinante_addons';
 

@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-04-29 (Plano 25 criado — M17 Admin Gerenciamento de Planos)
+> Última atualização: 2026-05-18 (Planos 26 e 27 concluídos — Multi-Produtos Backend)
 
 ## Legenda
 - ✅ Concluído
@@ -37,6 +37,10 @@
 | 23 | [Relatório Personalizado por IA (M15)](23.md) | ✅ | 7, 11, 12, 4, 14, 22 | 7 |
 | 24 | [Risk Score de Portfólio (M16)](24.md) | ✅ | 4, 10, 22, 19, 21 | 9 |
 | 25 | [Admin Gerenciamento de Planos e Recursos (M17)](25.md) | ✅ | 1–24 | 5 |
+| 26 | [Multi-Produtos: Backend Core (Catálogo + /meus-produtos + CRUD Admin)](26.md) | ✅ | 19, 20, 25 | 6 |
+| 27 | [Multi-Produtos: Backend Gestão Manual de Addons (Individual + Lote)](27.md) | ✅ | 26 | 6 |
+| 28 | [Multi-Produtos: Frontend Core (Tipos, Serviços, Hooks e Componentes)](28.md) | ⏳ | 26 | 6 |
+| 29 | [Multi-Produtos: Frontend Admin UI (Produtos, Addons e Importação)](29.md) | ⏳ | 27, 28 | 7 |
 
 ## Ordem de execução recomendada
 
@@ -68,6 +72,9 @@
 ## Módulo 13 — Verticais e Add-ons — ordem de execução
 `19 → 20 → 21`
 
+## Multi-Produtos por Assinante — ordem de execução
+`26 → 27 (paralelo com 28) → 29`
+
 ## Módulos do PRD cobertos
 
 | Módulo PRD | Planos | Status |
@@ -94,3 +101,7 @@
 | M14 – Exportação para PDF | Plano 22 | ✅ |
 | M15 – Relatório Personalizado por IA | Plano 23 | ✅ |
 | M16 – Risk Score de Portfólio | Plano 24 | ✅ |
+| Multi-Produtos: Catálogo + /meus-produtos + CRUD admin | Plano 26 | ✅ |
+| Multi-Produtos: Gestão manual de addons (individual + lote) | Plano 27 | ✅ |
+| Multi-Produtos: Frontend core (tipos, hooks, componentes) | Plano 28 | ⏳ |
+| Multi-Produtos: Frontend admin UI | Plano 29 | ⏳ |

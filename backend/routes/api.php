@@ -19,6 +19,9 @@ use App\Http\Controllers\Api\Admin\AdminPerfilPaisController;
 use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\Admin\AdminEventoSemEditorialController;
+use App\Http\Controllers\Api\Admin\AdminAssinanteAddonController;
+use App\Http\Controllers\Api\Admin\AdminProdutoController;
+use App\Http\Controllers\Api\MeusProdutosController;
 use App\Http\Controllers\Api\Admin\ImportarAssinantesController;
 use App\Http\Controllers\Api\SuporteController;
 use App\Http\Controllers\Api\CarteiraRiscoController;
@@ -59,6 +62,10 @@ Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/senha/alterar-inicial', [SenhaController::class, 'alterarInicial']);
     });
+});
+
+Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+    Route::get('/meus-produtos', [MeusProdutosController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
@@ -238,6 +245,20 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/planos', [AdminPlanoController::class, 'store']);
     Route::put('/planos/{plano}', [AdminPlanoController::class, 'update']);
     Route::put('/planos/{plano}/recursos/{chave}', [AdminPlanoController::class, 'atualizarRecurso']);
+
+    // Gestão de produtos (addons extra)
+    Route::get('/produtos', [AdminProdutoController::class, 'index']);
+    Route::post('/produtos', [AdminProdutoController::class, 'store']);
+    Route::put('/produtos/{produto}', [AdminProdutoController::class, 'update']);
+    Route::delete('/produtos/{produto}', [AdminProdutoController::class, 'destroy']);
+
+    // Gestão de addons por assinante (manual + importação)
+    Route::get('/assinantes/addons/exportar', [AdminAssinanteAddonController::class, 'exportar']);
+    Route::post('/assinantes/addons/importar', [AdminAssinanteAddonController::class, 'importar']);
+    Route::get('/assinantes/{user}/addons', [AdminAssinanteAddonController::class, 'index']);
+    Route::post('/assinantes/{user}/addons', [AdminAssinanteAddonController::class, 'store']);
+    Route::put('/assinantes/{user}/addons/{addon}', [AdminAssinanteAddonController::class, 'update']);
+    Route::delete('/assinantes/{user}/addons/{addon}', [AdminAssinanteAddonController::class, 'destroy']);
 });
 
 // Rota pública: informações do tenant atual
