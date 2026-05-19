@@ -180,9 +180,32 @@ class HotmartHandlerService
             if ($addonKey !== null) {
                 return ['tipo' => 'addon', 'addon_key' => $addonKey];
             }
+
+            $nomeProduto = $this->extrairValor($payload, [
+                'data.product.name',
+                'product.name',
+                'data.subscription.plan.name',
+                'subscription.plan.name',
+            ]);
+
+            if (! $this->ehNomeDePlano((string) $nomeProduto)) {
+                $addonKey = AddonService::resolverOuCriarAddonKey($productId, 'hotmart', $nomeProduto ?: null);
+
+                return ['tipo' => 'addon', 'addon_key' => $addonKey];
+            }
         }
 
         return ['tipo' => 'plano'];
+    }
+
+    private function ehNomeDePlano(string $nome): bool
+    {
+        $lower = strtolower($nome);
+
+        return str_contains($lower, 'reservado')
+            || (bool) preg_match('/\bpro\b/', $lower)
+            || str_contains($lower, 'essencial')
+            || str_contains($lower, 'essential');
     }
 
     private function ativarAddon(array $payload, string $addonKey): void

@@ -452,12 +452,12 @@ class WebhookLastlinkTest extends TestCase
         $this->assertNull($evento->log_acao);
     }
 
-    public function test_offer_e_produto_desconhecidos_nao_criam_usuario(): void
+    public function test_product_id_desconhecido_auto_cadastra_produto_e_ativa_addon(): void
     {
         $payload = [
             'event'    => 'approved',
             'customer' => ['email' => 'desconhecido@teste.com', 'name' => 'Desconhecido'],
-            'product'  => ['id' => 'PROD_INEXISTENTE'],
+            'product'  => ['id' => 'PROD_INEXISTENTE', 'name' => 'Novo Addon Externo'],
             'offer'    => ['id' => 'OFFER_INEXISTENTE', 'name' => 'Outro Produto'],
         ];
 
@@ -465,7 +465,24 @@ class WebhookLastlinkTest extends TestCase
             ->postJson('/api/webhook/lastlink', $payload)
             ->assertOk();
 
-        $this->assertFalse(User::where('email', 'desconhecido@teste.com')->exists());
+        $this->assertTrue(User::where('email', 'desconhecido@teste.com')->exists());
+        $this->assertTrue(Produto::where('product_id_lastlink', 'PROD_INEXISTENTE')->exists());
+        $this->assertTrue(AssinanteAddon::where('addon_key', 'lastlink_prod_inexistente')->exists());
+    }
+
+    public function test_sem_product_id_e_offer_desconhecido_nao_cria_usuario(): void
+    {
+        $payload = [
+            'event'    => 'approved',
+            'customer' => ['email' => 'semid@teste.com', 'name' => 'Sem ID'],
+            'offer'    => ['id' => 'OFFER_INEXISTENTE', 'name' => 'Outro Produto'],
+        ];
+
+        $this->withHeader('x-lastlink-token', 'test-lastlink-token')
+            ->postJson('/api/webhook/lastlink', $payload)
+            ->assertOk();
+
+        $this->assertFalse(User::where('email', 'semid@teste.com')->exists());
     }
 
     // -----------------------------------------------------------------------
