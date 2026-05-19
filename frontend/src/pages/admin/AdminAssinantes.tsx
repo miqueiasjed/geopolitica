@@ -520,17 +520,9 @@ function badgeColorDoStatus(status: string) {
 function badgeColorDoPlano(plano: string) {
   const normalizado = plano.toLowerCase()
 
-  if (normalizado.includes('reservado')) {
-    return 'purple'
-  }
-
-  if (normalizado.includes('pro')) {
-    return 'cyan'
-  }
-
-  if (normalizado.includes('essencial')) {
-    return 'amber'
-  }
+  if (normalizado.includes('reservado')) return 'purple'
+  if (normalizado.includes('pro')) return 'cyan'
+  if (normalizado.includes('essencial')) return 'amber'
 
   return 'gray'
 }
@@ -867,7 +859,7 @@ export function AdminAssinantes() {
                           <Table.Cell>{assinante.name}</Table.Cell>
                           <Table.Cell>
                             <Badge color={badgeColorDoPlano(assinante.plano)} variant="soft">
-                              {assinante.plano}
+                              {(produtosQuery.data ?? []).find((p) => p.chave === assinante.plano)?.nome ?? assinante.plano}
                             </Badge>
                           </Table.Cell>
                           <Table.Cell>

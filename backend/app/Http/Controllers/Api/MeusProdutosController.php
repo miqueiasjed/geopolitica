@@ -32,7 +32,7 @@ class MeusProdutosController extends Controller
             ];
         });
 
-        return response()->json(['data' => $dados]);
+        return response()->json($dados);
     }
 
     private function resolverStatus(int $userId, string $chave, $assinante, bool $isAdmin): ?string

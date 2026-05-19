@@ -16,7 +16,10 @@ class AddonService
         ?string $orderId = null,
         ?string $productId = null,
     ): void {
-        $assinante = Assinante::query()->where('user_id', $userId)->firstOrFail();
+        $assinante = Assinante::query()->firstOrCreate(
+            ['user_id' => $userId],
+            ['plano' => $addonKey, 'ativo' => true, 'status' => 'ativo'],
+        );
 
         $addonsAtuais = $assinante->addons ?? [];
 

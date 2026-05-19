@@ -19,10 +19,10 @@ class ConteudoPolicy
             return 99;
         }
 
-        $slugPlano   = $usuario->assinante?->plano ?? 'essencial';
-        $nivelMaximo = $this->planoService->valorRecurso($slugPlano, 'conteudo_nivel_maximo') ?? 'essencial';
+        $slugPlano   = $usuario->assinante?->plano ?? 'gratuito';
+        $nivelMaximo = $this->planoService->valorRecurso($slugPlano, 'conteudo_nivel_maximo') ?? $slugPlano;
 
-        return self::HIERARQUIA_NIVEL[$nivelMaximo] ?? 1;
+        return self::HIERARQUIA_NIVEL[$nivelMaximo] ?? 0;
     }
 
     public function verPublico(User $usuario, Conteudo $conteudo): bool

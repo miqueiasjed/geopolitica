@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\AcessoLiberadoMail;
+use App\Mail\AddonBoasVindasMail;
 use App\Mail\BoasVindasMail;
 use App\Mail\CancelamentoMail;
 use App\Mail\ReembolsoMail;
@@ -216,7 +217,11 @@ class HotmartHandlerService
             throw new RuntimeException('Nao foi possivel identificar o e-mail do comprador no payload Hotmart.');
         }
 
-        $usuario = User::query()->where('email', $email)->firstOrFail();
+        $nome    = $this->extrairNome($payload) ?? Str::of($email)->before('@')->replace(['.', '_', '-'], ' ')->title()->value();
+        $usuario = User::query()->firstOrCreate(
+            ['email' => $email],
+            ['name' => $nome, 'password' => bcrypt('12345678'), 'deve_alterar_senha' => true],
+        );
 
         $orderId = $this->extrairValor($payload, [
             'data.purchase.order_date',
@@ -232,6 +237,9 @@ class HotmartHandlerService
         ]);
 
         (new AddonService())->ativar($usuario->id, $addonKey, 'hotmart', $orderId, $productId);
+
+        $linkAcesso = rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/') . '/login';
+        Mail::to($email)->send(new AddonBoasVindasMail($nome, $addonKey, $linkAcesso, $usuario->wasRecentlyCreated, $email));
     }
 
     private function cancelarAddon(array $payload, string $addonKey, string $motivo): void
