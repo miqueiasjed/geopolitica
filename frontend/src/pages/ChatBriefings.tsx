@@ -4,6 +4,7 @@ import { useChat } from '../hooks/useChat'
 import { ChatInput } from '../components/chat/ChatInput'
 import { ChatMessages } from '../components/chat/ChatMessages'
 import { ChatLimitWarning } from '../components/chat/ChatLimitWarning'
+import { PlanoGate } from '../components/PlanoGate'
 
 const SUGESTOES_PERGUNTAS = [
   'Quais são os principais conflitos geopolíticos do momento?',
@@ -35,6 +36,7 @@ export function ChatBriefings() {
     : `${perguntaCount} / ∞ perguntas hoje`
 
   return (
+    <PlanoGate>
     <div className="flex flex-col gap-6">
       {/* Cabeçalho */}
       <div>
@@ -153,5 +155,6 @@ export function ChatBriefings() {
         </aside>
       </div>
     </div>
+    </PlanoGate>
   )
 }

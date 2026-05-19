@@ -68,13 +68,17 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/meus-produtos', [MeusProdutosController::class, 'index']);
 });
 
+// Perfil: disponível para todos os assinantes ativos (inclusive addon-only)
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
-    Route::get('/feed', [FeedController::class, 'index']);
-    Route::get('/feed/{id}', [FeedController::class, 'show']);
     Route::get('/perfil', [PerfilController::class, 'show']);
     Route::patch('/perfil', [PerfilController::class, 'update']);
-    Route::post('/feed/atualizar', [FeedController::class, 'atualizar'])
-        ->middleware('role:admin');
+});
+
+// Rotas exclusivas de plano real (essencial, pro, reservado)
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
+    Route::get('/feed', [FeedController::class, 'index']);
+    Route::get('/feed/{id}', [FeedController::class, 'show']);
+    Route::post('/feed/atualizar', [FeedController::class, 'atualizar'])->middleware('role:admin');
 });
 
 Route::middleware(['auth:sanctum', 'assinante.ativo', 'recurso.plano:biblioteca_acesso'])->group(function () {
@@ -82,22 +86,22 @@ Route::middleware(['auth:sanctum', 'assinante.ativo', 'recurso.plano:biblioteca_
     Route::get('/biblioteca/{slug}', [ConteudoController::class, 'show']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('mapa')->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->prefix('mapa')->group(function () {
     Route::get('/intensidade', [MapaIntensidadeController::class, 'index']);
     Route::get('/regiao-eventos', [RegiaoEventosController::class, 'index']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
     Route::get('/indicadores', [IndicadoresController::class, 'index']);
     Route::get('/indicadores/historico', [IndicadoresHistoricoController::class, 'index']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
     Route::get('/timeline', [TimelineController::class, 'index']);
     Route::get('/timeline/crise/{slug}', [TimelineDetailController::class, 'show']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
     Route::get('/alertas', [AlertaController::class, 'index']);
     Route::post('/alertas/{id}/lido', [AlertaController::class, 'marcarLido']);
 });
@@ -105,12 +109,12 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
 Route::post('/webhook/hotmart', [WebhookHotmartController::class, 'receber']);
 Route::post('/webhook/lastlink', [WebhookLastlinkController::class, 'receber']);
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('chat')->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->prefix('chat')->group(function () {
     Route::post('/perguntar', [ChatController::class, 'perguntar']);
     Route::get('/historico', [ChatHistoricoController::class, 'index']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
     Route::get('/paises', [PaisController::class, 'index']);
     Route::get('/paises/{codigo}', [PaisController::class, 'show']);
     Route::get('/paises/{codigo}/eventos', [PaisController::class, 'eventos']);
@@ -120,20 +124,22 @@ Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::delete('/meus-paises/{codigo}', [PaisUsuarioController::class, 'destroy']);
 });
 
+// Monitor de Guerra: addon-only users com 'war' podem acessar (gate no controller)
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/war-feed', [WarFeedController::class, 'index']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
     Route::post('/export-pdf', [ExportPdfController::class, 'exportar']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
     Route::post('/relatorios', [RelatorioIaController::class, 'gerar']);
     Route::get('/relatorios', [RelatorioIaController::class, 'historico']);
     Route::get('/relatorios/{id}', [RelatorioIaController::class, 'show']);
 });
 
+// Monitor Eleitoral: addon-only users com 'elections' podem acessar (gate no controller)
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/eleicoes', [EleicaoController::class, 'index']);
     Route::get('/eleicoes/{id}', [EleicaoController::class, 'show']);
@@ -144,7 +150,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo', 'risk_score.acesso'])->gro
     Route::post('/carteira', [CarteiraRiscoController::class, 'calcular']);
 });
 
-Route::middleware(['auth:sanctum', 'assinante.ativo'])->prefix('suporte')->group(function () {
+Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->prefix('suporte')->group(function () {
     Route::get('/tickets', [SuporteController::class, 'index']);
     Route::post('/tickets', [SuporteController::class, 'store']);
     Route::get('/tickets/{id}', [SuporteController::class, 'show']);

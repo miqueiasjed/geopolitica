@@ -4,6 +4,7 @@ import { FilterBar } from '../components/FilterBar'
 import { EventList } from '../components/EventList'
 import { RefetchIndicator } from '../components/RefetchIndicator'
 import { useFeed } from '../hooks/useFeed'
+import { PlanoGate } from '../components/PlanoGate'
 import type { FeedFilters } from '../types/feed'
 
 interface DashboardOutletContext {
@@ -51,6 +52,7 @@ export function Feed() {
   const summary = `${events.length.toString().padStart(2, '0')} eventos carregados`
 
   return (
+    <PlanoGate>
     <section className="space-y-6">
       <div className="space-y-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -87,5 +89,6 @@ export function Feed() {
         fetchNextPage={fetchNextPage}
       />
     </section>
+    </PlanoGate>
   )
 }

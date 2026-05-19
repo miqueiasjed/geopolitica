@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import { useQueryClient } from '@tanstack/react-query'
 import { useGerarRelatorio } from '../../hooks/useGerarRelatorio'
 import { ExportPdfButton } from '../../components/ExportPdfButton'
+import { PlanoGate } from '../../components/PlanoGate'
 
 const SUGESTOES_TEMA = [
   'Risco energético para portfólios com exposição europeia',
@@ -33,6 +34,7 @@ export function NovoRelatorio() {
   const desabilitado = topico.trim() === '' || gerando || erroLimite
 
   return (
+    <PlanoGate>
     <motion.div
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -192,5 +194,6 @@ export function NovoRelatorio() {
         )}
       </AnimatePresence>
     </motion.div>
+    </PlanoGate>
   )
 }

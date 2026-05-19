@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import api from '../../lib/axios'
+import { PlanoGate } from '../../components/PlanoGate'
 
 interface RelatorioResumo {
   id: string
@@ -86,6 +87,7 @@ export function RelatoriosIA() {
   })
 
   return (
+    <PlanoGate>
     <motion.div
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -202,5 +204,6 @@ export function RelatoriosIA() {
         </motion.div>
       )}
     </motion.div>
+    </PlanoGate>
   )
 }

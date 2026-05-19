@@ -4,6 +4,7 @@ import { WorldMap } from '../components/WorldMap'
 import { RegionPanel } from '../components/RegionPanel'
 import { IntensityLegend } from '../components/IntensityLegend'
 import { useMapaIntensidade } from '../hooks/useMapaIntensidade'
+import { PlanoGate } from '../components/PlanoGate'
 
 interface PaisSelecionado {
   codigoPais: string
@@ -36,6 +37,7 @@ export function Mapa() {
   }
 
   return (
+    <PlanoGate>
     <motion.div
       className="relative -mx-4 -my-6 flex h-[calc(100vh-13rem)] min-h-[620px] flex-col overflow-hidden bg-[#0a0a0b] sm:-mx-6 lg:-my-8 lg:h-[calc(100vh-14rem)]"
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
@@ -83,5 +85,6 @@ export function Mapa() {
         />
       </div>
     </motion.div>
+    </PlanoGate>
   )
 }

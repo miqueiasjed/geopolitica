@@ -5,6 +5,7 @@ import { TimelineBar } from '../components/timeline/TimelineBar'
 import { CriseDetailPanel } from '../components/timeline/CriseDetailPanel'
 import { EventoDetailPanel } from '../components/timeline/EventoDetailPanel'
 import { CATEGORY_COLORS } from '../components/timeline/CriseMarker'
+import { PlanoGate } from '../components/PlanoGate'
 import type { CategoriaCrise, FiltrosTimeline } from '../types/timeline'
 
 export function Timeline() {
@@ -25,6 +26,7 @@ export function Timeline() {
   }
 
   return (
+    <PlanoGate>
     <motion.div
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -138,5 +140,6 @@ export function Timeline() {
         onClose={() => setEventoIdSelecionado(null)}
       />
     </motion.div>
+    </PlanoGate>
   )
 }

@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useMeusPaises } from '../hooks/useMeusPaises'
 import { BuscaPais } from '../components/paises/BuscaPais'
 import { CardPais } from '../components/paises/CardPais'
+import { PlanoGate } from '../components/PlanoGate'
 import { EmptyState } from '../components/EmptyState'
 
 const LIMITE_PLANO: Record<string, number> = {
@@ -101,6 +102,7 @@ export function MeusPaisesPage() {
   }
 
   return (
+    <PlanoGate>
     <section className="space-y-8">
       {/* Cabeçalho */}
       <div className="space-y-3">
@@ -223,5 +225,6 @@ export function MeusPaisesPage() {
         )}
       </div>
     </section>
+    </PlanoGate>
   )
 }

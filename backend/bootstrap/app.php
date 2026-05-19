@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('api', \App\Http\Middleware\ForcarAlteracaoSenha::class);
         $middleware->alias([
             'assinante.ativo'      => \App\Http\Middleware\EnsureAssinanteAtivo::class,
+            'plano.real'           => \App\Http\Middleware\EnsurePlanoReal::class,
             'role'                 => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'cron.secret'          => \App\Http\Middleware\CronSecretMiddleware::class,
             'identificar.tenant'   => \App\Http\Middleware\IdentificarTenantMiddleware::class,
