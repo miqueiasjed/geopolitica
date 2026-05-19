@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual do Assinante — Geopolítica para Investidores</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #050606;
+      --bg-card:   #0e1010;
+      --bg-card2:  #141616;
+      --border:    rgba(255,255,255,0.07);
+      --border-md: rgba(255,255,255,0.12);
+      --lime:      #BFFF3C;
+      --lime-dim:  #7db800;
+      --lime-light:#D7FF69;
+      --text:      #e8e8e8;
+      --muted:     #7a7a7a;
+      --danger:    #FF5B20;
+      --red:       #ef4444;
+      --yellow:    #facc15;
+      --green:     #4ade80;
+      --cyan:      #22d3ee;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ─── LAYOUT ─── */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 260px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 32px 0 48px;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 24px 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .logo-mark {
+      width: 32px; height: 32px;
+      background: var(--lime);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: #000;
+      flex-shrink: 0;
+    }
+    .logo-text { font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--text); }
+    .logo-sub  { font-size: 10px; color: var(--muted); font-weight: 400; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .nav-group { margin-bottom: 4px; }
+    .nav-label {
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 8px 24px 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 24px;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      text-decoration: none;
+      border-radius: 0;
+      transition: color 0.15s, background 0.15s;
+      cursor: pointer;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--lime); background: rgba(191,255,60,0.07); border-right: 2px solid var(--lime); }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+    /* ─── MAIN ─── */
+    .main { margin-left: 260px; flex: 1; }
+
+    /* ─── COVER ─── */
+    .cover {
+      position: relative; overflow: hidden;
+      padding: 80px 64px 72px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #050606 0%, #0a120a 50%, #050606 100%);
+    }
+    .cover-glow {
+      position: absolute; top: -80px; right: -60px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(191,255,60,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cover-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(191,255,60,0.1); border: 1px solid rgba(191,255,60,0.25);
+      color: var(--lime); border-radius: 20px;
+      padding: 4px 12px; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 20px;
+    }
+    .cover-title {
+      font-size: 42px; font-weight: 800; line-height: 1.1;
+      color: #fff; max-width: 520px; margin-bottom: 16px;
+    }
+    .cover-title span { color: var(--lime); }
+    .cover-desc {
+      font-size: 16px; color: var(--muted);
+      max-width: 480px; line-height: 1.7; margin-bottom: 36px;
+    }
+    .cover-meta {
+      display: flex; gap: 32px; flex-wrap: wrap;
+    }
+    .meta-item { font-size: 12px; color: var(--muted); }
+    .meta-item strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+
+    /* ─── CONTENT AREA ─── */
+    .content { padding: 0 64px 80px; }
+
+    /* ─── SECTIONS ─── */
+    .section {
+      padding-top: 72px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 64px;
+    }
+    .section:last-child { border-bottom: none; }
+
+    .section-number {
+      display: inline-block;
+      font-size: 11px; font-weight: 700; color: var(--lime);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .section-title {
+      font-size: 28px; font-weight: 800; color: #fff;
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .section-desc {
+      font-size: 15px; color: var(--muted);
+      max-width: 620px; line-height: 1.7; margin-bottom: 36px;
+    }
+
+    h3 {
+      font-size: 16px; font-weight: 700; color: var(--text);
+      margin: 28px 0 10px;
+    }
+    p { color: var(--muted); line-height: 1.75; margin-bottom: 14px; }
+    p strong { color: var(--text); font-weight: 600; }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 14px; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .card-icon { font-size: 18px; }
+    .card p { margin-bottom: 0; font-size: 14px; }
+
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 16px;
+    }
+
+    /* ─── FEATURE ROW ─── */
+    .feature-row {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 18px 20px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .feature-icon {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: rgba(191,255,60,0.1); border: 1px solid rgba(191,255,60,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .feature-body {}
+    .feature-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .feature-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ─── BADGES ─── */
+    .badge {
+      display: inline-flex; align-items: center;
+      border-radius: 6px; padding: 3px 10px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .badge-critico  { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .badge-alto     { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+    .badge-medio    { background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
+    .badge-monitor  { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+    .badge-lime     { background: rgba(191,255,60,0.1);  color: var(--lime); border: 1px solid rgba(191,255,60,0.25); }
+    .badge-cyan     { background: rgba(34,211,238,0.1);  color: var(--cyan); border: 1px solid rgba(34,211,238,0.2); }
+    .badge-addon    { background: rgba(255,91,32,0.1);   color: var(--danger); border: 1px solid rgba(255,91,32,0.25); }
+
+    /* ─── STEP LIST ─── */
+    .steps { counter-reset: step; margin-bottom: 24px; }
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      counter-increment: step;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(191,255,60,0.1); border: 1px solid rgba(191,255,60,0.25);
+      color: var(--lime); font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .step-num::after { content: counter(step); }
+    .step-body {}
+    .step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .step-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ─── INFO BOX ─── */
+    .info-box {
+      display: flex; gap: 14px;
+      padding: 16px 20px;
+      border-radius: 10px; margin-bottom: 16px;
+    }
+    .info-box.tip    { background: rgba(191,255,60,0.05); border: 1px solid rgba(191,255,60,0.15); }
+    .info-box.warn   { background: rgba(250,204,21,0.05); border: 1px solid rgba(250,204,21,0.15); }
+    .info-box.addon  { background: rgba(255,91,32,0.05);  border: 1px solid rgba(255,91,32,0.15); }
+    .info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .info-body { font-size: 13px; line-height: 1.65; }
+    .info-box.tip  .info-body  { color: #a8cc60; }
+    .info-box.warn .info-body  { color: #c9a82c; }
+    .info-box.addon .info-body { color: #c96040; }
+    .info-body strong { color: inherit; font-weight: 700; }
+
+    /* ─── PLAN TABLE ─── */
+    .plan-table {
+      width: 100%; border-collapse: collapse;
+      margin-bottom: 24px; font-size: 14px;
+    }
+    .plan-table th {
+      text-align: left; padding: 10px 16px;
+      background: var(--bg-card2); color: var(--muted);
+      font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+    .plan-table th:not(:first-child) { text-align: center; }
+    .plan-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      vertical-align: middle;
+    }
+    .plan-table td:not(:first-child) { text-align: center; }
+    .plan-table tr:last-child td { border-bottom: none; }
+    .plan-table .feature-name { color: var(--text); font-weight: 500; }
+    .check { color: var(--lime); font-size: 16px; }
+    .cross { color: #3a3a3a; font-size: 16px; }
+    .partial { color: var(--yellow); font-size: 13px; }
+
+    /* ─── IMPACT LEGEND ─── */
+    .impact-legend {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px; margin-bottom: 24px;
+    }
+    .impact-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 14px 16px;
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .impact-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
+    }
+    .impact-text {}
+    .impact-label { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+    .impact-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ─── SCORE GAUGE ─── */
+    .score-example {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .score-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-radius: 8px;
+      flex: 1; min-width: 140px;
+    }
+    .score-item.low  { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); }
+    .score-item.med  { background: rgba(250,204,21,0.08); border: 1px solid rgba(250,204,21,0.2); }
+    .score-item.high { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.2); }
+    .score-val { font-size: 22px; font-weight: 800; }
+    .score-item.low  .score-val { color: var(--green); }
+    .score-item.med  .score-val { color: var(--yellow); }
+    .score-item.high .score-val { color: var(--red); }
+    .score-label { font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .score-label strong { display: block; color: var(--text); font-size: 13px; }
+
+    /* ─── NAV SCREEN MOCKUP ─── */
+    .nav-mockup {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .nav-mockup-bar {
+      display: flex; gap: 0; padding: 12px 20px; gap: 4px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 6px 14px; border-radius: 6px;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      white-space: nowrap;
+    }
+    .nav-tab.active { background: rgba(191,255,60,0.1); color: var(--lime); }
+    .nav-mockup-body { padding: 20px; }
+    .mockup-text { font-size: 13px; color: var(--muted); }
+
+    /* ─── DIVIDER ─── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* ─── TOC ─── */
+    .toc {
+      background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 28px 32px; margin: 48px 0;
+    }
+    .toc-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 32px; }
+    .toc-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0;
+      font-size: 13px; color: var(--muted);
+      text-decoration: none; border-bottom: 1px solid var(--border);
+      transition: color 0.15s;
+    }
+    .toc-item:hover { color: var(--lime); }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-num { font-size: 11px; font-weight: 700; color: var(--lime); width: 20px; flex-shrink: 0; }
+    @media (max-width: 700px) { .toc-grid { grid-template-columns: 1fr; } }
+
+    /* ─── FAQ ─── */
+    .faq-item {
+      border-bottom: 1px solid var(--border); padding: 20px 0;
+    }
+    .faq-q { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .faq-a { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .faq-a strong { color: var(--text); }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      margin-top: 0; padding: 40px 64px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;
+      gap: 16px;
+    }
+    .footer-brand { font-size: 13px; font-weight: 700; color: var(--text); }
+    .footer-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .footer-lime  { color: var(--lime); }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #1e2020; border-radius: 3px; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .cover { padding: 48px 28px 48px; }
+      .content { padding: 0 28px 60px; }
+      .footer { padding: 32px 28px; }
+      .cover-title { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">G</div>
+      <div>
+        <div class="logo-text">Geopolítica</div>
+        <div class="logo-sub">para Investidores</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Introdução</div>
+      <a class="nav-item" href="#primeiros-passos"><span class="nav-icon">🚀</span>Primeiros Passos</a>
+      <a class="nav-item" href="#navegacao"><span class="nav-icon">🗺️</span>Como Navegar</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Módulos Principais</div>
+      <a class="nav-item" href="#feed"><span class="nav-icon">⚡</span>Feed de Eventos</a>
+      <a class="nav-item" href="#mapa"><span class="nav-icon">🌍</span>Mapa Geopolítico</a>
+      <a class="nav-item" href="#biblioteca"><span class="nav-icon">📚</span>Biblioteca</a>
+      <a class="nav-item" href="#timeline"><span class="nav-icon">📅</span>Timeline de Crises</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Módulos Add-on</div>
+      <a class="nav-item" href="#eleicoes"><span class="nav-icon">🗳️</span>Radar de Eleições</a>
+      <a class="nav-item" href="#guerra"><span class="nav-icon">⚔️</span>Monitor de Guerra</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Inteligência IA</div>
+      <a class="nav-item" href="#chat"><span class="nav-icon">🤖</span>Chat com Briefings</a>
+      <a class="nav-item" href="#relatorios"><span class="nav-icon">📊</span>Relatórios IA</a>
+      <a class="nav-item" href="#risk-score"><span class="nav-icon">📈</span>Risk Score</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Conta</div>
+      <a class="nav-item" href="#paises"><span class="nav-icon">🏳️</span>Meus Países</a>
+      <a class="nav-item" href="#perfil"><span class="nav-icon">👤</span>Perfil</a>
+      <a class="nav-item" href="#suporte"><span class="nav-icon">💬</span>Suporte</a>
+      <a class="nav-item" href="#planos"><span class="nav-icon">⭐</span>Planos</a>
+      <a class="nav-item" href="#faq"><span class="nav-icon">❓</span>Dúvidas Frequentes</a>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main class="main">
+
+    <!-- ─── COVER ─── -->
+    <div class="cover">
+      <div class="cover-glow"></div>
+      <div class="cover-badge">📖 Manual do Assinante</div>
+      <h1 class="cover-title">Tudo que você precisa para usar a <span>plataforma</span></h1>
+      <p class="cover-desc">Este guia explica cada módulo, funcionalidade e recurso disponível para assinantes. Leia do começo ao fim ou navegue direto à seção que precisa.</p>
+      <div class="cover-meta">
+        <div class="meta-item"><strong>Versão</strong>1.0 — Maio 2026</div>
+        <div class="meta-item"><strong>Plataforma</strong>Geopolítica para Investidores</div>
+        <div class="meta-item"><strong>Público</strong>Assinantes Essencial, Pro e Reservado</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ─── TOC ─── -->
+      <div class="toc">
+        <div class="toc-title">📋 Índice</div>
+        <div class="toc-grid">
+          <a class="toc-item" href="#primeiros-passos"><span class="toc-num">01</span>Primeiros Passos</a>
+          <a class="toc-item" href="#eleicoes"><span class="toc-num">07</span>Radar de Eleições</a>
+          <a class="toc-item" href="#navegacao"><span class="toc-num">02</span>Como Navegar</a>
+          <a class="toc-item" href="#guerra"><span class="toc-num">08</span>Monitor de Guerra</a>
+          <a class="toc-item" href="#feed"><span class="toc-num">03</span>Feed de Eventos</a>
+          <a class="toc-item" href="#chat"><span class="toc-num">09</span>Chat com Briefings IA</a>
+          <a class="toc-item" href="#mapa"><span class="toc-num">04</span>Mapa Geopolítico</a>
+          <a class="toc-item" href="#relatorios"><span class="toc-num">10</span>Relatórios IA</a>
+          <a class="toc-item" href="#biblioteca"><span class="toc-num">05</span>Biblioteca de Conteúdo</a>
+          <a class="toc-item" href="#risk-score"><span class="toc-num">11</span>Risk Score de Portfólio</a>
+          <a class="toc-item" href="#timeline"><span class="toc-num">06</span>Timeline de Crises</a>
+          <a class="toc-item" href="#paises"><span class="toc-num">12</span>Meus Países</a>
+          <a class="toc-item" href="#perfil"><span class="toc-num">13</span>Perfil &amp; Conta</a>
+          <a class="toc-item" href="#suporte"><span class="toc-num">14</span>Suporte</a>
+          <a class="toc-item" href="#planos"><span class="toc-num">15</span>Comparativo de Planos</a>
+          <a class="toc-item" href="#faq"><span class="toc-num">16</span>Dúvidas Frequentes</a>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           01 PRIMEIROS PASSOS
+      ══════════════════════════════════════ -->
+      <section class="section" id="primeiros-passos">
+        <div class="section-number">01 — Introdução</div>
+        <h2 class="section-title">Primeiros Passos</h2>
+        <p class="section-desc">Da criação da conta até o primeiro acesso — veja como entrar na plataforma e configurar tudo antes de começar a usar.</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <div class="step-title">Acesse o link enviado por e-mail</div>
+              <div class="step-desc">Após confirmar sua assinatura, você receberá um e-mail com o link de acesso e suas credenciais iniciais. Clique no link para abrir a plataforma.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <div class="step-title">Faça login com e-mail e senha</div>
+              <div class="step-desc">Na tela de login, informe o e-mail cadastrado e a senha recebida. Se for seu primeiro acesso, será solicitado que você crie uma nova senha pessoal.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <div class="step-title">Crie sua nova senha (primeiro acesso)</div>
+              <div class="step-desc">A plataforma pedirá que você redefina a senha inicial por uma de sua escolha. Escolha algo seguro — mínimo 8 caracteres.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <div class="step-title">Você está dentro — explore o Feed</div>
+              <div class="step-desc">Após o login, você será redirecionado ao <strong>Feed de Eventos</strong>, a tela principal da plataforma. Daqui você navega para todos os módulos.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body"><strong>Esqueceu a senha?</strong> Na tela de login, clique em "Esqueci minha senha" e informe seu e-mail. Você receberá um link para criar uma nova senha em instantes.</div>
+        </div>
+
+        <div class="info-box warn">
+          <div class="info-icon">⚠️</div>
+          <div class="info-body"><strong>Conta inativa?</strong> Se aparecer a tela "Assinatura Inativa", significa que o pagamento não foi processado ou o plano expirou. Entre em contato pelo módulo de <strong>Suporte</strong> para regularizar.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           02 NAVEGAÇÃO
+      ══════════════════════════════════════ -->
+      <section class="section" id="navegacao">
+        <div class="section-number">02 — Interface</div>
+        <h2 class="section-title">Como Navegar na Plataforma</h2>
+        <p class="section-desc">A plataforma é organizada em módulos acessíveis pelo menu lateral. Entenda a estrutura geral da interface antes de explorar cada seção.</p>
+
+        <div class="nav-mockup">
+          <div class="nav-mockup-bar">
+            <div class="nav-tab active">⚡ Feed</div>
+            <div class="nav-tab">🌍 Mapa</div>
+            <div class="nav-tab">📚 Biblioteca</div>
+            <div class="nav-tab">📅 Timeline</div>
+            <div class="nav-tab">🗳️ Eleições</div>
+            <div class="nav-tab">⚔️ Guerra</div>
+            <div class="nav-tab">🤖 Chat IA</div>
+            <div class="nav-tab">📊 Relatórios</div>
+            <div class="nav-tab">📈 Risk Score</div>
+          </div>
+          <div class="nav-mockup-body">
+            <div class="mockup-text">↑ Barra de navegação principal — cada aba leva a um módulo diferente da plataforma</div>
+          </div>
+        </div>
+
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title"><span class="card-icon">🧭</span>Menu Lateral</div>
+            <p>Clique em qualquer item do menu à esquerda para navegar entre os módulos. O item ativo aparece destacado em <strong style="color:var(--lime)">verde-limão</strong>.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-icon">👤</span>Perfil e Conta</div>
+            <p>No canto superior direito ou nas últimas opções do menu, você acessa seu <strong>Perfil</strong>, configurações e botão de logout.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-icon">🔒</span>Conteúdo Bloqueado</div>
+            <p>Módulos que exigem plano ou add-on superior exibem uma tela de acesso restrito com opção de upgrade. Veja a seção <strong>Planos</strong> para detalhes.</p>
+          </div>
+        </div>
+
+        <h3>Indicadores de Impacto</h3>
+        <p>Em toda a plataforma, eventos e análises são classificados em quatro níveis de impacto geopolítico. Aprenda a identificar cada um:</p>
+        <div class="impact-legend">
+          <div class="impact-item">
+            <div class="impact-dot" style="background:#ef4444;"></div>
+            <div class="impact-text">
+              <div class="impact-label" style="color:#ef4444;">CRÍTICO</div>
+              <div class="impact-desc">Evento com potencial de disrupção severa. Exige atenção imediata nos portfólios.</div>
+            </div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-dot" style="background:#fb923c;"></div>
+            <div class="impact-text">
+              <div class="impact-label" style="color:#fb923c;">ALTO</div>
+              <div class="impact-desc">Impacto significativo esperado em mercados e fluxo de capitais.</div>
+            </div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-dot" style="background:#facc15;"></div>
+            <div class="impact-text">
+              <div class="impact-label" style="color:#facc15;">MÉDIO</div>
+              <div class="impact-desc">Evento relevante, mas com efeitos contidos ou ainda incertos.</div>
+            </div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-dot" style="background:#94a3b8;"></div>
+            <div class="impact-text">
+              <div class="impact-label" style="color:#94a3b8;">MONITORAR</div>
+              <div class="impact-desc">Situação em desenvolvimento. Baixo impacto imediato, mas merece acompanhamento.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           03 FEED
+      ══════════════════════════════════════ -->
+      <section class="section" id="feed">
+        <div class="section-number">03 — Módulo Principal</div>
+        <h2 class="section-title">Feed de Eventos</h2>
+        <p class="section-desc">O coração da plataforma. Aqui chegam todos os eventos geopolíticos em tempo real, classificados por impacto e filtráveis por região e categoria.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-body">
+            <div class="feature-title">Atualização automática a cada 5 minutos</div>
+            <div class="feature-desc">O feed se atualiza sozinho enquanto você está na página. Um indicador de progresso na tela mostra quanto tempo falta para a próxima atualização e quando foi a última.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🔍</div>
+          <div class="feature-body">
+            <div class="feature-title">Filtros por Região, Categoria e Impacto</div>
+            <div class="feature-desc">Use a barra de filtros no topo para refinar os eventos exibidos. Filtre por região geográfica (ex: América Latina, Oriente Médio), categoria (ex: energia, militar, econômica) ou nível de impacto.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📄</div>
+          <div class="feature-body">
+            <div class="feature-title">Scroll infinito</div>
+            <div class="feature-desc">Role para baixo para carregar mais eventos automaticamente. Não há paginação — os eventos aparecem à medida que você rola a tela.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🧠</div>
+          <div class="feature-body">
+            <div class="feature-title">Análise IA por evento</div>
+            <div class="feature-desc">Clique em qualquer evento para abrir a tela de detalhe. Além do resumo e da fonte, você verá uma <strong>análise gerada por IA</strong> com contexto estratégico e implicações para investidores.</div>
+          </div>
+        </div>
+
+        <h3>Entendendo o cartão de evento</h3>
+        <div class="card">
+          <p>Cada cartão no feed exibe: o <strong>título do evento</strong>, um <strong>resumo curto</strong>, a <strong>fonte jornalística</strong>, a <strong>região</strong> onde ocorre e um <strong>badge de impacto</strong> colorido. Clique no cartão para ler a análise completa com o contexto geopolítico.</p>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body"><strong>Dica:</strong> Use o filtro de impacto para ver apenas eventos <span style="color:#ef4444;font-weight:700;">CRÍTICO</span> e <span style="color:#fb923c;font-weight:700;">ALTO</span> quando quiser uma leitura rápida do dia sem ruído.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           04 MAPA
+      ══════════════════════════════════════ -->
+      <section class="section" id="mapa">
+        <div class="section-number">04 — Módulo Principal</div>
+        <h2 class="section-title">Mapa Geopolítico</h2>
+        <p class="section-desc">Visualize o mundo através da lente geopolítica. O mapa exibe a intensidade de tensão em cada país usando um gradiente de cores.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">🎨</div>
+          <div class="feature-body">
+            <div class="feature-title">Heat map de intensidade geopolítica</div>
+            <div class="feature-desc">Países com maior tensão geopolítica aparecem com cores mais intensas. A legenda na tela explica o que cada tonalidade representa — do verde (baixo) ao vermelho (alto).</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🖱️</div>
+          <div class="feature-body">
+            <div class="feature-title">Clique em qualquer país</div>
+            <div class="feature-desc">Ao clicar sobre um país no mapa, um painel lateral se abre exibindo: nome e bandeira do país, eventos recentes classificados por impacto, e uma visão geral do cenário geopolítico local.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📋</div>
+          <div class="feature-body">
+            <div class="feature-title">Lista de eventos por país</div>
+            <div class="feature-desc">O painel lateral exibe os eventos mais recentes vinculados àquele país. Clique em qualquer evento para ser levado ao detalhe completo no Feed.</div>
+          </div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body"><strong>Como usar:</strong> O mapa é ideal para uma leitura visual rápida do estado do mundo. Use-o como ponto de partida antes de mergulhar nos eventos detalhados do Feed.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           05 BIBLIOTECA
+      ══════════════════════════════════════ -->
+      <section class="section" id="biblioteca">
+        <div class="section-number">05 — Módulo Principal</div>
+        <h2 class="section-title">Biblioteca de Conteúdo</h2>
+        <p class="section-desc">Análises aprofundadas produzidas pela equipe editorial. Diferente do feed (eventos em tempo real), a Biblioteca reúne conteúdos elaborados com maior profundidade analítica.</p>
+
+        <h3>Tipos de conteúdo disponíveis</h3>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title"><span class="badge badge-cyan" style="font-size:10px;">Briefing</span></div>
+            <p>Análises rápidas e objetivas sobre eventos ou tendências geopolíticas. Ideal para leitura diária e atualização ágil sobre o cenário global.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="badge badge-lime" style="font-size:10px;">Mapa Estratégico</span></div>
+            <p>Panoramas completos de regiões ou temas específicos — estrutura de poder, disputas, alianzas e implicações econômicas.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="badge badge-addon" style="font-size:10px;">Tese de Investimento</span></div>
+            <p>Análises detalhadas conectando geopolítica e alocação de capital. Aponta riscos, oportunidades e ativos sensíveis a determinados cenários.</p>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🔎</div>
+          <div class="feature-body">
+            <div class="feature-title">Busca e filtros avançados</div>
+            <div class="feature-desc">Use o campo de busca para encontrar conteúdos por título ou tag. Filtre por tipo de conteúdo, região geográfica ou intervalo de datas de publicação.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📥</div>
+          <div class="feature-body">
+            <div class="feature-title">Exportar como PDF</div>
+            <div class="feature-desc">Todo conteúdo da Biblioteca pode ser exportado em PDF para leitura offline. Clique no botão de exportar dentro do artigo aberto.</div>
+          </div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body"><strong>Dica:</strong> As <strong>Teses de Investimento</strong> são o material de maior valor estratégico da plataforma. Reserve um tempo semanal para ler as publicações mais recentes e conectar com o portfólio.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           06 TIMELINE
+      ══════════════════════════════════════ -->
+      <section class="section" id="timeline">
+        <div class="section-number">06 — Módulo Principal</div>
+        <h2 class="section-title">Timeline de Crises Históricas</h2>
+        <p class="section-desc">Contexto é tudo em geopolítica. A Timeline reúne as principais crises históricas do mundo moderno, conectando o passado ao presente para dar profundidade às análises.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">📍</div>
+          <div class="feature-body">
+            <div class="feature-title">Linha do tempo visual e interativa</div>
+            <div class="feature-desc">A timeline exibe marcadores coloridos posicionados cronologicamente. Cada marcador representa uma crise histórica. Clique para abrir o painel de detalhes.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🏷️</div>
+          <div class="feature-body">
+            <div class="feature-title">11 categorias de crise</div>
+            <div class="feature-desc">Cada crise é classificada por categoria e exibida com uma cor distinta na timeline: <strong>Guerra, Econômica, Humanitária, Geopolítica, Terrorismo, Financeira, Petróleo, Logística, Naval, Energia e Transição.</strong></div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🇧🇷</div>
+          <div class="feature-body">
+            <div class="feature-title">Impacto no Brasil</div>
+            <div class="feature-desc">O painel de detalhe de cada crise inclui uma seção específica sobre <strong>como aquele evento impactou o Brasil</strong> — câmbio, exportações, fluxo de capital, inflação e outros efeitos.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🔧</div>
+          <div class="feature-body">
+            <div class="feature-title">Filtros por categoria e período</div>
+            <div class="feature-desc">Use os filtros para ver apenas crises de um tipo específico (ex: só crises econômicas) ou de um intervalo de anos específico.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           07 ELEIÇÕES
+      ══════════════════════════════════════ -->
+      <section class="section" id="eleicoes">
+        <div class="section-number">07 — Módulo Add-on</div>
+        <h2 class="section-title">Radar de Eleições</h2>
+        <p class="section-desc">Acompanhe todas as eleições relevantes do mundo com análise de impacto para o investidor brasileiro.</p>
+
+        <div class="info-box addon">
+          <div class="info-icon">🔐</div>
+          <div class="info-body"><strong>Add-on "Eleições"</strong> — Este módulo está disponível como complemento pago ao plano base. Se o acesso estiver bloqueado, entre em contato com o suporte para habilitar.</div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📊</div>
+          <div class="feature-body">
+            <div class="feature-title">Grade visual por mês e país</div>
+            <div class="feature-desc">O Radar exibe uma grade onde as colunas são os meses do ano e as linhas são os países com eleições. As células são coloridas por relevância: <span style="color:#ef4444;font-weight:600;">vermelha (alta)</span>, <span style="color:#facc15;font-weight:600;">amarela (média)</span> e <span style="color:#94a3b8;font-weight:600;">cinza (baixa)</span>.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🗓️</div>
+          <div class="feature-body">
+            <div class="feature-title">Seletor de ano</div>
+            <div class="feature-desc">Alterne entre anos diferentes para ver o calendário eleitoral global completo — passado e futuro.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🗳️</div>
+          <div class="feature-body">
+            <div class="feature-title">Painel de detalhe da eleição</div>
+            <div class="feature-desc">Clique em qualquer célula para abrir o painel com: data e tipo da eleição, contexto geopolítico para o Brasil, principais candidatos e conteúdos relacionados da Biblioteca.</div>
+          </div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body">Também existe o <strong>Monitor Eleitoral</strong> — uma visão combinada que une o Radar com os briefings mais recentes sobre eleições, acessível mesmo sem o add-on completo.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           08 GUERRA
+      ══════════════════════════════════════ -->
+      <section class="section" id="guerra">
+        <div class="section-number">08 — Módulo Add-on</div>
+        <h2 class="section-title">Monitor de Guerra</h2>
+        <p class="section-desc">Feed exclusivo de conflitos armados, tensões militares e escaladas bélicas com análise de impacto em commodities, câmbio e mercados globais.</p>
+
+        <div class="info-box addon">
+          <div class="info-icon">🔐</div>
+          <div class="info-body"><strong>Add-on "Guerra"</strong> — Módulo complementar. Assinantes sem este add-on veem a tela de bloqueio com opção de upgrade.</div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">⚔️</div>
+          <div class="feature-body">
+            <div class="feature-title">Feed exclusivo de conflitos</div>
+            <div class="feature-desc">Todos os eventos classificados como conflitos militares ou tensões bélicas aparecem aqui em um feed dedicado, separado do Feed principal para facilitar o acompanhamento.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📰</div>
+          <div class="feature-body">
+            <div class="feature-title">Briefings de Guerra</div>
+            <div class="feature-desc">Abaixo do feed, você encontra os últimos briefings editoriais sobre conflitos — análises mais aprofundadas publicadas pela equipe sobre os principais teatros de guerra ativos.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           09 CHAT IA
+      ══════════════════════════════════════ -->
+      <section class="section" id="chat">
+        <div class="section-number">09 — Inteligência IA</div>
+        <h2 class="section-title">Chat com Briefings IA</h2>
+        <p class="section-desc">Faça perguntas sobre qualquer tema geopolítico e receba respostas fundamentadas nos dados e briefings da plataforma, com inteligência artificial.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">💬</div>
+          <div class="feature-body">
+            <div class="feature-title">Perguntas e respostas contextualizadas</div>
+            <div class="feature-desc">A IA responde com base no conteúdo e nos eventos da plataforma. Pergunte sobre conflitos ativos, riscos geopolíticos por região, impactos em commodities, e muito mais.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-body">
+            <div class="feature-title">Prompts sugeridos</div>
+            <div class="feature-desc">Se não souber por onde começar, a interface oferece sugestões prontas como: "Principais conflitos do momento", "Impacto da relação EUA-China em emergentes", "Países com maior risco geopolítico agora".</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">⌨️</div>
+          <div class="feature-body">
+            <div class="feature-title">Atalho de teclado</div>
+            <div class="feature-desc">Pressione <strong>Ctrl + Enter</strong> para enviar a mensagem sem precisar clicar no botão.</div>
+          </div>
+        </div>
+
+        <h3>Limite de perguntas por dia</h3>
+        <p>Cada plano tem um número diferente de perguntas diárias ao chat. Um <strong>contador</strong> e uma <strong>barra de progresso</strong> na lateral mostram quantas você já usou e quantas ainda restam. O limite é resetado diariamente.</p>
+
+        <div class="info-box warn">
+          <div class="info-icon">⚠️</div>
+          <div class="info-body"><strong>Limite atingido?</strong> Quando o limite diário de perguntas for alcançado, o chat exibirá um aviso. O contador zera automaticamente no dia seguinte, ou você pode fazer upgrade de plano para ter mais perguntas.</div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body"><strong>Dica:</strong> Seja específico nas perguntas para obter respostas mais úteis. Em vez de "o que está acontecendo no mundo?", prefira: "Qual o impacto da guerra na Ucrânia nos preços de grãos e o que isso significa para o Brasil?"</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           10 RELATÓRIOS IA
+      ══════════════════════════════════════ -->
+      <section class="section" id="relatorios">
+        <div class="section-number">10 — Inteligência IA</div>
+        <h2 class="section-title">Relatórios IA</h2>
+        <p class="section-desc">Gere relatórios geopolíticos personalizados sobre qualquer tema. A IA produz documentos completos com análise estruturada, contexto histórico e implicações para investimentos.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">✍️</div>
+          <div class="feature-body">
+            <div class="feature-title">Criar novo relatório</div>
+            <div class="feature-desc">Clique em "Novo Relatório", defina o tema desejado (ex: "Risco geopolítico no Oriente Médio e impacto no petróleo") e aguarde a IA gerar o documento completo.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📂</div>
+          <div class="feature-body">
+            <div class="feature-title">Histórico de relatórios</div>
+            <div class="feature-desc">Todos os relatórios gerados ficam salvos na lista principal. Clique em qualquer um para expandir e ler o conteúdo completo. A data de criação é exibida em formato relativo ("há 2 semanas").</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📄</div>
+          <div class="feature-body">
+            <div class="feature-title">Conteúdo em markdown</div>
+            <div class="feature-desc">Os relatórios são formatados automaticamente com títulos, subtítulos, listas e destaques para facilitar a leitura. O conteúdo pode ser copiado e usado em apresentações ou comunicações.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           11 RISK SCORE
+      ══════════════════════════════════════ -->
+      <section class="section" id="risk-score">
+        <div class="section-number">11 — Inteligência IA</div>
+        <h2 class="section-title">Risk Score de Portfólio</h2>
+        <p class="section-desc">Calcule a exposição geopolítica do seu portfólio de investimentos. Informe os ativos e os pesos, e a plataforma gera uma pontuação de risco detalhada por fator.</p>
+
+        <div class="info-box addon">
+          <div class="info-icon">⭐</div>
+          <div class="info-body"><strong>Disponível nos planos Pro e Reservado.</strong> Assinantes do plano Essencial veem a tela de acesso restrito com opção de upgrade.</div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📋</div>
+          <div class="feature-body">
+            <div class="feature-title">Cadastre até 20 ativos</div>
+            <div class="feature-desc">Informe o ticker do ativo (ex: PETR4, VALE3, SPY) e o percentual de peso no portfólio. A soma dos pesos deve ser igual a 100%.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🧮</div>
+          <div class="feature-body">
+            <div class="feature-title">Score geral de 0 a 100</div>
+            <div class="feature-desc">A plataforma calcula um score geral e um score por cada fator de risco. Quanto mais alto o número, maior a exposição geopolítica do portfólio.</div>
+          </div>
+        </div>
+
+        <h3>Interpretando o Score</h3>
+        <div class="score-example">
+          <div class="score-item low">
+            <div class="score-val">0–39</div>
+            <div class="score-label"><strong>Risco Baixo</strong>Portfólio com exposição geopolítica controlada</div>
+          </div>
+          <div class="score-item med">
+            <div class="score-val">40–69</div>
+            <div class="score-label"><strong>Risco Médio</strong>Exposição moderada. Monitoramento recomendado</div>
+          </div>
+          <div class="score-item high">
+            <div class="score-val">70–100</div>
+            <div class="score-label"><strong>Risco Alto</strong>Alta sensibilidade a eventos geopolíticos</div>
+          </div>
+        </div>
+
+        <h3>Fatores analisados</h3>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title">⚡ Energia</div>
+            <p>Sensibilidade do portfólio a choques em preços de energia — petróleo, gás, renovável — causados por conflitos ou sanções.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">🌾 Alimentos</div>
+            <p>Exposição a disrupções nas cadeias de grãos e commodities agrícolas provocadas por guerras, secas ou bloqueios.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">💱 Câmbio</div>
+            <p>Vulnerabilidade a movimentos bruscos de câmbio decorrentes de tensões geopolíticas, sanções e fluxo de capitais.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">⚔️ Geopolítica Militar</div>
+            <p>Exposição direta a risco de conflitos armados — empresas de defesa, fornecedores de recursos em zonas de tensão.</p>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📥</div>
+          <div class="feature-body">
+            <div class="feature-title">Exportar relatório PDF</div>
+            <div class="feature-desc">Gere um PDF do Risk Score para compartilhar com clientes, advisors ou para registro pessoal. O arquivo inclui todos os fatores e o score de cada ativo.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           12 MEUS PAÍSES
+      ══════════════════════════════════════ -->
+      <section class="section" id="paises">
+        <div class="section-number">12 — Ferramentas Pessoais</div>
+        <h2 class="section-title">Meus Países</h2>
+        <p class="section-desc">Crie sua lista de países favoritos para monitorar de perto. Cada país na sua lista dá acesso rápido a um perfil geopolítico completo.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">➕</div>
+          <div class="feature-body">
+            <div class="feature-title">Adicionar países ao monitoramento</div>
+            <div class="feature-desc">Clique em "Adicionar país" e busque pelo nome. O país será adicionado ao seu painel pessoal. O limite de países depende do seu plano.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🌐</div>
+          <div class="feature-body">
+            <div class="feature-title">Cartões por país</div>
+            <div class="feature-desc">Cada país aparece em um cartão com bandeira emoji, nome, região e um trecho do contexto geopolítico. Clique para abrir o perfil completo.</div>
+          </div>
+        </div>
+
+        <h3>Limite por plano</h3>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title"><span class="badge badge-cyan">Essencial</span></div>
+            <p>Até <strong>3 países</strong> no monitoramento.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="badge badge-lime">Pro</span></div>
+            <p>Até <strong>10 países</strong> no monitoramento.</p>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color:var(--lime)"><span class="badge" style="background:rgba(191,255,60,0.15);color:var(--lime);border:1px solid rgba(191,255,60,0.3);">Reservado</span></div>
+            <p>Até <strong>10 países</strong> no monitoramento.</p>
+          </div>
+        </div>
+
+        <h3>Perfil do País</h3>
+        <p>Clique em qualquer país para abrir o perfil completo, que inclui:</p>
+        <div class="feature-row">
+          <div class="feature-icon">📝</div>
+          <div class="feature-body">
+            <div class="feature-title">Contexto Geopolítico</div>
+            <div class="feature-desc">Análise gerada por IA sobre a situação geopolítica atual do país — alianças, tensões, riscos e posicionamento global.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">👤</div>
+          <div class="feature-body">
+            <div class="feature-title">Análise de Liderança</div>
+            <div class="feature-desc">Perfil do governo ou liderança atual: orientação política, estabilidade, riscos de mudança de regime e impacto nas relações internacionais.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">📈</div>
+          <div class="feature-body">
+            <div class="feature-title">Indicadores Econômicos Relevantes</div>
+            <div class="feature-desc">Principais indicadores econômicos do país exibidos como badges — inflação, dívida/PIB, balança comercial e outros dados relevantes para o investidor.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-body">
+            <div class="feature-title">Eventos Recentes</div>
+            <div class="feature-desc">Lista dos eventos mais recentes vinculados ao país, com badge de impacto. Clique para ler o detalhe completo no Feed.</div>
+          </div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body">O perfil do país também tem um botão de <strong>exportar PDF</strong> — útil para registrar o contexto atual e compartilhar com advisors ou clientes.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           13 PERFIL
+      ══════════════════════════════════════ -->
+      <section class="section" id="perfil">
+        <div class="section-number">13 — Conta</div>
+        <h2 class="section-title">Perfil e Configurações</h2>
+        <p class="section-desc">Gerencie suas informações pessoais, altere sua senha e confira os detalhes da sua assinatura.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">✏️</div>
+          <div class="feature-body">
+            <div class="feature-title">Editar nome e e-mail</div>
+            <div class="feature-desc">Atualize seu nome de exibição e endereço de e-mail a qualquer momento. As alterações são salvas ao clicar em "Salvar".</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🔑</div>
+          <div class="feature-body">
+            <div class="feature-title">Alterar senha</div>
+            <div class="feature-desc">Para trocar de senha, preencha o campo de nova senha no perfil. Se deixar em branco, a senha atual é mantida.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">📋</div>
+          <div class="feature-body">
+            <div class="feature-title">Informações da assinatura</div>
+            <div class="feature-desc">O perfil exibe o <strong>nome do plano atual</strong>, o <strong>status da assinatura</strong> (ativo, trial, expirado) e quais <strong>add-ons</strong> estão habilitados na sua conta.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">🚪</div>
+          <div class="feature-body">
+            <div class="feature-title">Logout</div>
+            <div class="feature-desc">Para sair da plataforma com segurança, clique no botão "Sair" disponível na página de perfil ou no menu.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           14 SUPORTE
+      ══════════════════════════════════════ -->
+      <section class="section" id="suporte">
+        <div class="section-number">14 — Conta</div>
+        <h2 class="section-title">Suporte</h2>
+        <p class="section-desc">Precisa de ajuda? O módulo de suporte permite abrir tickets diretamente dentro da plataforma e acompanhar as respostas da equipe.</p>
+
+        <div class="feature-row">
+          <div class="feature-icon">📩</div>
+          <div class="feature-body">
+            <div class="feature-title">Abrir novo ticket</div>
+            <div class="feature-desc">Clique em "Novo Ticket", informe o assunto e descreva sua dúvida ou problema. Você pode anexar arquivos (imagens, PDF, documentos) para facilitar o diagnóstico — até 5 anexos por ticket.</div>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-icon">💬</div>
+          <div class="feature-body">
+            <div class="feature-title">Acompanhar e responder</div>
+            <div class="feature-desc">Todos os seus tickets aparecem em uma lista com status colorido. Clique em um ticket para ler o histórico da conversa e enviar resposta.</div>
+          </div>
+        </div>
+
+        <h3>Status dos tickets</h3>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title"><span class="badge badge-lime">Aberto</span></div>
+            <p>Ticket registrado, aguardando resposta da equipe de suporte.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="badge badge-cyan">Respondido</span></div>
+            <p>A equipe enviou uma resposta. Acesse o ticket para ler e responder.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="badge badge-monitor">Fechado</span></div>
+            <p>Ticket encerrado. O histórico fica disponível para consulta em modo somente leitura.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           15 PLANOS
+      ══════════════════════════════════════ -->
+      <section class="section" id="planos">
+        <div class="section-number">15 — Assinatura</div>
+        <h2 class="section-title">Comparativo de Planos</h2>
+        <p class="section-desc">Entenda o que cada plano inclui e o que é necessário para desbloquear cada funcionalidade.</p>
+
+        <table class="plan-table">
+          <thead>
+            <tr>
+              <th>Funcionalidade</th>
+              <th><span class="badge badge-cyan">Essencial</span></th>
+              <th><span class="badge badge-lime">Pro</span></th>
+              <th><span class="badge" style="background:rgba(191,255,60,0.15);color:var(--lime);border:1px solid rgba(191,255,60,0.3);">Reservado</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feature-name">Feed de Eventos (tempo real)</td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Mapa Geopolítico</td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Biblioteca (Briefings e Mapas)</td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Timeline de Crises</td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Monitor Eleitoral (briefings)</td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Chat com Briefings IA</td>
+              <td><span class="partial">Limite baixo</span></td>
+              <td><span class="partial">Limite médio</span></td>
+              <td><span class="check">✓ Limite alto</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Relatórios IA</td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Meus Países</td>
+              <td><span class="partial">3 países</span></td>
+              <td><span class="partial">10 países</span></td>
+              <td><span class="partial">10 países</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Teses de Investimento (Biblioteca)</td>
+              <td><span class="cross">—</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Risk Score de Portfólio</td>
+              <td><span class="cross">—</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Radar de Eleições (add-on)</td>
+              <td><span class="cross">—</span></td>
+              <td><span class="partial">Add-on</span></td>
+              <td><span class="partial">Add-on</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Monitor de Guerra (add-on)</td>
+              <td><span class="cross">—</span></td>
+              <td><span class="partial">Add-on</span></td>
+              <td><span class="partial">Add-on</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="info-box tip">
+          <div class="info-icon">💡</div>
+          <div class="info-body">Quer fazer upgrade ou habilitar um add-on? Entre em contato pelo módulo de <strong>Suporte</strong> ou pelo canal de atendimento da sua assinatura.</div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           16 FAQ
+      ══════════════════════════════════════ -->
+      <section class="section" id="faq">
+        <div class="section-number">16 — Dúvidas</div>
+        <h2 class="section-title">Dúvidas Frequentes</h2>
+        <p class="section-desc">Respostas rápidas para as perguntas mais comuns dos assinantes.</p>
+
+        <div class="faq-item">
+          <div class="faq-q">Com que frequência os eventos do Feed são atualizados?</div>
+          <div class="faq-a">O Feed é atualizado automaticamente a cada <strong>5 minutos</strong> enquanto você está na página. Um indicador de progresso mostra o tempo para a próxima atualização e quando foi a última.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Posso usar a plataforma em dispositivos móveis?</div>
+          <div class="faq-a">Sim. A plataforma é responsiva e funciona em smartphones e tablets via navegador. Recomendamos o uso em tela maior para aproveitar melhor módulos como o Mapa e o Radar de Eleições.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">O limite de perguntas do Chat IA zera quando?</div>
+          <div class="faq-a">O limite de perguntas é diário e zera automaticamente todo dia. Você pode acompanhar o saldo disponível pelo contador na lateral direita do Chat.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Como exporto um relatório ou análise em PDF?</div>
+          <div class="faq-a">O botão de exportar PDF está disponível dentro de cada conteúdo da Biblioteca, no Perfil do País e no Risk Score de Portfólio. Clique no ícone de download ou no botão "Exportar PDF" que aparece na parte superior da tela.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">O que é um Add-on e como habilito?</div>
+          <div class="faq-a">Add-ons são módulos complementares (Radar de Eleições e Monitor de Guerra) que podem ser contratados além do plano base. Para habilitar, entre em contato pelo <strong>Suporte</strong> dentro da plataforma.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Posso adicionar membros da minha equipe à minha conta?</div>
+          <div class="faq-a">Sim, desde que sua conta seja corporativa (B2B). Administradores de empresa têm acesso ao módulo <strong>Equipe</strong>, onde podem convidar membros por e-mail e gerenciar acessos.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Por que certos conteúdos aparecem bloqueados?</div>
+          <div class="faq-a">Alguns conteúdos são exclusivos de planos superiores — como as Teses de Investimento (Pro/Reservado) e o Risk Score (Pro/Reservado). A tela de bloqueio sempre indica qual plano é necessário para acesso.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Os dados e análises têm defasagem temporal?</div>
+          <div class="faq-a">Os eventos do Feed chegam em tempo real com atualização de 5 em 5 minutos. As análises editoriais (Biblioteca) e os Relatórios IA são produzidos com base nos dados mais recentes disponíveis no momento da geração.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Preciso de ajuda que não está aqui. Como falo com o suporte?</div>
+          <div class="faq-a">Acesse o módulo <strong>Suporte</strong> no menu lateral, abra um novo ticket descrevendo sua dúvida e aguarde o retorno da equipe. O histórico de todas as conversas fica registrado para consulta.</div>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+
+    <!-- ─── FOOTER ─── -->
+    <footer class="footer">
+      <div>
+        <div class="footer-brand">Geopolítica <span class="footer-lime">para Investidores</span></div>
+        <div class="footer-sub">Manual do Assinante — v1.0 · Maio 2026</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);text-align:right;">
+        Dúvidas? Acesse o módulo <strong style="color:var(--text)">Suporte</strong> dentro da plataforma.
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active nav item based on scroll
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(item => {
+          item.classList.remove('active');
+          if (item.getAttribute('href') === '#' + id) {
+            item.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

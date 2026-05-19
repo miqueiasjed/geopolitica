@@ -43,6 +43,7 @@ import { Suporte } from '../pages/dashboard/Suporte'
 import { AdminSuporte } from '../pages/admin/AdminSuporte'
 import { AdminEventosSemEditorial } from '../pages/admin/AdminEventosSemEditorial'
 import { AssinaturaInativa } from '../pages/AssinaturaInativa'
+import { Manual } from '../pages/Manual'
 
 function RedirecionamentoInicial() {
   const { isAuthenticated } = useAuth()
@@ -59,6 +60,7 @@ export function AppRouter() {
       <Route path="/redefinir-senha" element={<RedefinirSenha />} />
       <Route path="/convite/:token" element={<AceitarConvitePage />} />
       <Route path="/alterar-senha-inicial" element={<AlterarSenhaInicial />} />
+      <Route path="/manual" element={<Manual />} />
       <Route element={<RotaProtegida />}>
         <Route path="/assinatura-inativa" element={<AssinaturaInativa />} />
         <Route element={<DashboardLayout />}>
