@@ -16,21 +16,21 @@ class AdminProdutoController extends Controller
     {
         $produtos = Produto::orderBy('ordem')->orderBy('id')->get();
 
-        return response()->json(['data' => $produtos]);
+        return response()->json($produtos);
     }
 
     public function store(CriarProdutoRequest $request): JsonResponse
     {
         $produto = Produto::create($request->validated());
 
-        return response()->json(['data' => $produto], 201);
+        return response()->json($produto, 201);
     }
 
     public function update(AtualizarProdutoRequest $request, Produto $produto): JsonResponse
     {
         $produto->update($request->validated());
 
-        return response()->json(['data' => $produto->fresh()]);
+        return response()->json($produto->fresh());
     }
 
     public function destroy(Produto $produto): JsonResponse|Response
