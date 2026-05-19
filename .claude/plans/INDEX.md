@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-05-18 (Plano 28 concluído — Multi-Produtos Frontend Core)
+> Última atualização: 2026-05-18 (Plano 29 concluído — Multi-Produtos Frontend Admin UI)
 
 ## Legenda
 - ✅ Concluído
@@ -40,7 +40,7 @@
 | 26 | [Multi-Produtos: Backend Core (Catálogo + /meus-produtos + CRUD Admin)](26.md) | ✅ | 19, 20, 25 | 6 |
 | 27 | [Multi-Produtos: Backend Gestão Manual de Addons (Individual + Lote)](27.md) | ✅ | 26 | 6 |
 | 28 | [Multi-Produtos: Frontend Core (Tipos, Serviços, Hooks e Componentes)](28.md) | ✅ | 26 | 6 |
-| 29 | [Multi-Produtos: Frontend Admin UI (Produtos, Addons e Importação)](29.md) | ⏳ | 27, 28 | 7 |
+| 29 | [Multi-Produtos: Frontend Admin UI (Produtos, Addons e Importação)](29.md) | ✅ | 27, 28 | 7 |
 
 ## Ordem de execução recomendada
 
@@ -104,4 +104,4 @@
 | Multi-Produtos: Catálogo + /meus-produtos + CRUD admin | Plano 26 | ✅ |
 | Multi-Produtos: Gestão manual de addons (individual + lote) | Plano 27 | ✅ |
 | Multi-Produtos: Frontend core (tipos, hooks, componentes) | Plano 28 | ✅ |
-| Multi-Produtos: Frontend admin UI | Plano 29 | ⏳ |
+| Multi-Produtos: Frontend admin UI | Plano 29 | ✅ |

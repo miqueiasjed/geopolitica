@@ -181,3 +181,9 @@
 - Atualizado: MonitorEleitoral.tsx, MonitorGuerra.tsx e RadarEleicoes.tsx — prop renomeada addonKey → chave.
 - Gotcha: path alias @/types/produto não estava configurado no tsconfig — subagente corrigiu para ../types/produto nos services.
 - Validações: tsc --noEmit sem erros, npm run build 1568 módulos OK.
+
+- Plano 29 concluído: Multi-Produtos Frontend Admin UI.
+- Criados: AdminProdutos.tsx (tabela + modal criar/editar/excluir com tratamento de 422), AdminAssinanteAddons.tsx (embeddable, prop userId, CRUD de addons por assinante), AdminImportarAddons.tsx (dropzone, preview CSV inline, template download, exportar, relatório pós-importação com animação Framer Motion).
+- Atualizados: AdminLayout.tsx (sidebar — itens "Produtos" e "Importar Addons" adicionados), router/index.tsx (rotas /admin/produtos e /admin/assinantes/importar-addons), AdminAssinantes.tsx (botão "Addons" por linha + modal overlay com AdminAssinanteAddons).
+- Padrão visual: dark theme #C9B882 gold, fonte mono, Framer Motion com useReducedMotion() em todos os componentes.
+- Validações: tsc --noEmit sem erros, npm run build 1575 módulos OK.

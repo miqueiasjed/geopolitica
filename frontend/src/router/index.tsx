@@ -29,6 +29,8 @@ import { AdminCrises } from '../pages/admin/AdminCrises'
 import { AdminFontes } from '../pages/admin/AdminFontes'
 import { AdminPaises } from '../pages/admin/AdminPaises'
 import { AdminPlanos } from '../pages/admin/AdminPlanos'
+import { AdminProdutos } from '../pages/admin/AdminProdutos'
+import { AdminImportarAddons } from '../pages/admin/AdminImportarAddons'
 import { AceitarConvitePage } from '../pages/AceitarConvitePage'
 import { AlterarSenhaInicial } from '../pages/AlterarSenhaInicial'
 import { MeusPaisesPage } from '../pages/MeusPaisesPage'
@@ -101,6 +103,8 @@ export function AppRouter() {
           <Route path="paises" element={<AdminPaises />} />
           <Route path="b2b" element={<AdminB2BPage />} />
           <Route path="planos" element={<AdminPlanos />} />
+          <Route path="produtos" element={<AdminProdutos />} />
+          <Route path="assinantes/importar-addons" element={<AdminImportarAddons />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
           <Route path="ia/uso" element={<UsoPage />} />
           <Route path="suporte" element={<AdminSuporte />} />

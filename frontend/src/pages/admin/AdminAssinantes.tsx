@@ -30,7 +30,9 @@ import {
   ResetIcon,
   UpdateIcon,
   UploadIcon,
+  LayersIcon,
 } from '@radix-ui/react-icons'
+import { AdminAssinanteAddons } from './AdminAssinanteAddons'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   adminKeys,
@@ -539,6 +541,7 @@ export function AdminAssinantes() {
   const [status, setStatus] = useState(VALOR_TODOS)
   const [page, setPage] = useState(1)
   const [importando, setImportando] = useState(false)
+  const [addonsUserId, setAddonsUserId] = useState<number | null>(null)
   const [reenvioFeedback, setReenvioFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
   const [reenvioEmAndamento, setReenvioEmAndamento] = useState<number | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
@@ -851,24 +854,36 @@ export function AdminAssinantes() {
                           </Table.Cell>
                           <Table.Cell>{formatarDataCurta(assinante.assinado_em)}</Table.Cell>
                           <Table.Cell>
-                            <Tooltip content="Reenviar e-mail de boas-vindas">
-                              <IconButton
-                                size="1"
-                                variant="ghost"
-                                color="cyan"
-                                disabled={reenvioEmAndamento === assinante.id}
-                                onClick={() => {
-                                  setReenvioFeedback(null)
-                                  mutacaoReenvio.mutate(assinante.id)
-                                }}
-                              >
-                                {reenvioEmAndamento === assinante.id ? (
-                                  <Spinner size="1" />
-                                ) : (
-                                  <EnvelopeClosedIcon />
-                                )}
-                              </IconButton>
-                            </Tooltip>
+                            <Flex gap="1">
+                              <Tooltip content="Gerenciar addons">
+                                <IconButton
+                                  size="1"
+                                  variant="ghost"
+                                  color="violet"
+                                  onClick={() => setAddonsUserId(assinante.id)}
+                                >
+                                  <LayersIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip content="Reenviar e-mail de boas-vindas">
+                                <IconButton
+                                  size="1"
+                                  variant="ghost"
+                                  color="cyan"
+                                  disabled={reenvioEmAndamento === assinante.id}
+                                  onClick={() => {
+                                    setReenvioFeedback(null)
+                                    mutacaoReenvio.mutate(assinante.id)
+                                  }}
+                                >
+                                  {reenvioEmAndamento === assinante.id ? (
+                                    <Spinner size="1" />
+                                  ) : (
+                                    <EnvelopeClosedIcon />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            </Flex>
                           </Table.Cell>
                         </Table.Row>
                       ))
@@ -921,6 +936,32 @@ export function AdminAssinantes() {
       </div>
 
       <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
+
+      {addonsUserId !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setAddonsUserId(null) }}
+        >
+          <div className="w-full max-w-3xl rounded-2xl border border-[#2a2a2e] bg-[#0d0d0f] shadow-2xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#1e1e20] px-6 py-4 flex-shrink-0">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C9B882]/70">admin</p>
+                <h2 className="text-base font-semibold text-white">Addons — Assinante #{addonsUserId}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAddonsUserId(null)}
+                className="rounded-md p-1.5 text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-6">
+              <AdminAssinanteAddons userId={addonsUserId} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Barra de ação em massa */}
       {selecionados.size > 0 && (
