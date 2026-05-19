@@ -21,22 +21,17 @@ class AddonService
             ['plano' => $addonKey, 'ativo' => true, 'status' => 'ativo'],
         );
 
-        $addonsAtuais = $assinante->addons ?? [];
+        $addonsAtuais = array_values(array_unique($assinante->addons ?? []));
 
         if (! in_array($addonKey, $addonsAtuais, true)) {
             $addonsAtuais[] = $addonKey;
             $assinante->forceFill(['addons' => $addonsAtuais])->save();
         }
 
-        AssinanteAddon::query()->create([
-            'user_id'     => $userId,
-            'addon_key'   => $addonKey,
-            'status'      => 'ativo',
-            'fonte'       => $fonte,
-            'order_id'    => $orderId,
-            'product_id'  => $productId,
-            'iniciado_em' => now(),
-        ]);
+        AssinanteAddon::query()->firstOrCreate(
+            ['user_id' => $userId, 'addon_key' => $addonKey, 'status' => 'ativo'],
+            ['fonte' => $fonte, 'order_id' => $orderId, 'product_id' => $productId, 'iniciado_em' => now()],
+        );
     }
 
     public function cancelar(int $userId, string $addonKey, string $motivo): void
