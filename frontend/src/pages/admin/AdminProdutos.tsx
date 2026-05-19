@@ -666,9 +666,9 @@ export function AdminProdutos() {
       >
         <div className="space-y-1">
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">admin</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">Produtos</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Addons</h1>
           <p className="text-sm text-zinc-400">
-            Gerencie os produtos e addons disponíveis para os assinantes.
+            Gerencie os addons disponíveis para os assinantes.
           </p>
         </div>
         <button
