@@ -1338,20 +1338,38 @@
 </div>
 
 <script>
-  // Highlight active nav item based on scroll
   const navItems = document.querySelectorAll('.nav-item');
+  const anchorItems = document.querySelectorAll('a[href^="#"]');
   const sections = document.querySelectorAll('.section');
+
+  function setActiveNav(hash) {
+    navItems.forEach(item => {
+      item.classList.toggle('active', item.getAttribute('href') === hash);
+    });
+  }
+
+  anchorItems.forEach(item => {
+    item.addEventListener('click', event => {
+      const hash = item.getAttribute('href');
+      if (!hash || hash === '#') return;
+
+      const target = document.getElementById(hash.slice(1));
+      if (!target) return;
+
+      event.preventDefault();
+      target.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      });
+      history.pushState(null, '', hash);
+      setActiveNav(hash);
+    });
+  });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navItems.forEach(item => {
-          item.classList.remove('active');
-          if (item.getAttribute('href') === '#' + id) {
-            item.classList.add('active');
-          }
-        });
+        setActiveNav('#' + entry.target.id);
       }
     });
   }, { rootMargin: '-30% 0px -60% 0px' });
