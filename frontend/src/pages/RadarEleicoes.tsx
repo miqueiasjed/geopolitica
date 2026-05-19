@@ -118,7 +118,7 @@ export function RadarEleicoes() {
   const temAcesso = useAddonAccess('elections')
 
   if (!temAcesso) {
-    return <AddonGate addonKey="elections" />
+    return <AddonGate chave="elections" />
   }
 
   return <RadarEleicoesConteudo />

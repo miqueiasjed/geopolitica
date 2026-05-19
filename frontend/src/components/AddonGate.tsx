@@ -1,30 +1,30 @@
-const ADDON_INFO = {
-  elections: {
-    titulo: 'Monitor Eleitoral',
-    descricao:
-      'Acompanhe eleições globais que movem mercados. Briefings eleitorais diários + radar visual dos próximos 12 meses.',
-    preco: 'R$ 297/ano',
-    ctaLabel: 'Adicionar Monitor Eleitoral',
-    ctaUrl: import.meta.env.VITE_LASTLINK_ELECTIONS_URL || '#',
-    upgradePlano: 'Pro',
-  },
-  war: {
-    titulo: 'Monitor de Guerra',
-    descricao:
-      'Feed em tempo real de conflitos armados e movimentações militares com impacto em mercados de energia e commodities.',
-    preco: 'R$ 497/ano',
-    ctaLabel: 'Adicionar Monitor de Guerra',
-    ctaUrl: import.meta.env.VITE_LASTLINK_WAR_URL || '#',
-    upgradePlano: 'Reservado',
-  },
-} as const
+import { useProdutos, resolveLinkCta, resolveLabelCta } from '../hooks/useProdutos'
 
 interface AddonGateProps {
-  addonKey: 'elections' | 'war'
+  chave: string
+  children?: React.ReactNode
 }
 
-export function AddonGate({ addonKey }: AddonGateProps) {
-  const info = ADDON_INFO[addonKey]
+export function AddonGate({ chave, children }: AddonGateProps) {
+  const { data: produtos, isLoading } = useProdutos()
+
+  // Evitar flash de conteúdo durante o carregamento
+  if (isLoading) return null
+
+  const produto = produtos?.find((p) => p.chave === chave)
+
+  // Produto não encontrado (chave inválida) → renderizar children ou null
+  if (!produto) return <>{children ?? null}</>
+
+  // Usuário com acesso ativo → renderizar children ou null
+  if (produto.status_usuario === 'ativo') return <>{children ?? null}</>
+
+  // Determinar CTA
+  const ctaLink = resolveLinkCta(produto)
+  const ctaLabel = produto.status_usuario === null
+    ? 'Adicionar'
+    : resolveLabelCta(produto.status_usuario)
+  const desabilitado = ctaLink === null
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-6 py-16">
@@ -33,28 +33,38 @@ export function AddonGate({ addonKey }: AddonGateProps) {
           acesso exclusivo
         </p>
 
-        <h2 className="font-serif text-3xl font-bold text-white">{info.titulo}</h2>
+        {produto.nome && (
+          <h2 className="font-serif text-3xl font-bold text-white">{produto.nome}</h2>
+        )}
 
-        <p className="text-sm leading-6 text-zinc-400">{info.descricao}</p>
+        {produto.descricao && (
+          <p className="text-sm leading-6 text-zinc-400">{produto.descricao}</p>
+        )}
 
-        <div className="w-full rounded-xl border border-[#BFFF3C]/30 bg-zinc-900/60 px-6 py-5">
-          <p className="text-xs uppercase tracking-widest text-zinc-500">Acesso anual</p>
-          <p className="mt-1 text-2xl font-bold text-[#BFFF3C]">{info.preco}</p>
-        </div>
+        {produto.preco_label && (
+          <div className="w-full rounded-xl border border-[#BFFF3C]/30 bg-zinc-900/60 px-6 py-5">
+            <p className="text-xs uppercase tracking-widest text-zinc-500">Acesso anual</p>
+            <p className="mt-1 text-2xl font-bold text-[#BFFF3C]">{produto.preco_label}</p>
+          </div>
+        )}
 
-        <a
-          href={info.ctaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex w-full items-center justify-center rounded-lg bg-[#BFFF3C] px-6 py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BFFF3C]"
-        >
-          {info.ctaLabel}
-        </a>
-
-        <p className="text-xs text-zinc-500">
-          Usuários do plano{' '}
-          <span className="font-medium text-zinc-300">{info.upgradePlano}</span> têm acesso incluso
-        </p>
+        {desabilitado ? (
+          <button
+            disabled
+            className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-lg bg-[#BFFF3C] px-6 py-3 text-sm font-semibold text-zinc-900 opacity-40"
+          >
+            Entre em contato
+          </button>
+        ) : (
+          <a
+            href={ctaLink!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center rounded-lg bg-[#BFFF3C] px-6 py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BFFF3C]"
+          >
+            {ctaLabel}
+          </a>
+        )}
       </div>
     </div>
   )

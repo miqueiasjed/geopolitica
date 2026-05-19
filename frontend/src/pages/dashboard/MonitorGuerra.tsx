@@ -90,7 +90,7 @@ export function MonitorGuerra() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   if (!temAcesso) {
-    return <AddonGate addonKey="war" />
+    return <AddonGate chave="war" />
   }
 
   return (

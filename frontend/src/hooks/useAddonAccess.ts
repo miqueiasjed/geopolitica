@@ -1,22 +1,10 @@
-import { useAuth } from './useAuth'
+import { useProdutos } from './useProdutos'
 
-export function useAddonAccess(addonKey: 'elections' | 'war'): boolean {
-  const { user } = useAuth()
+export function useAddonAccess(addonKey: string): boolean {
+  const { data: produtos } = useProdutos()
 
-  if (!user) return false
+  if (!produtos) return false
 
-  if (user.role === 'admin') return true
-
-  const plano = user.assinante?.plano ?? ''
-  const addons: string[] = user.assinante?.addons ?? []
-
-  if (addonKey === 'elections') {
-    return plano === 'pro' || plano === 'reservado' || addons.includes('elections')
-  }
-
-  if (addonKey === 'war') {
-    return plano === 'reservado' || addons.includes('war')
-  }
-
-  return false
+  const produto = produtos.find(p => p.chave === addonKey)
+  return produto?.status_usuario === 'ativo'
 }

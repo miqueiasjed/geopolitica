@@ -24,6 +24,7 @@ import { AlertaPanel } from './alertas/AlertaPanel'
 import { useAuth } from '../hooks/useAuth'
 import { useTenant } from '../contexts/TenantContext'
 import { useAddonAccess } from '../hooks/useAddonAccess'
+import { useProdutos } from '../hooks/useProdutos'
 
 interface TopNavProps {
   lastUpdatedLabel: string
@@ -61,6 +62,9 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const { tenant, isB2B } = useTenant()
   const temAcessoEleitoral = useAddonAccess('elections')
   const temAcessoGuerra = useAddonAccess('war')
+  const { data: produtos } = useProdutos()
+  const statusEleitoral = produtos?.find((p) => p.chave === 'elections')?.status_usuario
+  const statusGuerra = produtos?.find((p) => p.chave === 'war')?.status_usuario
   const temAcessoRiskScore = ['pro', 'reservado', 'admin'].includes(
     user?.assinante?.plano ?? user?.role ?? '',
   )
@@ -106,7 +110,7 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
     {
       to: '/dashboard/monitor-eleitoral',
       label: 'Monitor Eleitoral',
-      eyebrow: temAcessoEleitoral ? 'Addon' : 'Exclusivo',
+      eyebrow: statusEleitoral === 'cancelado' ? 'Cancelado' : (temAcessoEleitoral ? 'Addon' : 'Exclusivo'),
       locked: !temAcessoEleitoral,
       isActive: (p: string) => p === '/dashboard/monitor-eleitoral',
       icon: <LightningBoltIcon />,
@@ -114,7 +118,7 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
     {
       to: '/dashboard/monitor-guerra',
       label: 'Monitor de Guerra',
-      eyebrow: temAcessoGuerra ? 'Addon' : 'Exclusivo',
+      eyebrow: statusGuerra === 'cancelado' ? 'Cancelado' : (temAcessoGuerra ? 'Addon' : 'Exclusivo'),
       locked: !temAcessoGuerra,
       isActive: (p: string) => p === '/dashboard/monitor-guerra',
       icon: <Crosshair2Icon />,

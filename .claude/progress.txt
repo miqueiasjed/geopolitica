@@ -169,3 +169,15 @@
 - PDF: template pdf/report.blade.php (Plano 23 pendente) + pdf/risk_score.blade.php, PdfTemplateService atualizado com cases 'report' e 'risk_score', ExportPdfController validação ampliada.
 - Gotcha: MySQL não aceita default em colunas JSON — carteiras.ativos ficou nullable (tratar com ?? [] no código). AlertaPreditivo usa 'titulo' e 'nivel' (não 'title'/'level'). Framer Motion Variants com ease: 'easeOut' precisa de 'as const' quando inline em variants prop.
 - Validações: php artisan migrate OK, MapaRiscoAtivosSeeder 40 registros OK, php artisan route:list confirmou carteira+export-pdf, npm run build 1562 módulos OK (zero erros TS).
+
+2026-05-18
+- Plano 28 concluído: Multi-Produtos Frontend Core.
+- Criado: frontend/src/types/produto.ts com StatusAddonUsuario, Produto, AdminProduto, CriarProdutoPayload, AtualizarProdutoPayload, AssinanteAddon, AdicionarAddonPayload, AtualizarAddonPayload.
+- Criado: frontend/src/services/adminProdutos.ts (CRUD + importarAddons com FormData + exportarAddons com responseType blob) e adminAssinanteAddons.ts (gestão individual por userId).
+- Criado: frontend/src/hooks/useProdutos.ts com queryKey ['meus-produtos'], staleTime 5min, helpers resolveLinkCta e resolveLabelCta.
+- Refatorado: useAddonAccess.ts delegou para useProdutos — removeu lógica hardcoded de plano/addons; retorna true apenas quando status_usuario === 'ativo'.
+- Reescrito: AddonGate.tsx recebe { chave: string; children?: ReactNode }, usa dados dinâmicos da API (nome, descricao, preco_label), CTA varia por status (Adicionar/Reativar/Renovar/Assinar/"Entre em contato" desabilitado).
+- Atualizado: TopNav.tsx usa useProdutos para exibir eyebrow 'Cancelado' em addons cancelados.
+- Atualizado: MonitorEleitoral.tsx, MonitorGuerra.tsx e RadarEleicoes.tsx — prop renomeada addonKey → chave.
+- Gotcha: path alias @/types/produto não estava configurado no tsconfig — subagente corrigiu para ../types/produto nos services.
+- Validações: tsc --noEmit sem erros, npm run build 1568 módulos OK.
