@@ -25,6 +25,8 @@ export interface AdminProduto {
   link_reativar: string | null
   ativo: boolean
   ordem: number
+  product_id_lastlink: string | null
+  product_id_hotmart: string | null
   created_at: string
   updated_at: string
 }
@@ -39,6 +41,8 @@ export interface CriarProdutoPayload {
   link_reativar?: string | null
   ativo?: boolean
   ordem?: number
+  product_id_lastlink?: string | null
+  product_id_hotmart?: string | null
 }
 
 // Payload para atualizar produto (chave é imutável)

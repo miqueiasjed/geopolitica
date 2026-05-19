@@ -17,6 +17,8 @@ class Produto extends Model
         'link_reativar',
         'ativo',
         'ordem',
+        'product_id_lastlink',
+        'product_id_hotmart',
     ];
 
     protected function casts(): array

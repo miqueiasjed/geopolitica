@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Assinante;
+use App\Models\Produto;
 use App\Models\User;
 use App\Models\WebhookToken;
 use Database\Seeders\RolesSeeder;
@@ -20,12 +21,9 @@ class HotmartAddonTest extends TestCase
 
         $this->seed(RolesSeeder::class);
 
-        config([
-            'app.frontend_url'        => 'http://localhost:5173',
-            'addons.hotmart_products' => [
-                'ADDON_TEST_PRODUCT_ID' => 'elections',
-            ],
-        ]);
+        config(['app.frontend_url' => 'http://localhost:5173']);
+
+        Produto::create(['chave' => 'elections', 'nome' => 'Monitor Eleitoral', 'product_id_hotmart' => 'ADDON_TEST_PRODUCT_ID']);
 
         WebhookToken::create([
             'fonte'     => 'hotmart',

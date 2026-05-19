@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-05-18 (Plano 29 concluído — Multi-Produtos Frontend Admin UI)
+> Última atualização: 2026-05-18 (Plano 30 concluído — Mapeamento Dinâmico de product_id)
 
 ## Legenda
 - ✅ Concluído
@@ -41,6 +41,7 @@
 | 27 | [Multi-Produtos: Backend Gestão Manual de Addons (Individual + Lote)](27.md) | ✅ | 26 | 6 |
 | 28 | [Multi-Produtos: Frontend Core (Tipos, Serviços, Hooks e Componentes)](28.md) | ✅ | 26 | 6 |
 | 29 | [Multi-Produtos: Frontend Admin UI (Produtos, Addons e Importação)](29.md) | ✅ | 27, 28 | 7 |
+| 30 | [Multi-Produtos: Mapeamento Dinâmico de product_id (Lastlink + Hotmart)](30.md) | ✅ | 26, 29 | 6 |
 
 ## Ordem de execução recomendada
 
@@ -105,3 +106,4 @@
 | Multi-Produtos: Gestão manual de addons (individual + lote) | Plano 27 | ✅ |
 | Multi-Produtos: Frontend core (tipos, hooks, componentes) | Plano 28 | ✅ |
 | Multi-Produtos: Frontend admin UI | Plano 29 | ✅ |
+| Multi-Produtos: Mapeamento dinâmico de product_id | Plano 30 | ✅ |

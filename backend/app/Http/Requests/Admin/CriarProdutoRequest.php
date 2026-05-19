@@ -21,8 +21,10 @@ class CriarProdutoRequest extends FormRequest
             'preco_label'   => ['nullable', 'string', 'max:50'],
             'link_compra'   => ['nullable', 'url', 'max:500'],
             'link_reativar' => ['nullable', 'url', 'max:500'],
-            'ativo'         => ['boolean'],
-            'ordem'         => ['integer', 'min:0'],
+            'ativo'               => ['boolean'],
+            'ordem'               => ['integer', 'min:0'],
+            'product_id_lastlink' => ['nullable', 'string', 'max:100', Rule::unique('produtos', 'product_id_lastlink')],
+            'product_id_hotmart'  => ['nullable', 'string', 'max:100', Rule::unique('produtos', 'product_id_hotmart')],
         ];
     }
 }

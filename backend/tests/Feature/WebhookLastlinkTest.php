@@ -9,6 +9,7 @@ use App\Mail\CancelamentoMail;
 use App\Mail\ReembolsoMail;
 use App\Models\Assinante;
 use App\Models\AssinanteAddon;
+use App\Models\Produto;
 use App\Models\User;
 use App\Models\WebhookEvento;
 use App\Models\WebhookToken;
@@ -35,11 +36,9 @@ class WebhookLastlinkTest extends TestCase
             'ativo'     => true,
         ]);
 
-        // Addons: identificados por product_id único (produtos separados na Lastlink)
-        Config::set('addons.lastlink_products', [
-            'PROD_ELECTIONS_TEST' => 'elections',
-            'PROD_WAR_TEST'       => 'war',
-        ]);
+        // Addons: produtos com product_id_lastlink mapeados no banco
+        Produto::create(['chave' => 'elections', 'nome' => 'Monitor Eleitoral', 'product_id_lastlink' => 'PROD_ELECTIONS_TEST']);
+        Produto::create(['chave' => 'war',       'nome' => 'Monitor de Guerra', 'product_id_lastlink' => 'PROD_WAR_TEST']);
 
         // Planos: identificados por offer code (URL /p/XXXXXXX/) — um produto, várias ofertas
         Config::set('addons.lastlink_offers', [

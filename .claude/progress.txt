@@ -182,6 +182,15 @@
 - Gotcha: path alias @/types/produto não estava configurado no tsconfig — subagente corrigiu para ../types/produto nos services.
 - Validações: tsc --noEmit sem erros, npm run build 1568 módulos OK.
 
+- Plano 30 concluído: Multi-Produtos Mapeamento Dinâmico de product_id (Lastlink + Hotmart).
+- Migration: adicionadas colunas nullable+unique `product_id_lastlink` e `product_id_hotmart` na tabela `produtos`.
+- Model Produto: novos campos em $fillable. ProdutoSeeder: elections e war populados via env vars existentes.
+- AddonService::resolverAddonKey(): refatorado para consultar banco (`Produto::query()->where("product_id_{$fonte}", $productId)->value('chave')`) em vez de config().
+- config/addons.php: removidas chaves `hotmart_products` e `lastlink_products`; mantida apenas `lastlink_offers` (usada por resolverPlanoByOferta).
+- FormRequests: CriarProdutoRequest e AtualizarProdutoRequest validam os novos campos com Rule::unique (atualizar usa ->ignore() para evitar falso positivo).
+- Frontend: AdminProduto + payloads TS atualizados; modal AdminProdutos.tsx ganhou inputs "ID Lastlink" e "ID Hotmart" com exibição de erros de validação do backend.
+- tsc --noEmit sem erros após todas as alterações.
+- Gotcha: AtualizarProdutoRequest não tinha `use Illuminate\Validation\Rule` — subagente adicionou corretamente.
 - Plano 29 concluído: Multi-Produtos Frontend Admin UI.
 - Criados: AdminProdutos.tsx (tabela + modal criar/editar/excluir com tratamento de 422), AdminAssinanteAddons.tsx (embeddable, prop userId, CRUD de addons por assinante), AdminImportarAddons.tsx (dropzone, preview CSV inline, template download, exportar, relatório pós-importação com animação Framer Motion).
 - Atualizados: AdminLayout.tsx (sidebar — itens "Produtos" e "Importar Addons" adicionados), router/index.tsx (rotas /admin/produtos e /admin/assinantes/importar-addons), AdminAssinantes.tsx (botão "Addons" por linha + modal overlay com AdminAssinanteAddons).

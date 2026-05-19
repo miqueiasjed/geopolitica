@@ -4,11 +4,11 @@ namespace Tests\Unit;
 
 use App\Models\Assinante;
 use App\Models\AssinanteAddon;
+use App\Models\Produto;
 use App\Models\User;
 use App\Services\AddonService;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class AddonServiceTest extends TestCase
@@ -140,10 +140,6 @@ class AddonServiceTest extends TestCase
 
     public function test_resolver_addon_key_retorna_null_para_produto_desconhecido(): void
     {
-        Config::set('addons.hotmart_products', [
-            'PRODUTO_CONHECIDO' => 'elections',
-        ]);
-
         $resultado = AddonService::resolverAddonKey('produto_inexistente', 'hotmart');
 
         $this->assertNull($resultado);
@@ -151,8 +147,10 @@ class AddonServiceTest extends TestCase
 
     public function test_resolver_addon_key_retorna_chave_correta_para_produto_conhecido(): void
     {
-        Config::set('addons.hotmart_products', [
-            'ADDON_TEST_PRODUCT_ID' => 'elections',
+        Produto::create([
+            'chave'              => 'elections',
+            'nome'               => 'Monitor Eleitoral',
+            'product_id_hotmart' => 'ADDON_TEST_PRODUCT_ID',
         ]);
 
         $resultado = AddonService::resolverAddonKey('ADDON_TEST_PRODUCT_ID', 'hotmart');

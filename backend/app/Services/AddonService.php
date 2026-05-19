@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assinante;
 use App\Models\AssinanteAddon;
+use App\Models\Produto;
 use App\Models\WebhookOfferPlano;
 
 class AddonService
@@ -59,13 +60,9 @@ class AddonService
 
     public static function resolverAddonKey(string $productId, string $fonte): ?string
     {
-        $mapa = config("addons.{$fonte}_products");
-
-        if (! is_array($mapa)) {
-            return null;
-        }
-
-        return $mapa[$productId] ?? null;
+        return Produto::query()
+            ->where("product_id_{$fonte}", $productId)
+            ->value('chave');
     }
 
     public static function resolverPlanoByOferta(string $ofertaId): ?string

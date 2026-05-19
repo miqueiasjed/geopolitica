@@ -94,6 +94,8 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
     link_reativar: produto?.link_reativar ?? '',
     ativo:        produto?.ativo ?? true,
     ordem:        produto?.ordem ?? 0,
+    product_id_lastlink: produto?.product_id_lastlink ?? '',
+    product_id_hotmart:  produto?.product_id_hotmart ?? '',
   })
   const [erros, setErros] = useState<ErrosCampos>({})
   const [erroGeral, setErroGeral] = useState<string | null>(null)
@@ -135,26 +137,30 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
     mutationFn: () => {
       if (editando) {
         const payload: AtualizarProdutoPayload = {
-          nome:          form.nome.trim(),
-          descricao:     form.descricao.trim() || null,
-          preco_label:   form.preco_label.trim() || null,
-          link_compra:   form.link_compra.trim() || null,
-          link_reativar: form.link_reativar.trim() || null,
-          ativo:         form.ativo,
-          ordem:         Number(form.ordem),
+          nome:                form.nome.trim(),
+          descricao:           form.descricao.trim() || null,
+          preco_label:         form.preco_label.trim() || null,
+          link_compra:         form.link_compra.trim() || null,
+          link_reativar:       form.link_reativar.trim() || null,
+          ativo:               form.ativo,
+          ordem:               Number(form.ordem),
+          product_id_lastlink: form.product_id_lastlink.trim() || null,
+          product_id_hotmart:  form.product_id_hotmart.trim() || null,
         }
         return adminProdutos.atualizar(produto.id, payload)
       }
 
       const payload: CriarProdutoPayload = {
-        chave:         form.chave.trim(),
-        nome:          form.nome.trim(),
-        descricao:     form.descricao.trim() || null,
-        preco_label:   form.preco_label.trim() || null,
-        link_compra:   form.link_compra.trim() || null,
-        link_reativar: form.link_reativar.trim() || null,
-        ativo:         form.ativo,
-        ordem:         Number(form.ordem),
+        chave:               form.chave.trim(),
+        nome:                form.nome.trim(),
+        descricao:           form.descricao.trim() || null,
+        preco_label:         form.preco_label.trim() || null,
+        link_compra:         form.link_compra.trim() || null,
+        link_reativar:       form.link_reativar.trim() || null,
+        ativo:               form.ativo,
+        ordem:               Number(form.ordem),
+        product_id_lastlink: form.product_id_lastlink.trim() || null,
+        product_id_hotmart:  form.product_id_hotmart.trim() || null,
       }
       return adminProdutos.criar(payload)
     },
@@ -339,6 +345,48 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
               />
               {erros.link_reativar && (
                 <p className="font-mono text-[11px] text-red-400">{erros.link_reativar}</p>
+              )}
+            </div>
+          </div>
+
+          {/* IDs de Pagamento */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="produto-lastlink-id"
+                className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500"
+              >
+                ID Lastlink
+              </label>
+              <input
+                id="produto-lastlink-id"
+                type="text"
+                value={form.product_id_lastlink}
+                onChange={e => set('product_id_lastlink', e.target.value)}
+                placeholder="ex: 98765"
+                className={CAMPO}
+              />
+              {erros.product_id_lastlink && (
+                <p className="font-mono text-[11px] text-red-400">{erros.product_id_lastlink}</p>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <label
+                htmlFor="produto-hotmart-id"
+                className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500"
+              >
+                ID Hotmart
+              </label>
+              <input
+                id="produto-hotmart-id"
+                type="text"
+                value={form.product_id_hotmart}
+                onChange={e => set('product_id_hotmart', e.target.value)}
+                placeholder="ex: 12345"
+                className={CAMPO}
+              />
+              {erros.product_id_hotmart && (
+                <p className="font-mono text-[11px] text-red-400">{erros.product_id_hotmart}</p>
               )}
             </div>
           </div>
