@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'master_password',
         'deve_alterar_senha',
     ];
 
