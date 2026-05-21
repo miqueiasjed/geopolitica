@@ -13,15 +13,20 @@ interface PlanoGateProps {
 
 export function PlanoGate({ children }: PlanoGateProps) {
   const { user, isLoading } = useAuth()
-  const { data: planos, isLoading: isLoadingPlanos } = usePlanosAtivos()
+  const { data: planos, isLoading: isLoadingPlanos, isError: isErrorPlanos } = usePlanosAtivos()
 
   if (isLoading || isLoadingPlanos) return null
 
-  const plano = user?.assinante?.plano
-  const planoReal = plano && planos?.some((p) => p.slug === plano)
+  if (user?.role === 'admin') return <>{children}</>
 
-  if (planoReal) {
-    return <>{children}</>
+  const plano = user?.assinante?.plano
+
+  // Se a API de planos falhou, usa assinante.ativo como fallback
+  if (isErrorPlanos) {
+    if (user?.assinante?.ativo) return <>{children}</>
+  } else {
+    const planoReal = plano && planos?.some((p) => p.slug === plano)
+    if (planoReal) return <>{children}</>
   }
 
   const planosExibidos = planos ?? []
