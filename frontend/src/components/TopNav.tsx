@@ -25,6 +25,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useTenant } from '../contexts/TenantContext'
 import { useAddonAccess } from '../hooks/useAddonAccess'
 import { useProdutos } from '../hooks/useProdutos'
+import { useRecurso } from '../hooks/useRecurso'
 
 interface TopNavProps {
   lastUpdatedLabel: string
@@ -65,9 +66,7 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const { data: produtos } = useProdutos()
   const statusEleitoral = produtos?.find((p) => p.chave === 'elections')?.status_usuario
   const statusGuerra = produtos?.find((p) => p.chave === 'war')?.status_usuario
-  const temAcessoRiskScore = ['pro', 'reservado', 'admin'].includes(
-    user?.assinante?.plano ?? user?.role ?? '',
-  )
+  const temAcessoRiskScore = useRecurso('risk_score')
   const [painelAberto, setPainelAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
 

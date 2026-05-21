@@ -1,31 +1,14 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
+import { useRecursoInteiro } from '../hooks/useRecurso'
 import { useMeusPaises } from '../hooks/useMeusPaises'
 import { BuscaPais } from '../components/paises/BuscaPais'
 import { CardPais } from '../components/paises/CardPais'
 import { PlanoGate } from '../components/PlanoGate'
 import { EmptyState } from '../components/EmptyState'
 
-const LIMITE_PLANO: Record<string, number> = {
-  essencial: 3,
-  pro: 10,
-  reservado: 10,
-  admin: 10,
-}
-
 const LIMITE_PADRAO = 3
-
-function obterLimitePlano(plano: string | null | undefined, role: string | null | undefined): number {
-  if (role === 'admin') return LIMITE_PLANO.admin
-  if (!plano) return LIMITE_PADRAO
-  return LIMITE_PLANO[plano.toLowerCase()] ?? LIMITE_PADRAO
-}
-
-function obterNomePlano(plano: string | null | undefined, role: string | null | undefined): string {
-  if (role === 'admin') return 'admin'
-  return plano ?? 'essencial'
-}
 
 export function MeusPaisesPage() {
   const { user } = useAuth()
@@ -36,10 +19,10 @@ export function MeusPaisesPage() {
   const [toastErro, setToastErro] = useState<string | null>(null)
   const [toastSucesso, setToastSucesso] = useState<string | null>(null)
 
-  const plano = user?.assinante?.plano
   const role = user?.role
-  const limite = obterLimitePlano(plano, role)
-  const nomePlano = obterNomePlano(plano, role)
+  const limiteRecurso = useRecursoInteiro('paises_seguidos_limite')
+  const limite = limiteRecurso === null ? Infinity : (limiteRecurso ?? LIMITE_PADRAO)
+  const nomePlano = user?.assinante?.plano ?? (role === 'admin' ? 'admin' : 'essencial')
 
   function exibirToastErro(mensagem: string) {
     setToastErro(mensagem)
@@ -69,7 +52,7 @@ export function MeusPaisesPage() {
           const mensagemApi = axiosErro.response.data?.message
           exibirToastErro(
             mensagemApi ??
-              `Limite de ${limite.toString()} países atingido para o plano ${nomePlano}. Faça upgrade para adicionar mais.`,
+              `Limite de ${limite === Infinity ? 'países ilimitados' : `${limite} países`} atingido para o plano ${nomePlano}. Faça upgrade para adicionar mais.`,
           )
         } else {
           exibirToastErro('Não foi possível adicionar o país. Tente novamente.')
@@ -122,7 +105,7 @@ export function MeusPaisesPage() {
                 <span className="inline-block h-4 w-16 animate-pulse rounded bg-[#BFFF3C]/20" />
               ) : (
                 <>
-                  {paises.length} / {limite} países
+                  {paises.length} / {limite === Infinity ? '∞' : limite} países
                 </>
               )}
             </span>

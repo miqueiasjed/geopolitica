@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\Admin\AdminEventoSemEditorialController;
 use App\Http\Controllers\Api\Admin\AdminAssinanteAddonController;
 use App\Http\Controllers\Api\Admin\AdminProdutoController;
 use App\Http\Controllers\Api\MeusProdutosController;
+use App\Http\Controllers\Api\PlanoController;
 use App\Http\Controllers\Api\Admin\ImportarAssinantesController;
 use App\Http\Controllers\Api\SuporteController;
 use App\Http\Controllers\Api\CarteiraRiscoController;
@@ -66,6 +67,7 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/meus-produtos', [MeusProdutosController::class, 'index']);
+    Route::get('/planos', [PlanoController::class, 'index']);
 });
 
 // Perfil: disponível para todos os assinantes ativos (inclusive addon-only)

@@ -77,6 +77,19 @@ class PlanoService
         });
     }
 
+    /**
+     * Verifica se um slug corresponde a um plano ativo cadastrado.
+     * Usado para distinguir planos reais de usuários addon-only.
+     */
+    public function planoExiste(string $slugPlano): bool
+    {
+        $chaveCache = 'plano_existe_' . $slugPlano;
+
+        return Cache::remember($chaveCache, self::TTL_SEGUNDOS, function () use ($slugPlano) {
+            return Plano::where('slug', $slugPlano)->where('ativo', true)->exists();
+        });
+    }
+
     // -------------------------------------------------------------------------
     // Operações de escrita (admin)
     // -------------------------------------------------------------------------
@@ -140,6 +153,7 @@ class PlanoService
     public function invalidarCache(string $slugPlano): void
     {
         Cache::forget(self::PREFIXO_CACHE . $slugPlano);
+        Cache::forget('plano_existe_' . $slugPlano);
     }
 
     /**

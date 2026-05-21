@@ -3,11 +3,16 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Services\PlanoService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Hash;
 
 class AutenticacaoService
 {
+    public function __construct(
+        private readonly PlanoService $planoService,
+    ) {}
+
     public function fazerLogin(array $credenciais): array
     {
         /** @var User|null $usuario */
@@ -56,6 +61,7 @@ class AutenticacaoService
                 'hotmart_subscriber_code' => $usuario->assinante->hotmart_subscriber_code,
                 'assinado_em' => $usuario->assinante->assinado_em?->toIso8601String(),
                 'expira_em' => $usuario->assinante->expira_em?->toIso8601String(),
+                'recursos' => $this->planoService->recursosDoPlano($usuario->assinante->plano),
             ] : null,
         ];
     }

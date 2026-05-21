@@ -7,6 +7,7 @@ export interface Assinante {
   hotmart_subscriber_code?: string | null
   assinado_em?: string | null
   expira_em?: string | null
+  recursos?: Record<string, string | null>
 }
 
 export interface UsuarioAutenticado {

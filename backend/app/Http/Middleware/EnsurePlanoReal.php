@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\PlanoService;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -9,7 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsurePlanoReal
 {
-    private const PLANOS_REAIS = ['essencial', 'pro', 'reservado'];
+    public function __construct(
+        private readonly PlanoService $planoService,
+    ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -19,12 +22,14 @@ class EnsurePlanoReal
             return $next($request);
         }
 
-        if (in_array($usuario?->assinante?->plano, self::PLANOS_REAIS, true)) {
+        $slugPlano = $usuario?->assinante?->plano;
+
+        if ($slugPlano && $this->planoService->planoExiste($slugPlano)) {
             return $next($request);
         }
 
         return new JsonResponse([
-            'message' => 'Disponível apenas nos planos Essencial, Pro e Reservado.',
+            'message' => 'Disponível apenas em planos com assinatura ativa.',
             'code'    => 'plano_necessario',
         ], 403);
     }

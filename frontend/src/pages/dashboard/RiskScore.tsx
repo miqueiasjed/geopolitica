@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import api from '../../lib/axios'
-import { useAuth } from '../../hooks/useAuth'
+import { useRecurso } from '../../hooks/useRecurso'
+import { usePlanosAtivos, planosComRecurso } from '../../hooks/usePlanosAtivos'
 import { ScoreGauge } from '../../components/ScoreGauge'
 import { ExportPdfButton } from '../../components/ExportPdfButton'
 
@@ -44,9 +45,22 @@ function nivelAlerta(level: string): string {
   return '#4ade80'
 }
 
-// ─── Gate de plano (inline, pois AddonGate só aceita 'elections' | 'war') ───
+// ─── Gate de recurso (dinâmico via plano_recursos) ───────────────────────────
 
 function RiskScoreGate() {
+  const { data: planos } = usePlanosAtivos()
+  const planosHabilitados = planos ? planosComRecurso(planos, 'risk_score') : []
+  const nomes = planosHabilitados.map((p) => p.nome)
+
+  const descricaoPlanos =
+    nomes.length === 0
+      ? 'um plano com Risk Score habilitado'
+      : nomes.length === 1
+        ? `o plano ${nomes[0]}`
+        : `os planos ${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}`
+
+  const upgradeUrl = import.meta.env.VITE_UPGRADE_PRO_URL || '#'
+
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-6 py-16">
       <div className="flex max-w-md flex-col items-center gap-6 text-center">
@@ -56,24 +70,31 @@ function RiskScoreGate() {
         <h2 className="font-serif text-3xl font-bold text-white">Risk Score de Portfólio</h2>
         <p className="text-sm leading-6 text-zinc-400">
           Calcule a exposição geopolítica da sua carteira com base nos eventos ativos. Disponível
-          para assinantes Pro e Reservado.
+          para assinantes de {descricaoPlanos}.
         </p>
-        <div className="w-full rounded-xl border border-[#BFFF3C]/30 bg-zinc-900/60 px-6 py-5">
-          <p className="text-xs uppercase tracking-widest text-zinc-500">Acesso</p>
-          <p className="mt-1 text-2xl font-bold text-[#BFFF3C]">Disponível no plano Pro</p>
-        </div>
+        {planosHabilitados.length > 0 && (
+          <div className="w-full rounded-xl border border-[#BFFF3C]/30 bg-zinc-900/60 px-6 py-5">
+            <p className="text-xs uppercase tracking-widest text-zinc-500">Planos com acesso</p>
+            <div className="mt-2 flex flex-wrap justify-center gap-2">
+              {planosHabilitados.map((p) => (
+                <span
+                  key={p.slug}
+                  className="rounded-full border border-[#BFFF3C]/40 bg-[#BFFF3C]/10 px-3 py-1 font-mono text-xs font-semibold text-[#BFFF3C]"
+                >
+                  {p.nome}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         <a
-          href={import.meta.env.VITE_UPGRADE_PRO_URL || '#'}
+          href={upgradeUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex w-full items-center justify-center rounded-lg bg-[#BFFF3C] px-6 py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BFFF3C]"
         >
-          Fazer upgrade para Pro
+          Fazer upgrade de plano
         </a>
-        <p className="text-xs text-zinc-500">
-          Usuários do plano{' '}
-          <span className="font-medium text-zinc-300">Pro</span> têm acesso incluso
-        </p>
       </div>
     </div>
   )
@@ -82,13 +103,10 @@ function RiskScoreGate() {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export function RiskScore() {
-  const { user } = useAuth()
+  const temAcesso = useRecurso('risk_score')
   const prefersReduced = useReducedMotion()
 
-  // ── Verificação de plano ──────────────────────────────────────────────────
-  const plano = user?.assinante?.plano ?? user?.role
-
-  if (!['pro', 'reservado', 'admin'].includes(plano ?? '')) {
+  if (!temAcesso) {
     return <RiskScoreGate />
   }
 
