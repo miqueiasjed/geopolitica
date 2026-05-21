@@ -65,7 +65,7 @@ function RadarEleicoesConteudo() {
   const [filtros, setFiltros] = useState<FiltrosEleicao>({ ano: ANO_ATUAL })
   const [eleicaoIdSelecionada, setEleicaoIdSelecionada] = useState<number | null>(null)
 
-  const { eleicoes, isLoading } = useEleicoes(filtros)
+  const { eleicoes, isLoading, error } = useEleicoes(filtros)
 
   return (
     <motion.div
@@ -89,13 +89,22 @@ function RadarEleicoesConteudo() {
         {/* Filtros + contadores */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <EleicaoFilterBar filtros={filtros} onChange={setFiltros} />
-          {!isLoading && <ContadoresRelevancia eleicoes={eleicoes} />}
+          {!isLoading && !error && <ContadoresRelevancia eleicoes={eleicoes} />}
         </div>
 
         {/* Grade de eleições */}
         <div className="rounded-xl border border-zinc-800 bg-[#111318] p-3 sm:p-5">
           {isLoading ? (
             <SkeletonGrid />
+          ) : error ? (
+            <div className="flex min-h-[200px] items-center justify-center">
+              <div className="text-center">
+                <p className="text-red-400">Erro ao carregar eleições</p>
+                <p className="mt-1 text-sm text-zinc-500">
+                  {error.message || 'Tente novamente mais tarde'}
+                </p>
+              </div>
+            </div>
           ) : (
             <RadarGrid
               eleicoes={eleicoes}
