@@ -94,6 +94,7 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
     link_reativar: produto?.link_reativar ?? '',
     ativo:        produto?.ativo ?? true,
     ordem:        produto?.ordem ?? 0,
+    recurso_plano: produto?.recurso_plano ?? '',
     product_id_lastlink: produto?.product_id_lastlink ?? '',
     product_id_hotmart:  produto?.product_id_hotmart ?? '',
   })
@@ -144,6 +145,7 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
           link_reativar:       form.link_reativar.trim() || null,
           ativo:               form.ativo,
           ordem:               Number(form.ordem),
+          recurso_plano:       form.recurso_plano.trim() || null,
           product_id_lastlink: form.product_id_lastlink.trim() || null,
           product_id_hotmart:  form.product_id_hotmart.trim() || null,
         }
@@ -159,6 +161,7 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
         link_reativar:       form.link_reativar.trim() || null,
         ativo:               form.ativo,
         ordem:               Number(form.ordem),
+        recurso_plano:       form.recurso_plano.trim() || null,
         product_id_lastlink: form.product_id_lastlink.trim() || null,
         product_id_hotmart:  form.product_id_hotmart.trim() || null,
       }
@@ -347,6 +350,27 @@ function ModalProduto({ produto, onFechar, onSucesso }: ModalProdutoProps) {
                 <p className="font-mono text-[11px] text-red-400">{erros.link_reativar}</p>
               )}
             </div>
+          </div>
+
+          {/* Recurso do Plano */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="produto-recurso-plano"
+              className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Recurso do Plano
+            </label>
+            <input
+              id="produto-recurso-plano"
+              type="text"
+              value={form.recurso_plano}
+              onChange={e => set('recurso_plano', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+              placeholder="ex: monitor_eleitoral"
+              className={CAMPO}
+            />
+            <p className="font-mono text-[10px] text-zinc-600">
+              Chave de <code className="text-zinc-500">plano_recursos</code> que libera este addon pelo plano. Deixe vazio se for avulso apenas.
+            </p>
           </div>
 
           {/* IDs de Pagamento */}

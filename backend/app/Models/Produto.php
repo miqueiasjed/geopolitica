@@ -17,6 +17,7 @@ class Produto extends Model
         'link_reativar',
         'ativo',
         'ordem',
+        'recurso_plano',
         'product_id_lastlink',
         'product_id_hotmart',
     ];

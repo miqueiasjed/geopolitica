@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Produto;
 use App\Services\PlanoService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -27,17 +28,14 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
 
-            $chave = match ($addonKey) {
-                'elections' => 'monitor_eleitoral',
-                'war'       => 'monitor_guerra',
-                default     => null,
-            };
+            // Verifica se o plano inclui este addon via recurso_plano configurado no produto
+            $recursoPlano = Produto::where('chave', $addonKey)->value('recurso_plano');
 
-            if ($chave === null) {
+            if (! $recursoPlano) {
                 return false;
             }
 
-            return app(PlanoService::class)->recursoBoolean($slugPlano, $chave);
+            return app(PlanoService::class)->recursoBoolean($slugPlano, $recursoPlano);
         });
     }
 }

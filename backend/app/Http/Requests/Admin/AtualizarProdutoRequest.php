@@ -22,6 +22,7 @@ class AtualizarProdutoRequest extends FormRequest
             'link_reativar' => ['nullable', 'url', 'max:500'],
             'ativo'               => ['boolean'],
             'ordem'               => ['integer', 'min:0'],
+            'recurso_plano'       => ['nullable', 'string', 'max:100'],
             'product_id_lastlink' => ['nullable', 'string', 'max:100', Rule::unique('produtos', 'product_id_lastlink')->ignore($this->route('produto'))],
             'product_id_hotmart'  => ['nullable', 'string', 'max:100', Rule::unique('produtos', 'product_id_hotmart')->ignore($this->route('produto'))],
         ];

@@ -25,6 +25,7 @@ export interface AdminProduto {
   link_reativar: string | null
   ativo: boolean
   ordem: number
+  recurso_plano: string | null
   product_id_lastlink: string | null
   product_id_hotmart: string | null
   created_at: string
@@ -41,6 +42,7 @@ export interface CriarProdutoPayload {
   link_reativar?: string | null
   ativo?: boolean
   ordem?: number
+  recurso_plano?: string | null
   product_id_lastlink?: string | null
   product_id_hotmart?: string | null
 }
