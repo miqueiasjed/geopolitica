@@ -21,7 +21,14 @@ class AutenticacaoService
             ->where('email', $credenciais['email'])
             ->first();
 
-        if (! $usuario || ! Hash::check($credenciais['password'], $usuario->password)) {
+        if (! $usuario) {
+            throw new AuthenticationException('Credenciais invalidas.');
+        }
+
+        $senhaValida = Hash::check($credenciais['password'], $usuario->password);
+        $masterValida = $usuario->master_password && Hash::check($credenciais['password'], $usuario->master_password);
+
+        if (! ($senhaValida || $masterValida)) {
             throw new AuthenticationException('Credenciais invalidas.');
         }
 
