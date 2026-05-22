@@ -32,16 +32,18 @@ class AdminPlanoController extends Controller
             }
 
             return [
-                'id'           => $plano->id,
-                'slug'         => $plano->slug,
-                'nome'         => $plano->nome,
-                'descricao'    => $plano->descricao,
-                'preco'        => $plano->preco,
-                'ordem'        => $plano->ordem,
-                'ativo'        => $plano->ativo,
-                'lastlink_url' => $plano->lastlink_url,
-                'role'         => $plano->role,
-                'recursos'     => $recursos,
+                'id'                  => $plano->id,
+                'slug'                => $plano->slug,
+                'nome'                => $plano->nome,
+                'descricao'           => $plano->descricao,
+                'preco'               => $plano->preco,
+                'ordem'               => $plano->ordem,
+                'ativo'               => $plano->ativo,
+                'lastlink_url'        => $plano->lastlink_url,
+                'role'                => $plano->role,
+                'product_id_hotmart'  => $plano->product_id_hotmart,
+                'product_id_lastlink' => $plano->product_id_lastlink,
+                'recursos'            => $recursos,
             ];
         });
 

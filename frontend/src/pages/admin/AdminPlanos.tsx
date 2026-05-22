@@ -538,28 +538,32 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
   const [form, setFormState] = useState(() =>
     plano
       ? {
-          nome:         plano.nome,
-          descricao:    plano.descricao ?? '',
-          preco:        String(plano.preco),
-          ordem:        String(plano.ordem),
-          ativo:        plano.ativo,
-          lastlink_url: plano.lastlink_url ?? '',
-          role:         plano.role ?? '',
+          nome:                plano.nome,
+          descricao:           plano.descricao ?? '',
+          preco:               String(plano.preco),
+          ordem:               String(plano.ordem),
+          ativo:               plano.ativo,
+          lastlink_url:        plano.lastlink_url ?? '',
+          role:                plano.role ?? '',
+          product_id_hotmart:  plano.product_id_hotmart ?? '',
+          product_id_lastlink: plano.product_id_lastlink ?? '',
         }
-      : { nome: '', descricao: '', preco: '', ordem: '', ativo: true, lastlink_url: '', role: '' }
+      : { nome: '', descricao: '', preco: '', ordem: '', ativo: true, lastlink_url: '', role: '', product_id_hotmart: '', product_id_lastlink: '' }
   )
   const [erro, setErro] = useState<string | null>(null)
 
   const mutation = useMutation({
     mutationFn: () =>
       atualizarPlano(planoId, {
-        nome:         form.nome.trim(),
-        descricao:    form.descricao.trim() || null,
-        preco:        parseFloat(form.preco) || 0,
-        ordem:        parseInt(form.ordem) || 0,
-        ativo:        form.ativo,
-        lastlink_url: form.lastlink_url.trim() || null,
-        role:         form.role.trim() || null,
+        nome:                form.nome.trim(),
+        descricao:           form.descricao.trim() || null,
+        preco:               parseFloat(form.preco) || 0,
+        ordem:               parseInt(form.ordem) || 0,
+        ativo:               form.ativo,
+        lastlink_url:        form.lastlink_url.trim() || null,
+        role:                form.role.trim() || null,
+        product_id_hotmart:  form.product_id_hotmart.trim() || null,
+        product_id_lastlink: form.product_id_lastlink.trim() || null,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
@@ -707,6 +711,35 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
                   placeholder="https://..."
                   className={CAMPO}
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+                    ID Produto Hotmart{' '}
+                    <span className="text-zinc-600 normal-case">(opcional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.product_id_hotmart}
+                    onChange={(e) => set('product_id_hotmart', e.target.value)}
+                    placeholder="ex: 12345678"
+                    className={CAMPO}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+                    ID Produto Lastlink{' '}
+                    <span className="text-zinc-600 normal-case">(opcional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.product_id_lastlink}
+                    onChange={(e) => set('product_id_lastlink', e.target.value)}
+                    placeholder="ex: abc123"
+                    className={CAMPO}
+                  />
+                </div>
               </div>
 
               {erro && (

@@ -357,6 +357,21 @@ class HotmartHandlerService
 
     private function normalizarPlano(array $payload): string
     {
+        $productId = $this->extrairValor($payload, [
+            'data.product.id',
+            'product.id',
+            'data.purchase.product.id',
+            'purchase.product.id',
+        ]);
+
+        if ($productId) {
+            $plano = Plano::where('product_id_hotmart', $productId)->value('slug');
+
+            if ($plano !== null) {
+                return $plano;
+            }
+        }
+
         $valor = Str::of((string) ($this->extrairValor($payload, [
             'data.product.name',
             'product.name',
@@ -364,8 +379,6 @@ class HotmartHandlerService
             'subscription.plan.name',
             'data.plan.name',
             'plan.name',
-            'data.product.id',
-            'product.id',
         ]) ?? ''))->lower()->ascii()->value();
 
         return match (true) {

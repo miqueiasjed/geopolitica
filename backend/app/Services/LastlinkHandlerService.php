@@ -187,11 +187,22 @@ class LastlinkHandlerService
 
     /**
      * Tenta resolver o plano em ordem de prioridade:
-     * 1. Offer code mapeado nas env vars (LASTLINK_OFFER_*)
-     * 2. Nome do produto/oferta contendo "essencial", "pro" ou "reservado"
+     * 1. product_id_lastlink direto na tabela planos
+     * 2. Offer code mapeado via WebhookOfferPlano
+     * 3. Nome do produto/oferta contendo "essencial", "pro" ou "reservado"
      */
     private function resolverPlano(array $payload): ?string
     {
+        $productId = $this->extrairProdutoId($payload);
+
+        if ($productId) {
+            $plano = Plano::where('product_id_lastlink', $productId)->value('slug');
+
+            if ($plano !== null) {
+                return $plano;
+            }
+        }
+
         $ofertaId = $this->extrairOfertaId($payload);
 
         if ($ofertaId) {
@@ -201,9 +212,6 @@ class LastlinkHandlerService
                 return $plano;
             }
         }
-
-        // Fallback: product_id pode ter sido mapeado como offer_id no admin
-        $productId = $this->extrairProdutoId($payload);
 
         if ($productId && $productId !== $ofertaId) {
             $plano = AddonService::resolverPlanoByOferta($productId);

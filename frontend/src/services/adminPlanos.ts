@@ -14,6 +14,8 @@ export interface Plano {
   ativo: boolean
   lastlink_url: string | null
   role: string | null
+  product_id_hotmart: string | null
+  product_id_lastlink: string | null
   recursos: Record<string, PlanoRecursoItem>
 }
 
@@ -56,6 +58,8 @@ export async function atualizarPlano(
     ativo?: boolean
     lastlink_url: string | null
     role: string | null
+    product_id_hotmart: string | null
+    product_id_lastlink: string | null
   },
 ): Promise<void> {
   await api.put(`/admin/planos/${planoId}`, dados)

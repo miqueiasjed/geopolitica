@@ -19,6 +19,8 @@ class Plano extends Model
         'ativo',
         'lastlink_url',
         'role',
+        'product_id_hotmart',
+        'product_id_lastlink',
     ];
 
     protected function casts(): array
