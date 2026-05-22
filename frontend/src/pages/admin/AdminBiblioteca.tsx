@@ -173,12 +173,12 @@ export function AdminBiblioteca() {
           </form>
 
           <Select.Root
-            value={filtros.tipo ?? ''}
-            onValueChange={(v) => handleFiltro('tipo', v)}
+            value={filtros.tipo ?? 'todos'}
+            onValueChange={(v) => handleFiltro('tipo', v === 'todos' ? '' : v)}
           >
             <Select.Trigger placeholder="Tipo" className="w-36" />
             <Select.Content>
-              <Select.Item value="">Todos os tipos</Select.Item>
+              <Select.Item value="todos">Todos os tipos</Select.Item>
               <Select.Item value="briefing">Briefing</Select.Item>
               <Select.Item value="mapa">Mapa</Select.Item>
               <Select.Item value="tese">A Tese</Select.Item>
@@ -186,12 +186,12 @@ export function AdminBiblioteca() {
           </Select.Root>
 
           <Select.Root
-            value={filtros.status ?? ''}
-            onValueChange={(v) => handleFiltro('status', v)}
+            value={filtros.status ?? 'todos'}
+            onValueChange={(v) => handleFiltro('status', v === 'todos' ? '' : v)}
           >
             <Select.Trigger placeholder="Status" className="w-36" />
             <Select.Content>
-              <Select.Item value="">Todos os status</Select.Item>
+              <Select.Item value="todos">Todos os status</Select.Item>
               <Select.Item value="publicado">Publicado</Select.Item>
               <Select.Item value="rascunho">Rascunho</Select.Item>
             </Select.Content>
