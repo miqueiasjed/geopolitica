@@ -109,6 +109,12 @@ export interface AdminConteudosResponse {
   last_page: number
 }
 
+export interface AdminConteudosFiltros {
+  tipo?: string
+  status?: string
+  q?: string
+}
+
 export type RoleUsuario = string
 
 export interface AdminUsuario {

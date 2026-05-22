@@ -20,9 +20,21 @@ class AdminConteudoController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $conteudos = Conteudo::query()
-            ->orderByDesc('created_at')
-            ->paginate(20);
+        $query = Conteudo::query()->orderByDesc('created_at');
+
+        if ($tipo = $request->string('tipo')->toString()) {
+            $query->where('tipo', $tipo);
+        }
+
+        if ($status = $request->string('status')->toString()) {
+            $query->where('publicado', $status === 'publicado');
+        }
+
+        if ($q = $request->string('q')->toString()) {
+            $query->where('titulo', 'like', "%{$q}%");
+        }
+
+        $conteudos = $query->paginate(20);
 
         return response()->json([
             'data'         => ConteudoResource::collection($conteudos->items()),
@@ -52,5 +64,16 @@ class AdminConteudoController extends Controller
         $this->conteudoService->despublicar($conteudo);
 
         return response()->json(['message' => 'Conteúdo despublicado com sucesso']);
+    }
+
+    public function excluir(Conteudo $conteudo): JsonResponse
+    {
+        if ($conteudo->publicado) {
+            return response()->json(['message' => 'Apenas rascunhos podem ser excluídos permanentemente.'], 422);
+        }
+
+        $conteudo->delete();
+
+        return response()->json(['message' => 'Conteúdo excluído permanentemente.']);
     }
 }

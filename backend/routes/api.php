@@ -188,6 +188,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);
     Route::patch('/conteudos/{conteudo}', [AdminConteudoController::class, 'update']);
     Route::delete('/conteudos/{conteudo}', [AdminConteudoController::class, 'destroy']);
+    Route::delete('/conteudos/{conteudo}/excluir', [AdminConteudoController::class, 'excluir']);
 
     Route::post('/eleicoes', [EleicaoAdminController::class, 'store']);
     Route::patch('/eleicoes/{id}', [EleicaoAdminController::class, 'update']);

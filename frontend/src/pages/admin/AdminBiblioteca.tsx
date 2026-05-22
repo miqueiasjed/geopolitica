@@ -7,17 +7,24 @@ import {
   Flex,
   Heading,
   ScrollArea,
+  Select,
   Spinner,
   Table,
   Text,
+  TextField,
 } from '@radix-ui/themes'
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@radix-ui/react-icons'
+import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { adminKeys, despublicarConteudo, fetchConteudosAdmin } from '../../services/admin'
+import {
+  adminKeys,
+  despublicarConteudo,
+  excluirConteudo,
+  fetchConteudosAdmin,
+} from '../../services/admin'
 import { formatarDataCurta } from '../../utils/formatters'
 import type { TipoConteudo, PlanoMinimo } from '../../types/biblioteca'
-import type { StatusConteudo } from '../../types/admin'
+import type { AdminConteudosFiltros, StatusConteudo } from '../../types/admin'
 
 const badgeTipo: Record<TipoConteudo, string> = {
   briefing: 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/40',
@@ -65,32 +72,57 @@ function BadgeStatus({ status }: { status: StatusConteudo }) {
 
 export function AdminBiblioteca() {
   const [page, setPage] = useState(1)
+  const [filtros, setFiltros] = useState<AdminConteudosFiltros>({})
+  const [buscaInput, setBuscaInput] = useState('')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const query = useQuery({
-    queryKey: adminKeys.conteudos(page),
-    queryFn: () => fetchConteudosAdmin(page),
+    queryKey: adminKeys.conteudos(page, filtros),
+    queryFn: () => fetchConteudosAdmin(page, filtros),
     placeholderData: (dadosAnteriores) => dadosAnteriores,
   })
 
   const mutationDespublicar = useMutation({
     mutationFn: despublicarConteudo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.conteudos(page) })
+      queryClient.invalidateQueries({ queryKey: adminKeys.conteudos(page, filtros) })
     },
   })
+
+  const mutationExcluir = useMutation({
+    mutationFn: excluirConteudo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.conteudos(page, filtros) })
+    },
+  })
+
+  function handleFiltro(campo: keyof AdminConteudosFiltros, valor: string) {
+    setPage(1)
+    setFiltros((prev) => ({ ...prev, [campo]: valor || undefined }))
+  }
+
+  function handleBusca(e: React.FormEvent) {
+    e.preventDefault()
+    setPage(1)
+    setFiltros((prev) => ({ ...prev, q: buscaInput || undefined }))
+  }
+
+  function handleDespublicar(id: number, titulo: string) {
+    if (!window.confirm(`Deseja despublicar "${titulo}"?`)) return
+    mutationDespublicar.mutate(id)
+  }
+
+  function handleExcluir(id: number, titulo: string) {
+    if (!window.confirm(`Excluir permanentemente "${titulo}"? Esta ação não pode ser desfeita.`)) return
+    mutationExcluir.mutate(id)
+  }
 
   const conteudos = query.data?.data ?? []
   const total = query.data?.total ?? 0
   const paginaAtual = query.data?.current_page ?? 1
   const ultimaPagina = query.data?.last_page ?? 1
-
-  function handleDespublicar(id: number, titulo: string) {
-    const confirmado = window.confirm(`Deseja despublicar o conteúdo "${titulo}"? Esta ação não pode ser desfeita.`)
-    if (!confirmado) return
-    mutationDespublicar.mutate(id)
-  }
+  const isPending = mutationDespublicar.isPending || mutationExcluir.isPending
 
   return (
     <main className="min-h-screen bg-[#0a0a0b] px-6 py-10 text-cyan-50">
@@ -120,6 +152,65 @@ export function AdminBiblioteca() {
               Novo conteúdo
             </Button>
           </Flex>
+        </Flex>
+
+        {/* Filtros */}
+        <Flex gap="3" wrap="wrap" align="end">
+          <form onSubmit={handleBusca} className="flex gap-2">
+            <TextField.Root
+              placeholder="Buscar por título…"
+              value={buscaInput}
+              onChange={(e) => setBuscaInput(e.target.value)}
+              className="w-56"
+            >
+              <TextField.Slot>
+                <MagnifyingGlassIcon />
+              </TextField.Slot>
+            </TextField.Root>
+            <Button type="submit" variant="soft" color="gray" size="2">
+              Buscar
+            </Button>
+          </form>
+
+          <Select.Root
+            value={filtros.tipo ?? ''}
+            onValueChange={(v) => handleFiltro('tipo', v)}
+          >
+            <Select.Trigger placeholder="Tipo" className="w-36" />
+            <Select.Content>
+              <Select.Item value="">Todos os tipos</Select.Item>
+              <Select.Item value="briefing">Briefing</Select.Item>
+              <Select.Item value="mapa">Mapa</Select.Item>
+              <Select.Item value="tese">A Tese</Select.Item>
+            </Select.Content>
+          </Select.Root>
+
+          <Select.Root
+            value={filtros.status ?? ''}
+            onValueChange={(v) => handleFiltro('status', v)}
+          >
+            <Select.Trigger placeholder="Status" className="w-36" />
+            <Select.Content>
+              <Select.Item value="">Todos os status</Select.Item>
+              <Select.Item value="publicado">Publicado</Select.Item>
+              <Select.Item value="rascunho">Rascunho</Select.Item>
+            </Select.Content>
+          </Select.Root>
+
+          {(filtros.tipo || filtros.status || filtros.q) && (
+            <Button
+              variant="ghost"
+              color="gray"
+              size="2"
+              onClick={() => {
+                setFiltros({})
+                setBuscaInput('')
+                setPage(1)
+              }}
+            >
+              Limpar filtros
+            </Button>
+          )}
         </Flex>
 
         <Card size="4" className="border border-cyan-400/10 bg-slate-950/80 backdrop-blur">
@@ -162,15 +253,27 @@ export function AdminBiblioteca() {
                           <Table.Cell>{formatarDataCurta(conteudo.publicado_em)}</Table.Cell>
                           <Table.Cell>
                             <Flex gap="2">
-                              <Button
-                                size="1"
-                                variant="soft"
-                                color="ruby"
-                                disabled={mutationDespublicar.isPending}
-                                onClick={() => handleDespublicar(conteudo.id, conteudo.titulo)}
-                              >
-                                Despublicar
-                              </Button>
+                              {conteudo.status === 'publicado' ? (
+                                <Button
+                                  size="1"
+                                  variant="soft"
+                                  color="ruby"
+                                  disabled={isPending}
+                                  onClick={() => handleDespublicar(conteudo.id, conteudo.titulo)}
+                                >
+                                  Despublicar
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="1"
+                                  variant="solid"
+                                  color="red"
+                                  disabled={isPending}
+                                  onClick={() => handleExcluir(conteudo.id, conteudo.titulo)}
+                                >
+                                  Excluir
+                                </Button>
+                              )}
                               <Button
                                 size="1"
                                 variant="soft"
@@ -189,7 +292,7 @@ export function AdminBiblioteca() {
                         <Table.Cell colSpan={6}>
                           <Box className="py-10 text-center">
                             <Text size="3" className="text-cyan-100/65">
-                              Nenhum conteúdo cadastrado ainda.
+                              Nenhum conteúdo encontrado.
                             </Text>
                           </Box>
                         </Table.Cell>

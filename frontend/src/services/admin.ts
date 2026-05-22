@@ -87,7 +87,7 @@ export const adminKeys = {
   webhookOfferPlanos: () => [...adminKeys.all, 'webhook-offer-planos'] as const,
   planosAtivos: () => [...adminKeys.all, 'planos-ativos'] as const,
   produtos: () => [...adminKeys.all, 'produtos'] as const,
-  conteudos: (page: number) => [...adminKeys.all, 'conteudos', page] as const,
+  conteudos: (page: number, filtros?: import('../types/admin').AdminConteudosFiltros) => [...adminKeys.all, 'conteudos', page, filtros] as const,
   b2bEmpresas: () => [...adminKeys.all, 'b2b', 'empresas'] as const,
   usuarios: (filtros: AdminUsuariosFiltros) => [...adminKeys.all, 'usuarios', filtros] as const,
   usuario: (id: number) => [...adminKeys.all, 'usuarios', id] as const,
@@ -248,9 +248,12 @@ export async function criarConteudo(payload: CriarConteudoPayload): Promise<Cont
   return resposta.data
 }
 
-export async function fetchConteudosAdmin(page: number): Promise<AdminConteudosResponse> {
+export async function fetchConteudosAdmin(
+  page: number,
+  filtros?: import('../types/admin').AdminConteudosFiltros,
+): Promise<AdminConteudosResponse> {
   const resposta = await api.get<AdminConteudosResponse>('/admin/conteudos', {
-    params: { page },
+    params: { page, ...filtros },
   })
 
   return resposta.data
@@ -258,6 +261,10 @@ export async function fetchConteudosAdmin(page: number): Promise<AdminConteudosR
 
 export async function despublicarConteudo(id: number): Promise<void> {
   await api.delete(`/admin/conteudos/${id}`)
+}
+
+export async function excluirConteudo(id: number): Promise<void> {
+  await api.delete(`/admin/conteudos/${id}/excluir`)
 }
 
 // --- Roles Admin ---
