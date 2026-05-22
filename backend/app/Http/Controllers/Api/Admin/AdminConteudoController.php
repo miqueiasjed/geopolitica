@@ -24,7 +24,13 @@ class AdminConteudoController extends Controller
             ->orderByDesc('created_at')
             ->paginate(20);
 
-        return response()->json(ConteudoResource::collection($conteudos));
+        return response()->json([
+            'data'         => ConteudoResource::collection($conteudos->items()),
+            'total'        => $conteudos->total(),
+            'per_page'     => $conteudos->perPage(),
+            'current_page' => $conteudos->currentPage(),
+            'last_page'    => $conteudos->lastPage(),
+        ]);
     }
 
     public function store(CriarConteudoRequest $request): JsonResponse
