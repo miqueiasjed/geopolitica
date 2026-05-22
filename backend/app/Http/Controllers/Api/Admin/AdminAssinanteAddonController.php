@@ -29,51 +29,55 @@ class AdminAssinanteAddonController extends Controller
             ->get()
             ->map(fn (AssinanteAddon $a) => [
                 'id'          => $a->id,
-                'addon_key'   => $a->addon_key,
+                'user_id'     => $a->user_id,
+                'produto_id'  => $a->product_id,
+                'chave'       => $a->addon_key,
                 'status'      => $a->status,
-                'fonte'       => $a->fonte,
-                'order_id'    => $a->order_id,
-                'product_id'  => $a->product_id,
-                'iniciado_em' => $a->iniciado_em?->toDateString(),
-                'expira_em'   => $a->expira_em?->toDateString(),
+                'data_inicio' => $a->iniciado_em?->toDateString(),
+                'data_fim'    => $a->expira_em?->toDateString(),
+                'created_at'  => $a->created_at?->toIso8601String(),
+                'updated_at'  => $a->updated_at?->toIso8601String(),
             ]);
 
-        return response()->json(['data' => $addons]);
+        return response()->json($addons);
     }
 
     public function store(AdicionarAddonRequest $request, User $user): JsonResponse
     {
         $dados = $request->validated();
 
-        DB::transaction(function () use ($user, $dados) {
+        $addonKey   = $dados['produto_chave'];
+        $iniciadoEm = $dados['data_inicio'] ?? null;
+        $expiraEm   = $dados['data_fim'] ?? null;
+
+        DB::transaction(function () use ($user, $dados, $addonKey, $iniciadoEm, $expiraEm) {
             if ($dados['status'] === 'ativo') {
                 $this->addonService->ativar(
                     userId:    $user->id,
-                    addonKey:  $dados['addon_key'],
-                    fonte:     $dados['fonte'],
+                    addonKey:  $addonKey,
+                    fonte:     'manual',
                     orderId:   null,
                     productId: null,
                 );
 
-                // Ajustar datas se fornecidas
-                if (! empty($dados['iniciado_em']) || ! empty($dados['expira_em'])) {
+                if ($iniciadoEm || $expiraEm) {
                     AssinanteAddon::where('user_id', $user->id)
-                        ->where('addon_key', $dados['addon_key'])
+                        ->where('addon_key', $addonKey)
                         ->latest('id')
                         ->first()
                         ?->update([
-                            'iniciado_em' => $dados['iniciado_em'] ?? now(),
-                            'expira_em'   => $dados['expira_em'] ?? null,
+                            'iniciado_em' => $iniciadoEm ?? now(),
+                            'expira_em'   => $expiraEm,
                         ]);
                 }
             } else {
                 AssinanteAddon::create([
                     'user_id'     => $user->id,
-                    'addon_key'   => $dados['addon_key'],
+                    'addon_key'   => $addonKey,
                     'status'      => $dados['status'],
-                    'fonte'       => $dados['fonte'],
-                    'iniciado_em' => $dados['iniciado_em'] ?? now(),
-                    'expira_em'   => $dados['expira_em'] ?? null,
+                    'fonte'       => 'manual',
+                    'iniciado_em' => $iniciadoEm ?? now(),
+                    'expira_em'   => $expiraEm,
                 ]);
             }
         });

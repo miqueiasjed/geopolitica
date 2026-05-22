@@ -16,11 +16,10 @@ class AdicionarAddonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'addon_key'   => ['required', 'string', Rule::exists('produtos', 'chave')],
-            'status'      => ['required', 'string', Rule::in(['ativo', 'cancelado', 'expirado', 'reembolsado'])],
-            'fonte'       => ['required', 'string', Rule::in(AssinanteAddon::FONTES)],
-            'iniciado_em' => ['nullable', 'date'],
-            'expira_em'   => ['nullable', 'date', 'after_or_equal:iniciado_em'],
+            'produto_chave' => ['required', 'string', Rule::exists('produtos', 'chave')],
+            'status'        => ['required', 'string', Rule::in(['ativo', 'cancelado', 'expirado', 'reembolsado'])],
+            'data_inicio'   => ['nullable', 'date'],
+            'data_fim'      => ['nullable', 'date', 'after_or_equal:data_inicio'],
         ];
     }
 }
