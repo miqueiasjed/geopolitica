@@ -4,6 +4,15 @@ import api from '../lib/axios'
 
 export type PlanoRecursoItem = string | null
 
+export interface OfertaPlano {
+  id: number
+  fonte: 'hotmart' | 'lastlink'
+  offer_id: string
+  descricao: string
+  plano: string
+  created_at: string
+}
+
 export interface Plano {
   id: number
   slug: string
@@ -31,6 +40,7 @@ export const adminPlanosKeys = {
   all: ['admin', 'planos'] as const,
   lista: () => [...adminPlanosKeys.all] as const,
   roles: () => ['admin', 'roles'] as const,
+  ofertas: (slug: string) => ['admin', 'planos', 'ofertas', slug] as const,
 }
 
 // ─── Funções de API ───────────────────────────────────────────────────────────
@@ -68,6 +78,27 @@ export async function atualizarPlano(
 export async function fetchRoles(): Promise<RoleItem[]> {
   const res = await api.get<{ data: RoleItem[] }>('/admin/usuarios/roles')
   return res.data.data
+}
+
+export async function fetchOfertasPorPlano(slug: string): Promise<OfertaPlano[]> {
+  const res = await api.get<{ data: OfertaPlano[] }>('/admin/webhook-offer-planos', {
+    params: { plano: slug },
+  })
+  return res.data.data
+}
+
+export async function criarOferta(dados: {
+  fonte: 'hotmart' | 'lastlink'
+  offer_id: string
+  descricao: string
+  plano: string
+}): Promise<OfertaPlano> {
+  const res = await api.post<{ data: OfertaPlano }>('/admin/webhook-offer-planos', dados)
+  return res.data.data
+}
+
+export async function deletarOferta(id: number): Promise<void> {
+  await api.delete(`/admin/webhook-offer-planos/${id}`)
 }
 
 export async function criarPlano(dados: {

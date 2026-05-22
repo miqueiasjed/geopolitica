@@ -11,6 +11,9 @@ import {
 import {
   fetchPlanos,
   fetchRoles,
+  fetchOfertasPorPlano,
+  criarOferta,
+  deletarOferta,
   atualizarRecurso,
   atualizarPlano,
   criarPlano,
@@ -511,12 +514,131 @@ function ModalVisualizarPlano({ planoId, onFechar }: { planoId: number; onFechar
   )
 }
 
+// ─── Painel de ofertas (webhook_offer_planos) ─────────────────────────────────
+
+function PainelOfertas({ planoSlug }: { planoSlug: string }) {
+  const queryClient = useQueryClient()
+  const [fonte, setFonte] = useState<'hotmart' | 'lastlink'>('hotmart')
+  const [offerId, setOfferId] = useState('')
+  const [descricao, setDescricao] = useState('')
+  const [erroAdd, setErroAdd] = useState<string | null>(null)
+
+  const { data: ofertas = [], isLoading } = useQuery({
+    queryKey: adminPlanosKeys.ofertas(planoSlug),
+    queryFn: () => fetchOfertasPorPlano(planoSlug),
+  })
+
+  const mutAdd = useMutation({
+    mutationFn: () => criarOferta({ fonte, offer_id: offerId.trim(), descricao: descricao.trim(), plano: planoSlug }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.ofertas(planoSlug) })
+      setOfferId('')
+      setDescricao('')
+      setErroAdd(null)
+    },
+    onError: (e: unknown) => {
+      setErroAdd(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Erro ao adicionar oferta.',
+      )
+    },
+  })
+
+  const mutDel = useMutation({
+    mutationFn: deletarOferta,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminPlanosKeys.ofertas(planoSlug) }),
+  })
+
+  return (
+    <div className="space-y-3">
+      {isLoading ? (
+        <p className="font-mono text-[11px] text-zinc-600">Carregando…</p>
+      ) : ofertas.length === 0 ? (
+        <p className="font-mono text-[11px] text-zinc-600">Nenhuma oferta cadastrada.</p>
+      ) : (
+        <div className="rounded-xl border border-[#1e1e20] overflow-hidden">
+          {ofertas.map((oferta) => (
+            <div
+              key={oferta.id}
+              className="flex items-center gap-3 px-4 py-2.5 border-b border-[#111113] last:border-0 group hover:bg-[#111115] transition-colors"
+            >
+              <span className={`flex-shrink-0 inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] ${
+                oferta.fonte === 'hotmart'
+                  ? 'bg-orange-500/10 text-orange-400'
+                  : 'bg-blue-500/10 text-blue-400'
+              }`}>
+                {oferta.fonte}
+              </span>
+              <span className="font-mono text-xs text-zinc-200 w-32 flex-shrink-0 truncate">{oferta.offer_id}</span>
+              <span className="text-xs text-zinc-500 flex-1 truncate">{oferta.descricao}</span>
+              <button
+                type="button"
+                onClick={() => mutDel.mutate(oferta.id)}
+                disabled={mutDel.isPending}
+                className="opacity-0 group-hover:opacity-100 transition-opacity rounded p-0.5 text-zinc-600 hover:text-red-400 disabled:opacity-30"
+                aria-label="Remover oferta"
+              >
+                <Cross2Icon className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="flex items-end gap-2 flex-wrap pt-1">
+        <div className="space-y-1">
+          <p className="font-mono text-[10px] text-zinc-600">Fonte</p>
+          <select
+            value={fonte}
+            onChange={(e) => setFonte(e.target.value as 'hotmart' | 'lastlink')}
+            className={`${INPUT_SM} cursor-pointer`}
+          >
+            <option value="hotmart" className="bg-[#0d0d0f]">Hotmart</option>
+            <option value="lastlink" className="bg-[#0d0d0f]">Lastlink</option>
+          </select>
+        </div>
+        <div className="space-y-1 w-36">
+          <p className="font-mono text-[10px] text-zinc-600">Offer ID</p>
+          <input
+            type="text"
+            value={offerId}
+            onChange={(e) => { setOfferId(e.target.value); setErroAdd(null) }}
+            placeholder="ex: abc123"
+            className={`${INPUT_SM} w-full`}
+          />
+        </div>
+        <div className="space-y-1 flex-1 min-w-[140px]">
+          <p className="font-mono text-[10px] text-zinc-600">Descrição</p>
+          <input
+            type="text"
+            value={descricao}
+            onChange={(e) => { setDescricao(e.target.value); setErroAdd(null) }}
+            placeholder="ex: Plano Pro Mensal"
+            className={`${INPUT_SM} w-full`}
+          />
+        </div>
+        <button
+          type="button"
+          disabled={!offerId.trim() || !descricao.trim() || mutAdd.isPending}
+          onClick={() => mutAdd.mutate()}
+          className="inline-flex items-center gap-1 rounded border border-[#C9B882]/30 bg-[#C9B882]/10 px-2.5 py-1.5 font-mono text-[10px] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <PlusIcon className="h-3 w-3" />
+          {mutAdd.isPending ? '…' : 'Adicionar'}
+        </button>
+      </div>
+      {erroAdd && (
+        <p className="font-mono text-[11px] text-red-400">{erroAdd}</p>
+      )}
+    </div>
+  )
+}
+
 // ─── Modal de edição ──────────────────────────────────────────────────────────
 
 const CAMPO =
   'rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 font-mono text-sm text-zinc-200 outline-none w-full transition-colors focus:border-[#C9B882]/40 focus:ring-1 focus:ring-[#C9B882]/20 placeholder:text-zinc-600'
 
-type AbaEditar = 'dados' | 'recursos'
+type AbaEditar = 'dados' | 'recursos' | 'identificadores'
 
 function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: () => void }) {
   const queryClient = useQueryClient()
@@ -604,7 +726,7 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
 
         {/* Tabs */}
         <div className="flex border-b border-[#1e1e20] px-6 flex-shrink-0">
-          {(['dados', 'recursos'] as AbaEditar[]).map((a) => (
+          {(['dados', 'recursos', 'identificadores'] as AbaEditar[]).map((a) => (
             <button
               key={a}
               type="button"
@@ -615,7 +737,7 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
                   : 'border-transparent text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              {a === 'dados' ? 'Dados' : 'Recursos'}
+              {a === 'dados' ? 'Dados' : a === 'recursos' ? 'Recursos' : 'Identificadores'}
             </button>
           ))}
         </div>
@@ -713,35 +835,6 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
-                    ID Produto Hotmart{' '}
-                    <span className="text-zinc-600 normal-case">(opcional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.product_id_hotmart}
-                    onChange={(e) => set('product_id_hotmart', e.target.value)}
-                    placeholder="ex: 12345678"
-                    className={CAMPO}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
-                    ID Produto Lastlink{' '}
-                    <span className="text-zinc-600 normal-case">(opcional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.product_id_lastlink}
-                    onChange={(e) => set('product_id_lastlink', e.target.value)}
-                    placeholder="ex: abc123"
-                    className={CAMPO}
-                  />
-                </div>
-              </div>
-
               {erro && (
                 <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">
                   {erro}
@@ -758,6 +851,56 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
               <PainelRecursos plano={plano} editavel={true} />
             </div>
           )}
+
+          {aba === 'identificadores' && (
+            <div className="space-y-6 px-6 py-5">
+              <div className="space-y-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">IDs de Produto</p>
+                <p className="text-xs text-zinc-600">Identificadores do produto principal em cada plataforma. O webhook usa este ID como primeira tentativa de resolução do plano.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+                      Hotmart <span className="text-zinc-600 normal-case">(opcional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={form.product_id_hotmart}
+                      onChange={(e) => set('product_id_hotmart', e.target.value)}
+                      placeholder="ex: 12345678"
+                      className={CAMPO}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+                      Lastlink <span className="text-zinc-600 normal-case">(opcional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={form.product_id_lastlink}
+                      onChange={(e) => set('product_id_lastlink', e.target.value)}
+                      placeholder="ex: abc123"
+                      className={CAMPO}
+                    />
+                  </div>
+                </div>
+                {erro && (
+                  <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">
+                    {erro}
+                  </p>
+                )}
+              </div>
+
+              <div className="border-t border-[#1e1e20]" />
+
+              <div className="space-y-3">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Ofertas</p>
+                  <p className="mt-1 text-xs text-zinc-600">Offer IDs vinculados a este plano. Um plano pode ter múltiplas ofertas (mensal, anual, promo). O webhook verifica estes IDs como fallback ao product_id.</p>
+                </div>
+                <PainelOfertas planoSlug={plano.slug} />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -769,7 +912,7 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
           >
             {aba === 'recursos' ? 'Fechar' : 'Cancelar'}
           </button>
-          {aba === 'dados' && (
+          {(aba === 'dados' || aba === 'identificadores') && (
             <button
               type="button"
               disabled={mutation.isPending || !form.nome || !form.preco}

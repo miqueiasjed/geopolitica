@@ -11,15 +11,21 @@ use Illuminate\Validation\Rule;
 
 class AdminWebhookOfferPlanoController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $registros = WebhookOfferPlano::orderBy('fonte')->orderBy('descricao')->get()
+        $query = WebhookOfferPlano::orderBy('fonte')->orderBy('descricao');
+
+        if ($request->filled('plano')) {
+            $query->where('plano', $request->plano);
+        }
+
+        $registros = $query->get()
             ->map(fn (WebhookOfferPlano $r) => [
-                'id'        => $r->id,
-                'fonte'     => $r->fonte,
-                'offer_id'  => $r->offer_id,
-                'descricao' => $r->descricao,
-                'plano'     => $r->plano,
+                'id'         => $r->id,
+                'fonte'      => $r->fonte,
+                'offer_id'   => $r->offer_id,
+                'descricao'  => $r->descricao,
+                'plano'      => $r->plano,
                 'created_at' => $r->created_at?->toIso8601String(),
             ]);
 
