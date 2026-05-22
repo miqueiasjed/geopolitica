@@ -37,30 +37,31 @@ class AddonServiceTest extends TestCase
         return [$usuario, $assinante];
     }
 
-    public function test_ativar_adiciona_addon_ao_array_do_assinante(): void
+    public function test_ativar_adiciona_addon_ao_assinante_addons(): void
     {
-        [$usuario, $assinante] = $this->criarUsuarioComAssinante();
+        [$usuario] = $this->criarUsuarioComAssinante();
 
         (new AddonService())->ativar($usuario->id, 'elections', 'hotmart');
 
-        $assinante->refresh();
-
-        $this->assertContains('elections', $assinante->addons);
+        $this->assertDatabaseHas('assinante_addons', [
+            'user_id'   => $usuario->id,
+            'addon_key' => 'elections',
+            'status'    => 'ativo',
+        ]);
     }
 
     public function test_ativar_e_idempotente_quando_addon_ja_existe(): void
     {
-        [$usuario, $assinante] = $this->criarUsuarioComAssinante([
-            'addons' => ['elections'],
-        ]);
+        [$usuario] = $this->criarUsuarioComAssinante();
 
         (new AddonService())->ativar($usuario->id, 'elections', 'hotmart');
         (new AddonService())->ativar($usuario->id, 'elections', 'hotmart');
 
-        $assinante->refresh();
+        $ocorrencias = AssinanteAddon::where('user_id', $usuario->id)
+            ->where('addon_key', 'elections')
+            ->count();
 
-        $ocorrencias = array_count_values($assinante->addons)['elections'] ?? 0;
-        $this->assertSame(1, $ocorrencias, 'addon_key não deve aparecer duplicado no array');
+        $this->assertSame(1, $ocorrencias, 'addon_key não deve gerar registros duplicados');
     }
 
     public function test_ativar_cria_registro_em_assinante_addons(): void
@@ -81,26 +82,17 @@ class AddonServiceTest extends TestCase
         $this->assertSame('prod-456', $registro->product_id);
     }
 
-    public function test_cancelar_remove_addon_do_array(): void
+    public function test_cancelar_atualiza_status_para_cancelado(): void
     {
-        [$usuario, $assinante] = $this->criarUsuarioComAssinante([
-            'addons' => ['elections', 'war'],
-        ]);
+        [$usuario] = $this->criarUsuarioComAssinante();
 
-        AssinanteAddon::query()->create([
-            'user_id'     => $usuario->id,
-            'addon_key'   => 'elections',
-            'status'      => 'ativo',
-            'fonte'       => 'hotmart',
-            'iniciado_em' => now(),
-        ]);
+        AssinanteAddon::query()->create(['user_id' => $usuario->id, 'addon_key' => 'elections', 'status' => 'ativo', 'fonte' => 'hotmart', 'iniciado_em' => now()]);
+        AssinanteAddon::query()->create(['user_id' => $usuario->id, 'addon_key' => 'war',       'status' => 'ativo', 'fonte' => 'hotmart', 'iniciado_em' => now()]);
 
         (new AddonService())->cancelar($usuario->id, 'elections', 'cancelado');
 
-        $assinante->refresh();
-
-        $this->assertNotContains('elections', $assinante->addons);
-        $this->assertContains('war', $assinante->addons);
+        $this->assertDatabaseHas('assinante_addons', ['user_id' => $usuario->id, 'addon_key' => 'elections', 'status' => 'cancelado']);
+        $this->assertDatabaseHas('assinante_addons', ['user_id' => $usuario->id, 'addon_key' => 'war',       'status' => 'ativo']);
     }
 
     public function test_cancelar_atualiza_status_em_assinante_addons(): void

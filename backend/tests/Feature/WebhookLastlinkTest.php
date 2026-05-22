@@ -210,7 +210,6 @@ class WebhookLastlinkTest extends TestCase
 
         $assinante = Assinante::whereHas('user', fn ($q) => $q->where('email', 'novo@teste.com'))->firstOrFail();
         $this->assertSame('elections', $assinante->plano);
-        $this->assertContains('elections', $assinante->addons);
         $this->assertDatabaseHas('assinante_addons', ['addon_key' => 'elections', 'status' => 'ativo']);
         Mail::assertQueued(AddonBoasVindasMail::class);
     }
@@ -225,23 +224,21 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $assinante = $usuario->fresh()->assinante;
-        $this->assertContains('elections', $assinante->addons);
         $this->assertSame('pro', $assinante->plano);
+        $this->assertDatabaseHas('assinante_addons', ['user_id' => $usuario->id, 'addon_key' => 'elections', 'status' => 'ativo']);
         Mail::assertQueued(AddonBoasVindasMail::class);
     }
 
     public function test_cancelamento_addon_remove_addon(): void
     {
         $usuario = User::factory()->create(['email' => 'existente@teste.com']);
-        Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo', 'addons' => ['elections']]);
+        Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
         AssinanteAddon::create(['user_id' => $usuario->id, 'addon_key' => 'elections', 'status' => 'ativo', 'fonte' => 'lastlink', 'iniciado_em' => now()]);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
             ->postJson('/api/webhook/lastlink', $this->payloadCancelamentoAddon('existente@teste.com', 'PROD_ELECTIONS_TEST'))
             ->assertOk();
 
-        $assinante = $usuario->fresh()->assinante;
-        $this->assertNotContains('elections', $assinante->addons);
         $this->assertDatabaseHas('assinante_addons', ['user_id' => $usuario->id, 'addon_key' => 'elections', 'status' => 'cancelado']);
     }
 

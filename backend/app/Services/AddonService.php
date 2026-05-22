@@ -21,46 +21,18 @@ class AddonService
             ['plano' => $addonKey, 'ativo' => true, 'status' => 'ativo'],
         );
 
-        $addonsAtuais = array_values(array_unique($assinante->addons ?? []));
-
-        $deveAdicionarAddon = ! in_array($addonKey, $addonsAtuais, true);
-        if ($deveAdicionarAddon) {
-            $addonsAtuais[] = $addonKey;
-        }
-
-        $updates = [];
-        if ($deveAdicionarAddon) {
-            $updates['addons'] = $addonsAtuais;
-        }
-        // Garante que o assinante fica ativo ao receber um addon
         if (! $assinante->ativo) {
-            $updates['ativo'] = true;
-        }
-        if (! empty($updates)) {
-            $assinante->forceFill($updates)->save();
+            $assinante->forceFill(['ativo' => true])->save();
         }
 
-        AssinanteAddon::query()->firstOrCreate(
-            ['user_id' => $userId, 'addon_key' => $addonKey, 'status' => 'ativo'],
-            ['fonte' => $fonte, 'order_id' => $orderId, 'product_id' => $productId, 'iniciado_em' => now()],
+        AssinanteAddon::query()->updateOrCreate(
+            ['user_id' => $userId, 'addon_key' => $addonKey],
+            ['status' => 'ativo', 'fonte' => $fonte, 'order_id' => $orderId, 'product_id' => $productId, 'iniciado_em' => now()],
         );
     }
 
     public function cancelar(int $userId, string $addonKey, string $motivo): void
     {
-        $assinante = Assinante::query()->where('user_id', $userId)->firstOrFail();
-
-        $addonsAtuais = $assinante->addons ?? [];
-
-        if (in_array($addonKey, $addonsAtuais, true)) {
-            $assinante->forceFill([
-                'addons' => array_values(array_filter(
-                    $addonsAtuais,
-                    fn (string $key) => $key !== $addonKey,
-                )),
-            ])->save();
-        }
-
         AssinanteAddon::query()
             ->where('user_id', $userId)
             ->where('addon_key', $addonKey)

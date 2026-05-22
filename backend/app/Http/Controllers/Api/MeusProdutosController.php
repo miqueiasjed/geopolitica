@@ -5,16 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AssinanteAddon;
 use App\Models\Produto;
-use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MeusProdutosController extends Controller
 {
-    public function __construct(
-        private readonly PlanoService $planoService,
-    ) {}
-
     public function index(Request $request): JsonResponse
     {
         $user      = $request->user();
@@ -24,7 +19,7 @@ class MeusProdutosController extends Controller
         $produtos = Produto::ativo()->ordenado()->get();
 
         $dados = $produtos->map(function (Produto $produto) use ($user, $assinante, $isAdmin) {
-            $statusUsuario = $this->resolverStatus($user->id, $produto, $assinante, $isAdmin);
+            $statusUsuario = $this->resolverStatus($user->id, $produto, $isAdmin, $assinante);
 
             return [
                 'chave'          => $produto->chave,
@@ -40,24 +35,17 @@ class MeusProdutosController extends Controller
         return response()->json($dados);
     }
 
-    private function resolverStatus(int $userId, Produto $produto, $assinante, bool $isAdmin): ?string
+    private function resolverStatus(int $userId, Produto $produto, bool $isAdmin, $assinante): ?string
     {
         if ($isAdmin) {
             return 'ativo';
         }
 
-        // temAddon verifica assinantes.addons E assinante_addons (status=ativo)
         if ($assinante?->temAddon($produto->chave)) {
             return 'ativo';
         }
 
-        if ($produto->recurso_plano && $assinante) {
-            if ($this->planoService->recursoBoolean($assinante->plano, $produto->recurso_plano)) {
-                return 'ativo';
-            }
-        }
-
-        // Retorna status não-ativo (cancelado/expirado/reembolsado) para o CTA correto
+        // Status não-ativo para CTA correto (Reativar / Renovar / Assinar)
         return AssinanteAddon::where('user_id', $userId)
             ->where('addon_key', $produto->chave)
             ->whereIn('status', ['cancelado', 'expirado', 'reembolsado'])

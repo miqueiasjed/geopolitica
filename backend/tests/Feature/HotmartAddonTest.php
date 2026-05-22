@@ -57,8 +57,8 @@ class HotmartAddonTest extends TestCase
 
         $assinante = Assinante::query()->where('user_id', $usuario->id)->firstOrFail();
 
-        $this->assertContains('elections', $assinante->addons, 'O addon elections deve estar no array de addons');
         $this->assertSame($planoAntes, $assinante->plano, 'O plano não deve ter sido alterado');
+        $this->assertDatabaseHas('assinante_addons', ['user_id' => $usuario->id, 'addon_key' => 'elections', 'status' => 'ativo']);
     }
 
     public function test_purchase_approved_de_plano_nao_altera_addons(): void
@@ -71,7 +71,7 @@ class HotmartAddonTest extends TestCase
         $assinante = Assinante::query()->whereHas('user', fn ($q) => $q->where('email', 'plano@teste.com'))->first();
 
         $this->assertNotNull($assinante);
-        $this->assertEmpty($assinante->addons, 'Addons deve continuar vazio para compra de plano');
+        $this->assertDatabaseMissing('assinante_addons', ['user_id' => $assinante->user_id, 'status' => 'ativo']);
     }
 
     public function test_purchase_canceled_de_addon_cancela_addon(): void
@@ -83,7 +83,6 @@ class HotmartAddonTest extends TestCase
             'plano'      => 'pro',
             'ativo'      => true,
             'status'     => 'ativo',
-            'addons'     => ['elections'],
             'assinado_em' => now(),
         ]);
 
