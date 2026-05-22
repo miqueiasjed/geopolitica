@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AssinanteAddon;
 use App\Models\Produto;
+use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MeusProdutosController extends Controller
 {
+    public function __construct(private readonly PlanoService $planoService) {}
+
     public function index(Request $request): JsonResponse
     {
         $user      = $request->user();
@@ -42,6 +45,14 @@ class MeusProdutosController extends Controller
         }
 
         if ($assinante?->temAddon($produto->chave)) {
+            return 'ativo';
+        }
+
+        if (
+            $produto->recurso_plano
+            && $assinante?->plano
+            && $this->planoService->recursoBoolean($assinante->plano, $produto->recurso_plano)
+        ) {
             return 'ativo';
         }
 
