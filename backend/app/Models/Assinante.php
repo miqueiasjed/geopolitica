@@ -48,7 +48,10 @@ class Assinante extends Model
 
     public function temAddon(string $addonKey): bool
     {
-        return in_array($addonKey, $this->addons ?? [], true);
+        return $this->assinanteAddons()
+            ->where('addon_key', $addonKey)
+            ->where('status', 'ativo')
+            ->exists();
     }
 
     public function getAddonsAttribute($valor): array

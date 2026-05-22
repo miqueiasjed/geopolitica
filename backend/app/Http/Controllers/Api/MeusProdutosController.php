@@ -46,22 +46,22 @@ class MeusProdutosController extends Controller
             return 'ativo';
         }
 
-        if ($assinante && $assinante->temAddon($produto->chave)) {
+        // temAddon verifica assinantes.addons E assinante_addons (status=ativo)
+        if ($assinante?->temAddon($produto->chave)) {
             return 'ativo';
         }
 
-        // Verifica se o plano do usuário inclui este addon via plano_recursos
         if ($produto->recurso_plano && $assinante) {
             if ($this->planoService->recursoBoolean($assinante->plano, $produto->recurso_plano)) {
                 return 'ativo';
             }
         }
 
-        $ultimoAddon = AssinanteAddon::where('user_id', $userId)
+        // Retorna status não-ativo (cancelado/expirado/reembolsado) para o CTA correto
+        return AssinanteAddon::where('user_id', $userId)
             ->where('addon_key', $produto->chave)
+            ->whereIn('status', ['cancelado', 'expirado', 'reembolsado'])
             ->latest('iniciado_em')
-            ->first();
-
-        return $ultimoAddon?->status;
+            ->value('status');
     }
 }

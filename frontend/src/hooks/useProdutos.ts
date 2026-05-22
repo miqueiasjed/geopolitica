@@ -21,7 +21,7 @@ export function useProdutos() {
   return useQuery({
     queryKey: produtosKeys.all,
     queryFn: fetchMeusProdutos,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 0,
   })
 }
 
