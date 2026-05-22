@@ -22,6 +22,7 @@ class ConteudoResource extends JsonResource
             'tags'             => $this->tags ?? [],
             'tese_manchete'    => $this->tese_manchete,
             'plano_minimo'     => $this->plano_minimo,
+            'status'           => $this->publicado ? 'publicado' : 'rascunho',
             'publicado_em'     => $this->publicado_em?->toIso8601String(),
             'vertical_conteudo' => $this->vertical_conteudo,
         ];
