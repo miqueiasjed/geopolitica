@@ -10,6 +10,7 @@ export interface PaginacaoLaravel<T> {
 
 export interface AdminAssinante {
   id: number
+  user_id: number
   email: string
   name: string
   plano: string

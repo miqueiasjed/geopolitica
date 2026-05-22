@@ -95,6 +95,7 @@ class AdminAssinanteService
             ->paginate(25)
             ->through(fn (Assinante $assinante) => [
                 'id' => $assinante->id,
+                'user_id' => $assinante->user_id,
                 'email' => $assinante->user?->email,
                 'name' => $assinante->user?->name,
                 'nome' => $assinante->user?->name,

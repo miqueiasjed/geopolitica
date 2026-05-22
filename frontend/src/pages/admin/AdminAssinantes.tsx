@@ -895,7 +895,7 @@ export function AdminAssinantes() {
                                   size="1"
                                   variant="ghost"
                                   color="violet"
-                                  onClick={() => setAddonsUserId(assinante.id)}
+                                  onClick={() => setAddonsUserId(assinante.user_id)}
                                 >
                                   <LayersIcon />
                                 </IconButton>
