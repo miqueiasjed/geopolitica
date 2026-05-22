@@ -17,7 +17,7 @@ import {
 } from '@radix-ui/themes'
 import { ChevronLeftIcon, UploadIcon } from '@radix-ui/react-icons'
 import { AdminEditor } from '../../components/biblioteca/AdminEditor'
-import { criarConteudo, parsearDocxBriefing } from '../../services/admin'
+import { criarConteudo, enriquecerBriefing, parsearArquivoBriefing } from '../../services/admin'
 import type { TipoConteudo, VerticalConteudo } from '../../types/biblioteca'
 
 const VALOR_SEM_VERTICAL = 'core'
@@ -69,12 +69,22 @@ export function AdminNovoConteudo() {
     setErroImport(null)
 
     try {
-      const resultado = await parsearDocxBriefing(arquivo)
+      const resultado = await parsearArquivoBriefing(arquivo)
       if (resultado.edicao) setEdicao(String(resultado.edicao))
       if (resultado.autor) setAutor(resultado.autor)
       if (resultado.corpo) {
         setCorpo(resultado.corpo)
         if (erros.corpo) setErros((prev) => ({ ...prev, corpo: undefined }))
+
+        try {
+          const enriquecido = await enriquecerBriefing(resultado.corpo)
+          if (enriquecido.titulo) setTitulo(enriquecido.titulo)
+          if (enriquecido.regiao) setRegiao(enriquecido.regiao)
+          if (enriquecido.tags?.length) setTags(enriquecido.tags.join(', '))
+          if (enriquecido.resumo) setResumo(enriquecido.resumo)
+        } catch {
+          // enriquecimento é best-effort — falha silenciosa
+        }
       }
     } catch {
       setErroImport('Não foi possível processar o arquivo. Verifique se é um .docx válido.')
@@ -162,7 +172,7 @@ export function AdminNovoConteudo() {
                   Importar briefing via DOCX
                 </Text>
                 <Text size="1" className="text-cyan-100/50">
-                  Pré-preenche edição, autor e corpo a partir do arquivo.
+                  Pré-preenche todos os campos via IA a partir do arquivo.
                 </Text>
                 {erroImport && (
                   <Text size="1" color="ruby">
@@ -173,7 +183,7 @@ export function AdminNovoConteudo() {
               <input
                 ref={inputDocx}
                 type="file"
-                accept=".docx"
+                accept=".docx,.pdf"
                 className="hidden"
                 onChange={handleDocxSelecionado}
               />
@@ -186,7 +196,7 @@ export function AdminNovoConteudo() {
                 onClick={() => inputDocx.current?.click()}
               >
                 {importando ? <Spinner size="1" /> : <UploadIcon />}
-                {importando ? 'Processando...' : 'Selecionar .docx'}
+                {importando ? 'Processando...' : 'Selecionar .docx ou .pdf'}
               </Button>
             </Flex>
           </Card>

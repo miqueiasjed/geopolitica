@@ -24,6 +24,14 @@ export function AdminEditor({ value, onChange, placeholder }: AdminEditorProps) 
   })
 
   useEffect(() => {
+    if (!editor) return
+    const atual = editor.getHTML()
+    if (value !== atual) {
+      editor.commands.setContent(value)
+    }
+  }, [editor, value])
+
+  useEffect(() => {
     return () => {
       editor?.destroy()
     }

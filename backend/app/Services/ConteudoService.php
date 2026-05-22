@@ -116,6 +116,10 @@ class ConteudoService
         $dados['slug']         = Conteudo::gerarSlug($dados['titulo']);
         $dados['plano_minimo'] = self::PLANO_POR_TIPO[$dados['tipo']];
 
+        if ($dados['publicado'] ?? false) {
+            $dados['publicado_em'] = now();
+        }
+
         return Conteudo::create($dados);
     }
 

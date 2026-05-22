@@ -56,12 +56,24 @@ export interface ParseDocxResponse {
   corpo: string
 }
 
-export async function parsearDocxBriefing(arquivo: File): Promise<ParseDocxResponse> {
+export interface EnriquecerBriefingResponse {
+  titulo: string | null
+  regiao: string | null
+  tags: string[]
+  resumo: string | null
+}
+
+export async function parsearArquivoBriefing(arquivo: File): Promise<ParseDocxResponse> {
   const form = new FormData()
   form.append('arquivo', arquivo)
   const resposta = await api.post<ParseDocxResponse>('/admin/conteudos/parse-docx', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
+  return resposta.data
+}
+
+export async function enriquecerBriefing(corpo: string): Promise<EnriquecerBriefingResponse> {
+  const resposta = await api.post<EnriquecerBriefingResponse>('/admin/conteudos/enriquecer-briefing', { corpo })
   return resposta.data
 }
 

@@ -6,26 +6,52 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use PhpOffice\PhpWord\IOFactory;
+use Smalot\PdfParser\Parser as PdfParser;
 
 class AdminImportarBriefingController extends Controller
 {
     public function parsear(Request $request): JsonResponse
     {
         $request->validate([
-            'arquivo' => ['required', 'file', 'mimes:docx', 'max:10240'],
+            'arquivo' => ['required', 'file', 'mimes:docx,pdf', 'max:10240'],
         ]);
 
-        $caminho = $request->file('arquivo')->getPathname();
+        $arquivo  = $request->file('arquivo');
+        $caminho  = $arquivo->getPathname();
+        $extensao = strtolower($arquivo->getClientOriginalExtension());
 
         try {
-            $phpWord  = IOFactory::load($caminho, 'Word2007');
-            $paragrafos = $this->extrairParagrafos($phpWord);
-            $resultado  = $this->parsearEstrutura($paragrafos);
+            if ($extensao === 'pdf') {
+                $resultado = $this->parsearPdf($caminho);
+            } else {
+                $phpWord    = IOFactory::load($caminho, 'Word2007');
+                $paragrafos = $this->extrairParagrafos($phpWord);
+                $resultado  = $this->parsearEstrutura($paragrafos);
+            }
         } catch (\Throwable $e) {
-            return response()->json(['message' => 'Não foi possível processar o arquivo DOCX.'], 422);
+            return response()->json(['message' => 'Não foi possível processar o arquivo.'], 422);
         }
 
         return response()->json($resultado);
+    }
+
+    private function parsearPdf(string $caminho): array
+    {
+        $parser = new PdfParser();
+        $pdf    = $parser->parseFile($caminho);
+        $texto  = $pdf->getText();
+
+        $linhas     = array_filter(array_map('trim', explode("\n", $texto)), fn ($l) => $l !== '');
+        $paragrafos = array_values($linhas);
+
+        $resultado = $this->parsearEstrutura($paragrafos);
+
+        if ($resultado['corpo'] === '') {
+            $html = implode('', array_map(fn ($p) => '<p>' . e($p) . '</p>', $paragrafos));
+            $resultado['corpo'] = $html;
+        }
+
+        return $resultado;
     }
 
     private function extrairParagrafos(\PhpOffice\PhpWord\PhpWord $phpWord): array
