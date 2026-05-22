@@ -23,9 +23,21 @@ class AddonService
 
         $addonsAtuais = array_values(array_unique($assinante->addons ?? []));
 
-        if (! in_array($addonKey, $addonsAtuais, true)) {
+        $deveAdicionarAddon = ! in_array($addonKey, $addonsAtuais, true);
+        if ($deveAdicionarAddon) {
             $addonsAtuais[] = $addonKey;
-            $assinante->forceFill(['addons' => $addonsAtuais])->save();
+        }
+
+        $updates = [];
+        if ($deveAdicionarAddon) {
+            $updates['addons'] = $addonsAtuais;
+        }
+        // Garante que o assinante fica ativo ao receber um addon
+        if (! $assinante->ativo) {
+            $updates['ativo'] = true;
+        }
+        if (! empty($updates)) {
+            $assinante->forceFill($updates)->save();
         }
 
         AssinanteAddon::query()->firstOrCreate(
