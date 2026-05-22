@@ -452,7 +452,7 @@ class WebhookLastlinkTest extends TestCase
         $this->assertNull($evento->log_acao);
     }
 
-    public function test_product_id_desconhecido_auto_cadastra_produto_e_ativa_addon(): void
+    public function test_product_id_desconhecido_nao_cria_usuario_nem_produto(): void
     {
         $payload = [
             'event'    => 'approved',
@@ -465,9 +465,9 @@ class WebhookLastlinkTest extends TestCase
             ->postJson('/api/webhook/lastlink', $payload)
             ->assertOk();
 
-        $this->assertTrue(User::where('email', 'desconhecido@teste.com')->exists());
-        $this->assertTrue(Produto::where('product_id_lastlink', 'PROD_INEXISTENTE')->exists());
-        $this->assertTrue(AssinanteAddon::where('addon_key', 'lastlink_prod_inexistente')->exists());
+        $this->assertFalse(User::where('email', 'desconhecido@teste.com')->exists());
+        $this->assertFalse(Produto::where('product_id_lastlink', 'PROD_INEXISTENTE')->exists());
+        $this->assertFalse(AssinanteAddon::where('addon_key', 'lastlink_prod_inexistente')->exists());
     }
 
     public function test_sem_product_id_e_offer_desconhecido_nao_cria_usuario(): void

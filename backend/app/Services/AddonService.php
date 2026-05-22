@@ -75,34 +75,6 @@ class AddonService
             ->value('chave');
     }
 
-    public static function resolverOuCriarAddonKey(string $productId, string $fonte, ?string $nomeProduto = null): string
-    {
-        $produto = Produto::query()->where("product_id_{$fonte}", $productId)->first();
-
-        if ($produto) {
-            return $produto->chave;
-        }
-
-        $base  = substr(rtrim(preg_replace('/[^a-z0-9_-]/', '_', strtolower("{$fonte}_{$productId}")), '_'), 0, 50);
-        $chave = $base;
-        $i     = 1;
-
-        while (Produto::query()->where('chave', $chave)->exists()) {
-            $chave = "{$base}_{$i}";
-            $i++;
-        }
-
-        $produto = Produto::create([
-            'chave'               => $chave,
-            'nome'                => $nomeProduto ?? "Addon {$fonte} {$productId}",
-            'ativo'               => true,
-            'ordem'               => 99,
-            "product_id_{$fonte}" => $productId,
-        ]);
-
-        return $produto->chave;
-    }
-
     public static function resolverPlanoByOferta(string $ofertaId): ?string
     {
         $registro = WebhookOfferPlano::where('fonte', 'lastlink')

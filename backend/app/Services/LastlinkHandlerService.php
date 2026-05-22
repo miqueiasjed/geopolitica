@@ -141,16 +141,8 @@ class LastlinkHandlerService
             return $this->ativarAssinatura($payload, $planoKey);
         }
 
-        // product_id presente mas sem mapeamento de addon ou plano → auto-cadastra como addon
         if ($productId) {
-            $nomeProduto = $this->extrairCampo($payload, [
-                'product.name',
-                'Data.Product.Name',
-                'Data.Products.0.Name',
-            ]);
-            $addonKey = AddonService::resolverOuCriarAddonKey($productId, 'lastlink', $nomeProduto);
-
-            return $this->ativarAddon($payload, $addonKey);
+            return "Produto Lastlink ID {$productId} não mapeado — configure o product_id_lastlink no painel de addons";
         }
 
         return 'Produto ou plano não identificado — nenhuma ação tomada';

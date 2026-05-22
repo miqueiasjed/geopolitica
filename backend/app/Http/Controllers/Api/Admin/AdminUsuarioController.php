@@ -11,6 +11,7 @@ use App\Models\Plano;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
@@ -19,13 +20,13 @@ class AdminUsuarioController extends Controller
 {
     public function roles(): JsonResponse
     {
-        $assinante = Plano::orderBy('ordem')
+        $assinante = Cache::remember('admin_planos_roles', 3600, fn () => Plano::orderBy('ordem')
             ->get()
             ->map(fn (Plano $plano) => [
                 'role'      => 'assinante_' . $plano->slug,
                 'label'     => $plano->nome,
                 'assinante' => true,
-            ]);
+            ]));
 
         $fixas = collect([
             ['role' => 'admin',         'label' => 'Admin',         'assinante' => false],
@@ -178,7 +179,9 @@ class AdminUsuarioController extends Controller
 
         $slug = substr($role, strlen('assinante_'));
 
-        return Plano::where('slug', $slug)->exists() ? $slug : null;
+        $existe = Cache::remember("plano_slug_{$slug}", 600, fn () => Plano::where('slug', $slug)->exists());
+
+        return $existe ? $slug : null;
     }
 
     private function serializar(User $user, bool $detalhado = false): array

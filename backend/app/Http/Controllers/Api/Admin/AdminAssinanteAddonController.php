@@ -13,6 +13,7 @@ use App\Services\AddonService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,7 +25,8 @@ class AdminAssinanteAddonController extends Controller
 
     public function index(User $user): JsonResponse
     {
-        $addons = AssinanteAddon::where('user_id', $user->id)
+        $addons = AssinanteAddon::select('id', 'user_id', 'product_id', 'addon_key', 'status', 'iniciado_em', 'expira_em', 'created_at', 'updated_at')
+            ->where('user_id', $user->id)
             ->orderByDesc('iniciado_em')
             ->get()
             ->map(fn (AssinanteAddon $a) => [
@@ -187,7 +189,11 @@ class AdminAssinanteAddonController extends Controller
             ]);
         }
 
-        $produtos  = Produto::pluck('chave')->all();
+        $produtos = Cache::remember('produtos_chaves', 3600, fn () => Produto::pluck('chave')->all());
+
+        // Carrega todos os usuários referenciados de uma vez para evitar N+1
+        $emails          = array_unique(array_map('trim', array_column($linhas, 'email')));
+        $usuariosPorEmail = User::whereIn('email', $emails)->get()->keyBy('email');
 
         $importados = 0;
         $erros      = [];
@@ -220,7 +226,7 @@ class AdminAssinanteAddonController extends Controller
                     $fonte = 'manual';
                 }
 
-                $user = User::where('email', $email)->first();
+                $user = $usuariosPorEmail[$email] ?? null;
 
                 if (! $user) {
                     $erros[] = ['linha' => $numeroLinha, 'motivo' => "usuário '{$email}' não encontrado"];

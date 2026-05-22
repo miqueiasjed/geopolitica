@@ -37,10 +37,24 @@ class ProdutoSeeder extends Seeder
         ];
 
         foreach ($produtos as $dados) {
-            Produto::updateOrCreate(
-                ['chave' => $dados['chave']],
-                $dados,
-            );
+            $existente = Produto::where('chave', $dados['chave'])->first();
+
+            if (! $existente) {
+                Produto::create($dados);
+                continue;
+            }
+
+            // Ao atualizar, preserva product_ids e links já configurados pelo admin
+            $existente->update([
+                'nome'        => $dados['nome'],
+                'descricao'   => $dados['descricao'],
+                'preco_label' => $dados['preco_label'],
+                'ativo'       => $dados['ativo'],
+                'ordem'       => $dados['ordem'],
+                'link_compra'         => $existente->link_compra         ?? $dados['link_compra'],
+                'product_id_lastlink' => $existente->product_id_lastlink ?? $dados['product_id_lastlink'],
+                'product_id_hotmart'  => $existente->product_id_hotmart  ?? $dados['product_id_hotmart'],
+            ]);
         }
     }
 }
