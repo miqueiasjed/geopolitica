@@ -3,51 +3,60 @@
 @section('content')
 <div class="briefing-content">
 
-    {{-- Categoria e tipo --}}
-    <div style="margin-bottom: 12pt;">
-        @if (!empty($conteudo->regiao))
-            <span style="
-                font-size: 7.5pt;
-                font-family: Georgia, serif;
-                font-weight: bold;
-                text-transform: uppercase;
-                letter-spacing: 0.12em;
-                color: #C9B882;
-                margin-right: 8pt;
-            ">{{ $conteudo->regiao }}</span>
-        @endif
+    {{-- Cabeçalho editorial --}}
+    <div style="margin-bottom: 20pt;">
+        <div style="
+            font-family: Georgia, serif;
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: #C9B882;
+            margin-bottom: 4pt;
+        ">Geopolítica para Investidores@if (!empty($conteudo->edicao)), Nº {{ str_pad($conteudo->edicao, 3, '0', STR_PAD_LEFT) }}@endif</div>
 
-        @if (!empty($conteudo->tipo))
-            <span style="
-                font-size: 7.5pt;
-                font-family: Georgia, serif;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-                color: #6b7280;
-                border: 1px solid #d1d5db;
-                padding: 1pt 5pt;
-            ">{{ $conteudo->tipo }}</span>
+        <div style="
+            font-size: 8pt;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+            margin-bottom: 2pt;
+        ">
+            @if (!empty($conteudo->publicado_em))
+                {{ \Carbon\Carbon::parse($conteudo->publicado_em)->locale('pt_BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+            @else
+                {{ \Carbon\Carbon::parse($conteudo->created_at)->locale('pt_BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+            @endif
+        </div>
+
+        @if (!empty($conteudo->autor))
+        <div style="
+            font-size: 8pt;
+            color: #6b7280;
+            font-style: italic;
+        ">Por {{ $conteudo->autor }}</div>
         @endif
     </div>
+
+    <hr style="border: none; border-top: 2px solid #C9B882; margin-bottom: 20pt;">
 
     {{-- Título --}}
     <h1 style="
         font-family: Georgia, serif;
-        font-size: 18pt;
+        font-size: 20pt;
         font-weight: bold;
         color: #1a1a1b;
-        line-height: 1.3;
-        margin-bottom: 8pt;
+        line-height: 1.25;
+        margin-bottom: 10pt;
     ">{{ $conteudo->titulo }}</h1>
 
-    {{-- Subtítulo / Tese manchete --}}
+    {{-- Resumo / manchete --}}
     @if (!empty($conteudo->tese_manchete))
         <p style="
             font-family: Georgia, serif;
             font-size: 11pt;
             font-style: italic;
             color: #4b5563;
-            margin-bottom: 8pt;
+            margin-bottom: 20pt;
             line-height: 1.5;
         ">{{ $conteudo->tese_manchete }}</p>
     @elseif (!empty($conteudo->resumo))
@@ -56,52 +65,49 @@
             font-size: 11pt;
             font-style: italic;
             color: #4b5563;
-            margin-bottom: 8pt;
+            margin-bottom: 20pt;
             line-height: 1.5;
         ">{{ $conteudo->resumo }}</p>
     @endif
 
-    {{-- Data de publicação --}}
-    <p style="
-        font-size: 8pt;
-        color: #9ca3af;
-        margin-bottom: 20pt;
-        letter-spacing: 0.03em;
-    ">
-        @if (!empty($conteudo->publicado_em))
-            {{ \Carbon\Carbon::parse($conteudo->publicado_em)->locale('pt_BR')->isoFormat('D [de] MMMM [de] YYYY') }}
-        @else
-            {{ \Carbon\Carbon::parse($conteudo->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM [de] YYYY') }}
-        @endif
-    </p>
+    {{-- Corpo com estilo para seções --}}
+    <style>
+        .briefing-body h2 {
+            font-family: Georgia, serif;
+            font-size: 8pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #1a1a1b;
+            margin-top: 20pt;
+            margin-bottom: 8pt;
+            padding-bottom: 4pt;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .briefing-body p {
+            font-family: Georgia, serif;
+            font-size: 10pt;
+            line-height: 1.85;
+            color: #1a1a1b;
+            margin-bottom: 8pt;
+            text-align: justify;
+        }
+    </style>
 
-    <hr style="border: none; border-top: 1px solid #e5e7eb; margin-bottom: 20pt;">
-
-    {{-- Corpo --}}
-    <div style="
-        font-family: Georgia, serif;
-        font-size: 10pt;
-        line-height: 1.8;
-        color: #1a1a1b;
-    ">
-        {!! $conteudo->corpo ?? $conteudo->resumo ?? '' !!}
+    <div class="briefing-body">
+        {!! $conteudo->corpo ?? '' !!}
     </div>
 
     {{-- Tags --}}
     @if (!empty($conteudo->tags) && is_array($conteudo->tags) && count($conteudo->tags) > 0)
-        <div style="margin-top: 20pt; padding-top: 12pt; border-top: 1px solid #e5e7eb;">
-            <span style="
-                font-size: 7.5pt;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-                color: #9ca3af;
-                margin-right: 6pt;
-            ">Tags:</span>
+        <div style="margin-top: 24pt; padding-top: 10pt; border-top: 1px solid #e5e7eb;">
             @foreach ($conteudo->tags as $tag)
                 <span style="
-                    font-size: 8pt;
+                    font-size: 7.5pt;
                     color: #C9B882;
-                    margin-right: 6pt;
+                    margin-right: 8pt;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
                 ">#{{ $tag }}</span>
             @endforeach
         </div>

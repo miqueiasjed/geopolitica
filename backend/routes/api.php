@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Admin\AdminSourceController;
 use App\Http\Controllers\Api\Admin\EleicaoAdminController;
 use App\Http\Controllers\Api\Admin\AdminEventoSemEditorialController;
 use App\Http\Controllers\Api\Admin\AdminAssinanteAddonController;
+use App\Http\Controllers\Api\Admin\AdminImportarBriefingController;
 use App\Http\Controllers\Api\Admin\AdminProdutoController;
 use App\Http\Controllers\Api\MeusProdutosController;
 use App\Http\Controllers\Api\PlanoController;
@@ -181,6 +182,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/webhook-offer-planos/{webhookOfferPlano}', [AdminWebhookOfferPlanoController::class, 'destroy']);
 
     Route::get('/conteudos', [AdminConteudoController::class, 'index']);
+    Route::post('/conteudos/parse-docx', [AdminImportarBriefingController::class, 'parsear']);
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);
     Route::patch('/conteudos/{conteudo}', [AdminConteudoController::class, 'update']);
     Route::delete('/conteudos/{conteudo}', [AdminConteudoController::class, 'destroy']);

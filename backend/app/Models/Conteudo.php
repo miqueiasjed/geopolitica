@@ -12,6 +12,8 @@ class Conteudo extends Model
 
     protected $fillable = [
         'tipo',
+        'edicao',
+        'autor',
         'titulo',
         'slug',
         'corpo',
@@ -22,6 +24,7 @@ class Conteudo extends Model
         'plano_minimo',
         'publicado',
         'publicado_em',
+        'vertical_conteudo',
     ];
 
     protected function casts(): array

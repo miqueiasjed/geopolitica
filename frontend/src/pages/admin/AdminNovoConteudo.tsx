@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useMutation } from '@tanstack/react-query'
 import {
@@ -15,9 +15,9 @@ import {
   TextArea,
   TextField,
 } from '@radix-ui/themes'
-import { ChevronLeftIcon } from '@radix-ui/react-icons'
+import { ChevronLeftIcon, UploadIcon } from '@radix-ui/react-icons'
 import { AdminEditor } from '../../components/biblioteca/AdminEditor'
-import { criarConteudo } from '../../services/admin'
+import { criarConteudo, parsearDocxBriefing } from '../../services/admin'
 import type { TipoConteudo, VerticalConteudo } from '../../types/biblioteca'
 
 const VALOR_SEM_VERTICAL = 'core'
@@ -30,8 +30,11 @@ interface FormErros {
 
 export function AdminNovoConteudo() {
   const navigate = useNavigate()
+  const inputDocx = useRef<HTMLInputElement>(null)
 
   const [tipo, setTipo] = useState<TipoConteudo>('briefing')
+  const [edicao, setEdicao] = useState('')
+  const [autor, setAutor] = useState('')
   const [titulo, setTitulo] = useState('')
   const [teseManchete, setTeseManchete] = useState('')
   const [regiao, setRegiao] = useState('')
@@ -48,6 +51,8 @@ export function AdminNovoConteudo() {
   const [corpo, setCorpo] = useState('')
   const [publicado, setPublicado] = useState(false)
   const [erros, setErros] = useState<FormErros>({})
+  const [importando, setImportando] = useState(false)
+  const [erroImport, setErroImport] = useState<string | null>(null)
 
   const mutation = useMutation({
     mutationFn: criarConteudo,
@@ -55,6 +60,29 @@ export function AdminNovoConteudo() {
       navigate('/admin/biblioteca')
     },
   })
+
+  async function handleDocxSelecionado(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0]
+    if (!arquivo) return
+
+    setImportando(true)
+    setErroImport(null)
+
+    try {
+      const resultado = await parsearDocxBriefing(arquivo)
+      if (resultado.edicao) setEdicao(String(resultado.edicao))
+      if (resultado.autor) setAutor(resultado.autor)
+      if (resultado.corpo) {
+        setCorpo(resultado.corpo)
+        if (erros.corpo) setErros((prev) => ({ ...prev, corpo: undefined }))
+      }
+    } catch {
+      setErroImport('Não foi possível processar o arquivo. Verifique se é um .docx válido.')
+    } finally {
+      setImportando(false)
+      if (inputDocx.current) inputDocx.current.value = ''
+    }
+  }
 
   function validar(): boolean {
     const novosErros: FormErros = {}
@@ -87,6 +115,8 @@ export function AdminNovoConteudo() {
 
     mutation.mutate({
       tipo,
+      edicao: edicao ? parseInt(edicao, 10) : null,
+      autor: autor.trim() || null,
       titulo: titulo.trim(),
       ...(tipo === 'tese' ? { tese_manchete: teseManchete.trim() } : {}),
       regiao: regiao.trim() || undefined,
@@ -123,6 +153,45 @@ export function AdminNovoConteudo() {
           </Button>
         </Flex>
 
+        {/* Importar DOCX */}
+        {tipo === 'briefing' && (
+          <Card size="3" className="border border-cyan-400/10 bg-slate-950/60">
+            <Flex align="center" justify="between" gap="4" wrap="wrap">
+              <Box className="space-y-1">
+                <Text size="2" weight="medium">
+                  Importar briefing via DOCX
+                </Text>
+                <Text size="1" className="text-cyan-100/50">
+                  Pré-preenche edição, autor e corpo a partir do arquivo.
+                </Text>
+                {erroImport && (
+                  <Text size="1" color="ruby">
+                    {erroImport}
+                  </Text>
+                )}
+              </Box>
+              <input
+                ref={inputDocx}
+                type="file"
+                accept=".docx"
+                className="hidden"
+                onChange={handleDocxSelecionado}
+              />
+              <Button
+                type="button"
+                size="2"
+                variant="soft"
+                color="cyan"
+                disabled={importando}
+                onClick={() => inputDocx.current?.click()}
+              >
+                {importando ? <Spinner size="1" /> : <UploadIcon />}
+                {importando ? 'Processando...' : 'Selecionar .docx'}
+              </Button>
+            </Flex>
+          </Card>
+        )}
+
         <Card size="4" className="border border-cyan-400/10 bg-slate-950/80 backdrop-blur">
           <form onSubmit={handleSubmit}>
             <Flex direction="column" gap="5">
@@ -143,6 +212,37 @@ export function AdminNovoConteudo() {
                   </Select.Content>
                 </Select.Root>
               </label>
+
+              {/* Edição e Autor — apenas briefing */}
+              {tipo === 'briefing' && (
+                <Flex gap="4" wrap="wrap">
+                  <label className="w-32 space-y-2">
+                    <Text size="2" weight="medium">
+                      Nº edição
+                    </Text>
+                    <TextField.Root
+                      size="3"
+                      type="number"
+                      min="1"
+                      value={edicao}
+                      onChange={(e) => setEdicao(e.target.value)}
+                      placeholder="001"
+                    />
+                  </label>
+
+                  <label className="min-w-[200px] flex-1 space-y-2">
+                    <Text size="2" weight="medium">
+                      Autor
+                    </Text>
+                    <TextField.Root
+                      size="3"
+                      value={autor}
+                      onChange={(e) => setAutor(e.target.value)}
+                      placeholder="Ex: Danuzio Neto"
+                    />
+                  </label>
+                </Flex>
+              )}
 
               {/* Título */}
               <label className="space-y-2">

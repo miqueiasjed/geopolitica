@@ -5,9 +5,11 @@ export type VerticalConteudo = 'elections' | 'war'
 export interface ConteudoCard {
   id: number
   tipo: TipoConteudo
+  edicao: number | null
+  autor: string | null
   titulo: string
   slug: string
-  resumo: string
+  resumo: string | null
   regiao: string | null
   tags: string[] | null
   tese_manchete: string | null

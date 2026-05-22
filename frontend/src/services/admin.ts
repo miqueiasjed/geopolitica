@@ -38,6 +38,8 @@ import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../
 
 export interface CriarConteudoPayload {
   tipo: TipoConteudo
+  edicao?: number | null
+  autor?: string | null
   titulo: string
   tese_manchete?: string
   regiao?: string
@@ -46,6 +48,21 @@ export interface CriarConteudoPayload {
   vertical_conteudo?: VerticalConteudo | null
   corpo: string
   publicado: boolean
+}
+
+export interface ParseDocxResponse {
+  edicao: number | null
+  autor: string | null
+  corpo: string
+}
+
+export async function parsearDocxBriefing(arquivo: File): Promise<ParseDocxResponse> {
+  const form = new FormData()
+  form.append('arquivo', arquivo)
+  const resposta = await api.post<ParseDocxResponse>('/admin/conteudos/parse-docx', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return resposta.data
 }
 
 const ITENS_POR_PAGINA = 25

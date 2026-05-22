@@ -8,7 +8,9 @@ use App\Models\ChatMensagem;
 use App\Models\Conteudo;
 use App\Models\Empresa;
 use App\Models\PerfilPais;
+use App\Models\PdfDownload;
 use App\Models\RelatorioIa;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -32,7 +34,7 @@ class PdfTemplateService
     private function buscarDados(string $tipo, string $id, int $userId): array
     {
         return match ($tipo) {
-            'briefing'   => $this->buscarBriefing($id),
+            'briefing'   => $this->buscarBriefing($id, $userId),
             'alerta'     => $this->buscarAlerta($id),
             'pais'       => $this->buscarPais($id),
             'chat'       => $this->buscarChat($id, $userId),
@@ -42,7 +44,7 @@ class PdfTemplateService
         };
     }
 
-    private function buscarBriefing(string $id): array
+    private function buscarBriefing(string $id, int $userId): array
     {
         $conteudo = Conteudo::findOrFail($id);
 
@@ -50,7 +52,34 @@ class PdfTemplateService
             abort(403, 'Este briefing não está publicado.');
         }
 
-        return ['conteudo' => $conteudo];
+        $usuario = User::find($userId);
+
+        $token = $this->gerarTokenDownload();
+
+        PdfDownload::create([
+            'user_id'     => $userId,
+            'conteudo_id' => $conteudo->id,
+            'token'       => $token,
+            'ip_address'  => request()->ip(),
+        ]);
+
+        return [
+            'conteudo'        => $conteudo,
+            'assinanteEmail'  => $usuario?->email,
+            'assinanteNome'   => $usuario?->name,
+            'tokenDownload'   => $token,
+        ];
+    }
+
+    private function gerarTokenDownload(): string
+    {
+        do {
+            $token = strtoupper(substr(bin2hex(random_bytes(3)), 0, 4))
+                . '-'
+                . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+        } while (PdfDownload::where('token', $token)->exists());
+
+        return $token;
     }
 
     private function buscarAlerta(string $id): array

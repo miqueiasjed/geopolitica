@@ -78,12 +78,19 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 10pt 48pt;
+            padding: 8pt 48pt;
             border-top: 1px solid #e5e7eb;
             background: #ffffff;
             font-size: 7pt;
             color: #9ca3af;
-            line-height: 1.4;
+            line-height: 1.5;
+        }
+
+        .footer-autenticidade {
+            font-size: 6.5pt;
+            color: #C9B882;
+            margin-top: 3pt;
+            letter-spacing: 0.04em;
         }
 
         /* Content area */
@@ -141,7 +148,14 @@
 </head>
 <body>
     <div class="footer">
-        Este documento tem caráter exclusivamente analítico e informativo. Não constitui recomendação de investimento, consultoria financeira ou indicação de compra e venda de ativos. © Geopolítica para Investidores.
+        <div>Conteúdo exclusivamente analítico e informativo. Não constitui recomendação de investimento ou consultoria financeira. © Geopolítica para Investidores.</div>
+        @if (!empty($assinanteEmail))
+        <div class="footer-autenticidade">
+            Emitido exclusivamente para: {{ $assinanteEmail }}@if (!empty($assinanteNome)) ({{ $assinanteNome }})@endif
+            &nbsp;|&nbsp; Cód. de autenticidade: {{ $tokenDownload ?? '—' }}
+            &nbsp;|&nbsp; {{ \Carbon\Carbon::now()->locale('pt_BR')->isoFormat('D [de] MMMM [de] YYYY') }}
+        </div>
+        @endif
     </div>
 
     <div class="page-wrapper">
