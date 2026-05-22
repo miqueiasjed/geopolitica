@@ -41,10 +41,13 @@ SYS;
         try {
             $resposta = AiProviderFactory::make()->complete($sistema, $mensagens, 512, 0.3);
             $dados    = json_decode($resposta, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            return response()->json(['message' => 'Resposta inválida da IA.'], 502);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Erro ao consultar a IA: ' . $e->getMessage()], 502);
+        } catch (\Throwable) {
+            return response()->json([
+                'titulo' => null,
+                'regiao' => null,
+                'tags'   => [],
+                'resumo' => null,
+            ]);
         }
 
         return response()->json([
