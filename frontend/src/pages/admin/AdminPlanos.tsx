@@ -133,24 +133,38 @@ const INPUT_SM =
 interface EditorRecursoProps {
   planoId: number
   chave: string
-  valor: PlanoRecursoItem
+  valor: PlanoRecursoItem | undefined
   onConcluir: () => void
 }
 
 function EditorRecurso({ planoId, chave, valor, onConcluir }: EditorRecursoProps) {
   const queryClient = useQueryClient()
   const tipo = inferirTipo(chave)
-  const [valorLocal, setValorLocal] = useState<string>(valor ?? (tipo === 'boolean' ? 'false' : ''))
+
+  const [ativo, setAtivo] = useState(() => recursoAtivo(valor, chave))
   const [ilimitado, setIlimitado] = useState(valor === null)
+  const [valorLocal, setValorLocal] = useState<string>(() => {
+    if (valor === null) return ''
+    if (!valor || valor === 'false' || valor === '0') {
+      if (tipo === 'alertas_nivel') return 'medium'
+      if (tipo === 'conteudo_nivel') return 'essencial'
+      return ''
+    }
+    return valor
+  })
 
   const mutation = useMutation({
     mutationFn: () => {
-      const v =
-        tipo === 'boolean'
-          ? valorLocal === 'true' ? 'true' : 'false'
-          : tipo === 'numero' && ilimitado
-            ? null
-            : valorLocal
+      let v: string | null
+      if (!ativo) {
+        v = tipo === 'numero' ? '0' : 'false'
+      } else if (tipo === 'boolean') {
+        v = 'true'
+      } else if (tipo === 'numero' && ilimitado) {
+        v = null
+      } else {
+        v = valorLocal
+      }
       return atualizarRecurso(planoId, chave, v)
     },
     onSuccess: () => {
@@ -160,80 +174,102 @@ function EditorRecurso({ planoId, chave, valor, onConcluir }: EditorRecursoProps
   })
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {tipo === 'boolean' && (
-        <select
-          value={valorLocal}
-          onChange={(e) => setValorLocal(e.target.value)}
-          className={`${INPUT_SM} cursor-pointer`}
+    <div className="flex flex-col gap-2">
+      {/* Toggle Ativo / Inativo */}
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setAtivo(true)}
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] border transition-colors ${
+            ativo
+              ? 'bg-green-500/15 text-green-400 border-green-500/30'
+              : 'bg-transparent text-zinc-600 border-zinc-700/30 hover:text-zinc-400'
+          }`}
         >
-          <option value="true"  className="bg-[#0d0d0f]">Sim</option>
-          <option value="false" className="bg-[#0d0d0f]">Não</option>
-        </select>
-      )}
+          <CheckCircledIcon className="h-3 w-3" />
+          Ativo
+        </button>
+        <button
+          type="button"
+          onClick={() => setAtivo(false)}
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] border transition-colors ${
+            !ativo
+              ? 'bg-zinc-700/40 text-zinc-300 border-zinc-600/40'
+              : 'bg-transparent text-zinc-600 border-zinc-700/20 hover:text-zinc-400'
+          }`}
+        >
+          Inativo
+        </button>
+      </div>
 
-      {tipo === 'numero' && (
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={ilimitado}
-              onChange={(e) => { setIlimitado(e.target.checked); if (e.target.checked) setValorLocal('') }}
-              className="accent-[#C9B882] h-3 w-3"
-            />
-            <span className="font-mono text-[10px] text-zinc-500">∞</span>
-          </label>
-          {!ilimitado && (
-            <input
-              type="number"
+      {/* Configuração — só aparece quando ativo e tipo não-boolean */}
+      {ativo && tipo !== 'boolean' && (
+        <div className="flex items-center gap-2 flex-wrap">
+          {tipo === 'numero' && (
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={ilimitado}
+                  onChange={(e) => { setIlimitado(e.target.checked); if (e.target.checked) setValorLocal('') }}
+                  className="accent-[#C9B882] h-3 w-3"
+                />
+                <span className="font-mono text-[10px] text-zinc-500">∞ ilimitado</span>
+              </label>
+              {!ilimitado && (
+                <input
+                  type="number"
+                  value={valorLocal}
+                  onChange={(e) => setValorLocal(e.target.value)}
+                  min={0}
+                  className={`${INPUT_SM} w-20`}
+                />
+              )}
+            </div>
+          )}
+          {tipo === 'alertas_nivel' && (
+            <select
               value={valorLocal}
               onChange={(e) => setValorLocal(e.target.value)}
-              min={0}
-              className={`${INPUT_SM} w-20`}
-            />
+              className={`${INPUT_SM} cursor-pointer`}
+            >
+              <option value="medium"      className="bg-[#0d0d0f]">Médio</option>
+              <option value="medium,high" className="bg-[#0d0d0f]">Médio + Alto</option>
+              <option value="all"         className="bg-[#0d0d0f]">Todos</option>
+            </select>
+          )}
+          {tipo === 'conteudo_nivel' && (
+            <select
+              value={valorLocal}
+              onChange={(e) => setValorLocal(e.target.value)}
+              className={`${INPUT_SM} cursor-pointer`}
+            >
+              <option value="essencial" className="bg-[#0d0d0f]">Essencial</option>
+              <option value="pro"       className="bg-[#0d0d0f]">Pro</option>
+              <option value="todos"     className="bg-[#0d0d0f]">Todos</option>
+            </select>
           )}
         </div>
       )}
 
-      {tipo === 'alertas_nivel' && (
-        <select
-          value={valorLocal}
-          onChange={(e) => setValorLocal(e.target.value)}
-          className={`${INPUT_SM} cursor-pointer`}
+      {/* Ações */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          disabled={mutation.isPending}
+          onClick={() => mutation.mutate()}
+          className="inline-flex items-center gap-1 rounded border border-[#C9B882]/30 bg-[#C9B882]/10 px-2 py-1 font-mono text-[10px] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:opacity-50"
         >
-          <option value="medium"      className="bg-[#0d0d0f]">Médio</option>
-          <option value="medium,high" className="bg-[#0d0d0f]">Médio + Alto</option>
-          <option value="all"         className="bg-[#0d0d0f]">Todos</option>
-        </select>
-      )}
-
-      {tipo === 'conteudo_nivel' && (
-        <select
-          value={valorLocal}
-          onChange={(e) => setValorLocal(e.target.value)}
-          className={`${INPUT_SM} cursor-pointer`}
+          {mutation.isPending ? '…' : 'Salvar'}
+        </button>
+        <button
+          type="button"
+          onClick={onConcluir}
+          className="rounded border border-zinc-700/50 p-1 text-zinc-500 hover:text-zinc-300"
         >
-          <option value="essencial" className="bg-[#0d0d0f]">Essencial</option>
-          <option value="pro"       className="bg-[#0d0d0f]">Pro</option>
-          <option value="todos"     className="bg-[#0d0d0f]">Todos</option>
-        </select>
-      )}
-
-      <button
-        type="button"
-        disabled={mutation.isPending}
-        onClick={() => mutation.mutate()}
-        className="inline-flex items-center gap-1 rounded border border-[#C9B882]/30 bg-[#C9B882]/10 px-2 py-1 font-mono text-[10px] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:opacity-50"
-      >
-        {mutation.isPending ? '…' : 'OK'}
-      </button>
-      <button
-        type="button"
-        onClick={onConcluir}
-        className="rounded border border-zinc-700/50 p-1 text-zinc-500 hover:text-zinc-300"
-      >
-        <Cross2Icon className="h-3 w-3" />
-      </button>
+          <Cross2Icon className="h-3 w-3" />
+        </button>
+      </div>
     </div>
   )
 }
@@ -271,7 +307,7 @@ function LinhaRecurso({ planoId, chave, valor, editavel }: LinhaRecursoProps) {
           <EditorRecurso
             planoId={planoId}
             chave={chave}
-            valor={valor ?? (inferirTipo(chave) === 'boolean' ? 'false' : '0')}
+            valor={valor}
             onConcluir={() => setEditando(false)}
           />
         ) : (
