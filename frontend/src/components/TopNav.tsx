@@ -269,10 +269,10 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
     <div className="space-y-3">
       <div className="rounded-md border border-[#BFFF3C]/15 bg-[#BFFF3C]/[0.06] p-3">
         <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+          <span className="flex-shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
             Plano
           </span>
-          <span className="rounded-full border border-[#BFFF3C]/25 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D7FF69]">
+          <span className="min-w-0 truncate rounded-full border border-[#BFFF3C]/25 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D7FF69]">
             {formatPlano(user?.assinante?.plano ?? user?.role)}
           </span>
         </div>
