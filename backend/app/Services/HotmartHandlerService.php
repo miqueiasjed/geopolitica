@@ -24,6 +24,23 @@ class HotmartHandlerService
         'assinante_reservado',
     ];
 
+    private const EVENTOS_ACEITOS = [
+        'PURCHASE_APPROVED',
+        'PURCHASE_COMPLETE',
+        'PURCHASE_CANCELED',
+        'PURCHASE_REFUNDED',
+        'PURCHASE_CHARGEBACK',
+        'PURCHASE_EXPIRED',
+        'SWITCH_PLAN',
+    ];
+
+    public function deveIgnorar(array $payload): bool
+    {
+        $tipo = strtoupper((string) ($this->extrairValor($payload, ['event', 'event_type']) ?? ''));
+
+        return ! in_array($tipo, self::EVENTOS_ACEITOS, true);
+    }
+
     public function registrarEvento(array $payload): WebhookEvento
     {
         return WebhookEvento::query()->create([

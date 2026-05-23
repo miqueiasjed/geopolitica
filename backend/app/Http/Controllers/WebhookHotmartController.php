@@ -19,6 +19,11 @@ class WebhookHotmartController extends Controller
     public function receber(ReceberWebhookHotmartRequest $request): JsonResponse
     {
         $payload = $request->validated() + $request->all();
+
+        if ($this->hotmartHandlerService->deveIgnorar($payload)) {
+            return response()->json(['received' => true]);
+        }
+
         $evento = $this->hotmartHandlerService->registrarEvento($payload);
 
         if (! $this->webhookTokenService->validar('hotmart', $request->header('x-hotmart-webhook-token'))) {
