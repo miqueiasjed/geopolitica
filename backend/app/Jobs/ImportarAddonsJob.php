@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Assinante;
 use App\Models\AssinanteAddon;
+use App\Models\Plano;
 use App\Models\Produto;
 use App\Models\User;
 use App\Services\AddonService;
@@ -96,8 +97,11 @@ class ImportarAddonsJob implements ShouldQueue
                         continue;
                     }
 
-                    $planoPadrao = $this->planoPadrao;
-                    DB::transaction(function () use ($email, $nome, $planoPadrao, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
+                    $planoPadrao  = $this->planoPadrao;
+                    $registroPlano = Plano::where('slug', $planoPadrao)->first();
+                    $rolePlano     = $registroPlano?->role ?? ('assinante_' . $planoPadrao);
+
+                    DB::transaction(function () use ($email, $nome, $planoPadrao, $rolePlano, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
                         $nomeUsuario = $nome ?: Str::of($email)->before('@')->replace(['.', '_', '-'], ' ')->title()->value();
 
                         $novoUsuario = new User;
@@ -107,6 +111,8 @@ class ImportarAddonsJob implements ShouldQueue
                             'password'           => '12345678',
                             'deve_alterar_senha' => true,
                         ])->save();
+
+                        $novoUsuario->assignRole($rolePlano);
 
                         Assinante::create([
                             'user_id'     => $novoUsuario->id,

@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\AtualizarAddonRequest;
 use App\Jobs\ImportarAddonsJob;
 use App\Models\Assinante;
 use App\Models\AssinanteAddon;
+use App\Models\Plano;
 use App\Models\Produto;
 use App\Models\User;
 use App\Services\AddonService;
@@ -211,6 +212,9 @@ class AdminAssinanteAddonController extends Controller
         $emails           = array_unique(array_filter(array_map(fn ($l) => strtolower(trim($l['email'] ?? '')), $linhas)));
         $usuariosPorEmail = User::whereIn('email', $emails)->get()->keyBy(fn ($u) => strtolower($u->email));
 
+        $registroPlano = $planoPadrao ? Plano::where('slug', $planoPadrao)->first() : null;
+        $rolePlano     = $planoPadrao ? ($registroPlano?->role ?? ('assinante_' . $planoPadrao)) : null;
+
         $importados = 0;
         $criados    = 0;
         $erros      = [];
@@ -255,7 +259,7 @@ class AdminAssinanteAddonController extends Controller
                         continue;
                     }
 
-                    $user = DB::transaction(function () use ($email, $nome, $planoPadrao, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
+                    $user = DB::transaction(function () use ($email, $nome, $planoPadrao, $rolePlano, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
                         $nomeUsuario = $nome ?: Str::of($email)->before('@')->replace(['.', '_', '-'], ' ')->title()->value();
 
                         $novoUsuario = new User;
@@ -265,6 +269,8 @@ class AdminAssinanteAddonController extends Controller
                             'password'           => '12345678',
                             'deve_alterar_senha' => true,
                         ])->save();
+
+                        $novoUsuario->assignRole($rolePlano);
 
                         Assinante::create([
                             'user_id'     => $novoUsuario->id,
