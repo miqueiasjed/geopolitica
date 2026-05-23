@@ -9,7 +9,7 @@ import { adminProdutos } from '../../services/adminProdutos'
 type ErroImportacao = { linha: number; motivo: string }
 
 type Relatorio =
-  | { importados: number; erros: ErroImportacao[] }
+  | { importados: number; criados: number; erros: ErroImportacao[] }
   | { mensagem: string }
   | null
 
@@ -119,7 +119,7 @@ function CardRelatorio({ relatorio, prefersReduced }: { relatorio: Relatorio; pr
     )
   }
 
-  const { importados, erros } = relatorio
+  const { importados, criados, erros } = relatorio
 
   return (
     <motion.div
@@ -128,10 +128,15 @@ function CardRelatorio({ relatorio, prefersReduced }: { relatorio: Relatorio; pr
       transition={{ duration: prefersReduced ? 0 : 0.25 }}
       className="space-y-3"
     >
-      <div className="rounded-lg border border-green-500/20 bg-green-500/5 px-4 py-3">
+      <div className="rounded-lg border border-green-500/20 bg-green-500/5 px-4 py-3 space-y-1">
         <p className="font-mono text-sm text-green-400">
-          ✓ {importados} registro{importados !== 1 ? 's' : ''} importado{importados !== 1 ? 's' : ''} com sucesso
+          ✓ {importados} registro{importados !== 1 ? 's' : ''} processado{importados !== 1 ? 's' : ''} com sucesso
         </p>
+        {criados > 0 && (
+          <p className="font-mono text-xs text-green-300/70">
+            {criados} usuário{criados !== 1 ? 's' : ''} novo{criados !== 1 ? 's' : ''} criado{criados !== 1 ? 's' : ''}
+          </p>
+        )}
       </div>
 
       {erros.length > 0 && (
@@ -179,6 +184,7 @@ export function AdminImportarAddons() {
   const [dragging, setDragging] = useState(false)
   const [relatorio, setRelatorio] = useState<Relatorio>(null)
   const [erroRede, setErroRede] = useState<string | null>(null)
+  const [planoPadrao, setPlanoPadrao] = useState('monitor_guerra')
 
   const mutacaoExportar = useMutation({
     mutationFn: () => adminProdutos.exportarAddons(),
@@ -186,7 +192,7 @@ export function AdminImportarAddons() {
   })
 
   const mutacaoImportar = useMutation({
-    mutationFn: (file: File) => adminProdutos.importarAddons(file),
+    mutationFn: (file: File) => adminProdutos.importarAddons(file, planoPadrao || undefined),
     onSuccess: (data) => {
       setRelatorio(data)
       setErroRede(null)
@@ -308,6 +314,24 @@ export function AdminImportarAddons() {
                 if (file) selecionarArquivo(file)
               }}
             />
+          </div>
+
+          {/* Plano para novos usuários */}
+          <div className="space-y-1.5">
+            <label className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+              Plano para novos usuários
+            </label>
+            <input
+              type="text"
+              value={planoPadrao}
+              onChange={(e) => setPlanoPadrao(e.target.value)}
+              placeholder="monitor_guerra"
+              disabled={importando}
+              className="w-full rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2 font-mono text-sm text-zinc-200 placeholder-zinc-600 focus:border-[#C9B882]/40 focus:outline-none disabled:opacity-50"
+            />
+            <p className="font-mono text-[10px] text-zinc-600">
+              Slug do plano a atribuir a usuários que ainda não têm cadastro.
+            </p>
           </div>
 
           {/* Preview */}

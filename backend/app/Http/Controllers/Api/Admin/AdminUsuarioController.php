@@ -26,14 +26,14 @@ class AdminUsuarioController extends Controller
                 'role'      => 'assinante_' . $plano->slug,
                 'label'     => $plano->nome,
                 'assinante' => true,
-            ]));
+            ])->toArray());
 
         $fixas = collect([
             ['role' => 'admin',         'label' => 'Admin',         'assinante' => false],
             ['role' => 'company_admin', 'label' => 'Empresa Admin', 'assinante' => false],
         ]);
 
-        return response()->json(['data' => $assinante->concat($fixas)->values()]);
+        return response()->json(['data' => collect($assinante)->concat($fixas)->values()]);
     }
 
     public function index(Request $request): JsonResponse

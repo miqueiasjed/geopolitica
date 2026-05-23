@@ -34,11 +34,13 @@ export const adminProdutos = {
 
   importarAddons: (
     arquivo: File,
-  ): Promise<{ importados: number; erros: Array<{ linha: number; motivo: string }> }> => {
+    planoPadrao?: string,
+  ): Promise<{ importados: number; criados: number; erros: Array<{ linha: number; motivo: string }> }> => {
     const form = new FormData()
     form.append('arquivo', arquivo)
+    if (planoPadrao) form.append('plano_padrao', planoPadrao)
     return api
-      .post<{ importados: number; erros: Array<{ linha: number; motivo: string }> }>(
+      .post<{ importados: number; criados: number; erros: Array<{ linha: number; motivo: string }> }>(
         '/admin/assinantes/addons/importar',
         form,
       )
