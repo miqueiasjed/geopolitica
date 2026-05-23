@@ -25,7 +25,7 @@ import {
   ResetIcon,
   TrashIcon,
 } from '@radix-ui/react-icons'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   adminKeys,
   buscarAdminWebhookEventos,
@@ -162,6 +162,7 @@ export function AdminWebhookEventos() {
   const [page, setPage] = useState(1)
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set())
+  const ultimoIndice = useRef<number | null>(null)
 
   const query = useQuery({
     queryKey: adminKeys.webhookEventos({
@@ -216,16 +217,34 @@ export function AdminWebhookEventos() {
     })
   }
 
-  function toggleEvento(id: number) {
-    setSelecionados((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
+  useEffect(() => {
+    ultimoIndice.current = null
+  }, [page, fonte, type, processado])
+
+  function handleCheckboxClick(e: React.MouseEvent, id: number, index: number) {
+    e.stopPropagation()
+    if (e.shiftKey && ultimoIndice.current !== null) {
+      const inicio = Math.min(ultimoIndice.current, index)
+      const fim = Math.max(ultimoIndice.current, index)
+      const idsNoRange = eventos.slice(inicio, fim + 1).map((ev) => ev.id)
+      const deveAdicionar = !selecionados.has(id)
+      setSelecionados((prev) => {
+        const next = new Set(prev)
+        idsNoRange.forEach((rid) => {
+          if (deveAdicionar) next.add(rid)
+          else next.delete(rid)
+        })
+        return next
+      })
+    } else {
+      setSelecionados((prev) => {
+        const next = new Set(prev)
+        if (next.has(id)) next.delete(id)
+        else next.add(id)
+        return next
+      })
+      ultimoIndice.current = index
+    }
   }
 
   function limparFiltros() {
@@ -417,7 +436,7 @@ export function AdminWebhookEventos() {
                   </Table.Header>
                   <Table.Body>
                     {eventos.length > 0 ? (
-                      eventos.flatMap((evento) => {
+                      eventos.flatMap((evento, index) => {
                         const expandido = expandedId === evento.id
                         const selecionado = selecionados.has(evento.id)
 
@@ -427,11 +446,12 @@ export function AdminWebhookEventos() {
                             className={`transition-colors hover:bg-cyan-400/5 ${selecionado ? 'bg-cyan-400/5' : ''}`}
                           >
                             <Table.Cell
-                              onClick={(e) => e.stopPropagation()}
+                              className="cursor-pointer"
+                              onClick={(e) => handleCheckboxClick(e, evento.id, index)}
                             >
                               <Checkbox
                                 checked={selecionado}
-                                onCheckedChange={() => toggleEvento(evento.id)}
+                                onCheckedChange={() => {}}
                                 aria-label={`Selecionar evento ${evento.id}`}
                               />
                             </Table.Cell>
