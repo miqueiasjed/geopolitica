@@ -91,36 +91,49 @@ class AdminAssinanteService
 
         $usuario->syncRoles(['assinante']);
 
+        $plano = $dados['plano'] ?? null;
+        $addonKey = $dados['addon_key'] ?? null;
+
         Assinante::create([
             'user_id'    => $usuario->id,
-            'plano'      => $dados['plano'] ?? null,
+            'plano'      => $plano,
             'ativo'      => true,
             'status'     => 'ativo',
             'assinado_em' => now(),
         ]);
 
-        AssinanteAddon::create([
-            'user_id'     => $usuario->id,
-            'addon_key'   => $dados['addon_key'],
-            'status'      => 'ativo',
-            'fonte'       => 'manual',
-            'iniciado_em' => now(),
-            'expira_em'   => $dados['expira_em'] ?? null,
-        ]);
+        if ($addonKey !== null) {
+            AssinanteAddon::create([
+                'user_id'     => $usuario->id,
+                'addon_key'   => $addonKey,
+                'status'      => 'ativo',
+                'fonte'       => 'manual',
+                'iniciado_em' => now(),
+                'expira_em'   => $dados['expira_em'] ?? null,
+            ]);
+        }
 
         if ($dados['enviar_email'] ?? true) {
             $linkAcesso = rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/').'/login';
 
-            Mail::to($usuario->email)->send(new AddonBoasVindasMail(
-                nome: $usuario->name,
-                addonKey: $dados['addon_key'],
-                linkAcesso: $linkAcesso,
-                contaNova: true,
-                email: $usuario->email,
-            ));
+            if ($addonKey !== null) {
+                Mail::to($usuario->email)->send(new AddonBoasVindasMail(
+                    nome: $usuario->name,
+                    addonKey: $addonKey,
+                    linkAcesso: $linkAcesso,
+                    contaNova: true,
+                    email: $usuario->email,
+                ));
+            } else {
+                Mail::to($usuario->email)->send(new BoasVindasMail(
+                    user: $usuario,
+                    linkAcesso: $linkAcesso,
+                    plano: $plano ?? 'essencial',
+                ));
+            }
         }
 
-        return ['message' => 'Usuário addon criado com sucesso.', 'user_id' => $usuario->id];
+        return ['message' => 'Usuário criado com sucesso.', 'user_id' => $usuario->id];
     }
 
     public function listar(array $filtros): LengthAwarePaginator

@@ -550,7 +550,7 @@ export function AdminAssinantes() {
   const [addonForm, setAddonForm] = useState<CriarAddonUsuarioPayload>({
     nome: '',
     email: '',
-    addon_key: 'war',
+    addon_key: null,
     plano: null,
     expira_em: null,
     enviar_email: true,
@@ -630,7 +630,7 @@ export function AdminAssinantes() {
     onSuccess: (data) => {
       setAddonFeedback({ tipo: 'sucesso', mensagem: data.message })
       setModalAddonAberto(false)
-      setAddonForm({ nome: '', email: '', addon_key: 'war', plano: null, expira_em: null, enviar_email: true })
+      setAddonForm({ nome: '', email: '', addon_key: null, plano: null, expira_em: null, enviar_email: true })
       void queryClient.invalidateQueries({ queryKey: adminKeys.assinantes({}) })
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
@@ -1078,9 +1078,9 @@ export function AdminAssinantes() {
 
       <Dialog.Root open={modalAddonAberto} onOpenChange={(aberto) => { if (!aberto) setModalAddonAberto(false) }}>
         <Dialog.Content maxWidth="460px">
-          <Dialog.Title>Novo usuário addon</Dialog.Title>
+          <Dialog.Title>Novo usuário manual</Dialog.Title>
           <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
-            Cria um usuário sem plano, com acesso apenas ao addon selecionado. Senha padrão: <strong>12345678</strong>.
+            Cria um usuário com plano, addon ou ambos. Ao menos um dos dois deve ser informado. Senha padrão: <strong>12345678</strong>.
           </Dialog.Description>
 
           <Flex direction="column" gap="3">
@@ -1120,13 +1120,14 @@ export function AdminAssinantes() {
             </label>
 
             <label>
-              <Text size="2" weight="medium" mb="1" as="div">Addon</Text>
+              <Text size="2" weight="medium" mb="1" as="div">Addon <Text size="1" color="gray">(opcional)</Text></Text>
               <Select.Root
-                value={addonForm.addon_key}
-                onValueChange={(v) => setAddonForm((f) => ({ ...f, addon_key: v as 'war' | 'elections' }))}
+                value={addonForm.addon_key ?? '__none__'}
+                onValueChange={(v) => setAddonForm((f) => ({ ...f, addon_key: v === '__none__' ? null : v as 'war' | 'elections' }))}
               >
-                <Select.Trigger style={{ width: '100%' }} />
+                <Select.Trigger placeholder="Sem addon" style={{ width: '100%' }} />
                 <Select.Content>
+                  <Select.Item value="__none__">Sem addon</Select.Item>
                   <Select.Item value="war">Monitor de Guerra</Select.Item>
                   <Select.Item value="elections">Monitor Eleitoral</Select.Item>
                 </Select.Content>
@@ -1160,7 +1161,7 @@ export function AdminAssinantes() {
             <Button
               color="amber"
               loading={mutacaoAddon.isPending}
-              disabled={!addonForm.nome.trim() || !addonForm.email.trim()}
+              disabled={!addonForm.nome.trim() || !addonForm.email.trim() || (!addonForm.plano && !addonForm.addon_key)}
               onClick={() => mutacaoAddon.mutate(addonForm)}
             >
               Criar usuário

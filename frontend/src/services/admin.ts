@@ -340,7 +340,7 @@ export async function resetarPrimeiroAcessoAssinante(id: number): Promise<{ mess
 export interface CriarAddonUsuarioPayload {
   nome: string
   email: string
-  addon_key: 'elections' | 'war'
+  addon_key?: 'elections' | 'war' | null
   plano?: string | null
   expira_em?: string | null
   enviar_email: boolean

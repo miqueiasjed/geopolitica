@@ -60,11 +60,15 @@ class AdminAssinanteController extends Controller
         $dados = $request->validate([
             'nome'         => ['required', 'string', 'max:255'],
             'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
-            'addon_key'    => ['required', 'string', Rule::in(AssinanteAddon::ADDON_KEYS)],
+            'addon_key'    => ['nullable', 'string', Rule::in(AssinanteAddon::ADDON_KEYS)],
             'plano'        => ['nullable', 'string', Rule::in($slugsValidos)],
             'expira_em'    => ['nullable', 'date', 'after:today'],
             'enviar_email' => ['boolean'],
         ]);
+
+        if (empty($dados['addon_key']) && empty($dados['plano'])) {
+            return response()->json(['message' => 'Informe ao menos um plano ou um addon.'], 422);
+        }
 
         try {
             $resultado = $this->adminAssinanteService->criarAddonUsuario($dados);
