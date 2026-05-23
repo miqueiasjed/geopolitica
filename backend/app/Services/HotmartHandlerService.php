@@ -208,7 +208,7 @@ class HotmartHandlerService
         $nome    = $this->extrairNome($payload) ?? Str::of($email)->before('@')->replace(['.', '_', '-'], ' ')->title()->value();
         $usuario = User::query()->firstOrCreate(
             ['email' => $email],
-            ['name' => $nome, 'password' => bcrypt('12345678'), 'deve_alterar_senha' => true],
+            ['name' => $nome, 'password' => '12345678', 'deve_alterar_senha' => true],
         );
 
         $orderId = $this->extrairValor($payload, [
