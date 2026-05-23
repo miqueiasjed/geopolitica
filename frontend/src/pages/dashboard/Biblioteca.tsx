@@ -45,6 +45,7 @@ export function Biblioteca() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
   } = useBiblioteca(filtros)
 
   useEffect(() => {
@@ -71,6 +72,19 @@ export function Biblioteca() {
 
   function handleFilterChange(novosFiltros: BibliotecaFiltros) {
     setFiltros(novosFiltros)
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <span className="mb-4 text-4xl text-zinc-700" aria-hidden="true">🔒</span>
+        <p className="text-lg font-semibold text-zinc-300">Biblioteca não inclusa no seu plano</p>
+        <p className="mt-2 max-w-sm text-sm text-zinc-500">
+          A biblioteca de análises está disponível nos planos que incluem o recurso{' '}
+          <span className="font-mono text-zinc-400">biblioteca_acesso</span>. Entre em contato com o suporte para fazer upgrade.
+        </p>
+      </div>
+    )
   }
 
   return (

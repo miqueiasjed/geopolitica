@@ -66,6 +66,7 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const { data: produtos } = useProdutos()
   const statusEleitoral = produtos?.find((p) => p.chave === 'elections')?.status_usuario
   const statusGuerra = produtos?.find((p) => p.chave === 'war')?.status_usuario
+  const temAcessoBiblioteca = useRecurso('biblioteca_acesso')
   const temAcessoRiskScore = useRecurso('risk_score')
   const [painelAberto, setPainelAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
@@ -82,7 +83,8 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
     {
       to: '/dashboard/biblioteca',
       label: 'Biblioteca',
-      eyebrow: 'Análises',
+      eyebrow: temAcessoBiblioteca ? 'Análises' : 'Plano',
+      locked: !temAcessoBiblioteca,
       isActive: (p) => p.startsWith('/dashboard/biblioteca'),
       icon: <ReaderIcon />,
     },
