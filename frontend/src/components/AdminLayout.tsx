@@ -64,7 +64,7 @@ export function AdminLayout() {
           </Link>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 px-3">
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3">
           {itens.map(({ label, rota, icone: Icone }) => {
             const ativo = location.pathname === rota
             return (
