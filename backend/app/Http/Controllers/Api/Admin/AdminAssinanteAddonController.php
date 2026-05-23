@@ -253,11 +253,6 @@ class AdminAssinanteAddonController extends Controller
                 $user = $usuariosPorEmail[$email] ?? null;
 
                 if (! $user) {
-                    if (! $planoPadrao) {
-                        $erros[] = ['linha' => $numeroLinha, 'motivo' => "usuário '{$email}' não encontrado"];
-                        continue;
-                    }
-
                     $user = DB::transaction(function () use ($email, $nome, $planoPadrao, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
                         $nomeUsuario = $nome ?: Str::of($email)->before('@')->replace(['.', '_', '-'], ' ')->title()->value();
 
@@ -273,7 +268,7 @@ class AdminAssinanteAddonController extends Controller
 
                         Assinante::create([
                             'user_id'     => $novoUsuario->id,
-                            'plano'       => $planoPadrao,
+                            'plano'       => $planoPadrao ?: null,
                             'ativo'       => $status === 'ativo',
                             'status'      => $status,
                             'assinado_em' => $iniciadoEm,
