@@ -68,7 +68,9 @@ class AutenticacaoService
                 'hotmart_subscriber_code' => $usuario->assinante->hotmart_subscriber_code,
                 'assinado_em' => $usuario->assinante->assinado_em?->toIso8601String(),
                 'expira_em' => $usuario->assinante->expira_em?->toIso8601String(),
-                'recursos' => $this->planoService->recursosDoPlano($usuario->assinante->plano),
+                'recursos' => $usuario->assinante->plano
+                    ? $this->planoService->recursosDoPlano($usuario->assinante->plano)
+                    : [],
             ] : null,
         ];
     }
