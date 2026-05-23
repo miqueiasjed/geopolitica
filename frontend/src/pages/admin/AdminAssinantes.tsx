@@ -1106,12 +1106,12 @@ export function AdminAssinantes() {
             <label>
               <Text size="2" weight="medium" mb="1" as="div">Plano <Text size="1" color="gray">(opcional — deixe vazio para addon-only)</Text></Text>
               <Select.Root
-                value={addonForm.plano ?? ''}
-                onValueChange={(v) => setAddonForm((f) => ({ ...f, plano: v || null }))}
+                value={addonForm.plano ?? '__none__'}
+                onValueChange={(v) => setAddonForm((f) => ({ ...f, plano: v === '__none__' ? null : v }))}
               >
                 <Select.Trigger placeholder="Sem plano (addon-only)" style={{ width: '100%' }} />
                 <Select.Content>
-                  <Select.Item value="">Sem plano (addon-only)</Select.Item>
+                  <Select.Item value="__none__">Sem plano (addon-only)</Select.Item>
                   {(planosQuery.data ?? []).map((p) => (
                     <Select.Item key={p.slug} value={p.slug}>{p.nome}</Select.Item>
                   ))}
