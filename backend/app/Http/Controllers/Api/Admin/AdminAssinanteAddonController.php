@@ -170,6 +170,17 @@ class AdminAssinanteAddonController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function statusImportacao(string $jobId): JsonResponse
+    {
+        $dados = Cache::get("importar_addons:{$jobId}");
+
+        if (! $dados) {
+            return response()->json(['status' => 'nao_encontrado'], 404);
+        }
+
+        return response()->json($dados);
+    }
+
     public function importar(Request $request): JsonResponse
     {
         $request->validate([

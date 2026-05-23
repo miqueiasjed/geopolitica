@@ -269,6 +269,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // Gestão de addons por assinante (manual + importação)
     Route::get('/assinantes/addons/exportar', [AdminAssinanteAddonController::class, 'exportar']);
     Route::post('/assinantes/addons/importar', [AdminAssinanteAddonController::class, 'importar']);
+    Route::get('/assinantes/addons/importar/{jobId}/status', [AdminAssinanteAddonController::class, 'statusImportacao']);
     Route::get('/assinantes/{user}/addons', [AdminAssinanteAddonController::class, 'index']);
     Route::post('/assinantes/{user}/addons', [AdminAssinanteAddonController::class, 'store']);
     Route::put('/assinantes/{user}/addons/{addon}', [AdminAssinanteAddonController::class, 'update']);

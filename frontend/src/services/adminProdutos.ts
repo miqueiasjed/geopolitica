@@ -35,17 +35,31 @@ export const adminProdutos = {
   importarAddons: (
     arquivo: File,
     planoPadrao?: string,
-  ): Promise<{ importados: number; criados: number; erros: Array<{ linha: number; motivo: string }> }> => {
+  ): Promise<
+    | { importados: number; criados: number; erros: Array<{ linha: number; motivo: string }> }
+    | { job_id: string; mensagem: string }
+  > => {
     const form = new FormData()
     form.append('arquivo', arquivo)
     if (planoPadrao) form.append('plano_padrao', planoPadrao)
     return api
-      .post<{ importados: number; criados: number; erros: Array<{ linha: number; motivo: string }> }>(
-        '/admin/assinantes/addons/importar',
-        form,
-      )
+      .post<
+        | { importados: number; criados: number; erros: Array<{ linha: number; motivo: string }> }
+        | { job_id: string; mensagem: string }
+      >('/admin/assinantes/addons/importar', form)
       .then(r => r.data)
   },
+
+  statusImportacaoAddons: (jobId: string): Promise<{
+    status: 'processando' | 'concluido' | 'erro' | 'nao_encontrado'
+    total?: number
+    processados?: number
+    importados?: number
+    criados?: number
+    erros?: Array<{ linha: number; motivo: string }>
+    mensagem?: string
+  }> =>
+    api.get(`/admin/assinantes/addons/importar/${jobId}/status`).then(r => r.data),
 
   exportarAddons: (): Promise<Blob> =>
     api

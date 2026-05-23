@@ -39,11 +39,22 @@ class ImportarAddonsJob implements ShouldQueue
         $caminho  = Storage::path($this->caminhoArquivo);
         $linhas   = $this->lerArquivo($caminho, $this->extensao);
         $linhas   = $this->normalizarLinhasHotmart($linhas);
+        $total    = count($linhas);
         $produtos = Produto::pluck('chave')->all();
 
-        $importados = 0;
-        $criados    = 0;
-        $erros      = [];
+        $importados  = 0;
+        $criados     = 0;
+        $processados = 0;
+        $erros       = [];
+
+        Cache::put("importar_addons:{$this->jobId}", [
+            'status'      => 'processando',
+            'total'       => $total,
+            'processados' => 0,
+            'importados'  => 0,
+            'criados'     => 0,
+            'erros'       => [],
+        ], now()->addHours(2));
 
         foreach ($linhas as $indice => $linha) {
             $numeroLinha = $indice + 2;
@@ -156,16 +167,39 @@ class ImportarAddonsJob implements ShouldQueue
             } catch (\Throwable $e) {
                 $erros[] = ['linha' => $numeroLinha, 'motivo' => $e->getMessage()];
             }
+
+            $processados++;
+
+            if ($processados % 25 === 0) {
+                Cache::put("importar_addons:{$this->jobId}", [
+                    'status'      => 'processando',
+                    'total'       => $total,
+                    'processados' => $processados,
+                    'importados'  => $importados,
+                    'criados'     => $criados,
+                    'erros'       => $erros,
+                ], now()->addHours(2));
+            }
         }
 
-        Cache::put("importar_addons:{$this->jobId}:resultado", [
-            'importados' => $importados,
-            'criados'    => $criados,
-            'erros'      => $erros,
-            'status'     => 'concluido',
+        Cache::put("importar_addons:{$this->jobId}", [
+            'status'      => 'concluido',
+            'total'       => $total,
+            'processados' => $processados,
+            'importados'  => $importados,
+            'criados'     => $criados,
+            'erros'       => $erros,
         ], now()->addHours(2));
 
         Storage::delete($this->caminhoArquivo);
+    }
+
+    public function failed(\Throwable $e): void
+    {
+        Cache::put("importar_addons:{$this->jobId}", [
+            'status'   => 'erro',
+            'mensagem' => 'Falha inesperada ao processar o arquivo. Tente novamente.',
+        ], now()->addHours(2));
     }
 
     private function normalizarLinhasHotmart(array $linhas): array

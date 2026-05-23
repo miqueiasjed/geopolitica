@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { DownloadIcon, UploadIcon } from '@radix-ui/react-icons'
@@ -8,10 +8,17 @@ import { adminProdutos } from '../../services/adminProdutos'
 
 type ErroImportacao = { linha: number; motivo: string }
 
-type Relatorio =
-  | { importados: number; criados: number; erros: ErroImportacao[] }
-  | { mensagem: string }
-  | null
+type RelatorioFinal = { importados: number; criados: number; erros: ErroImportacao[] }
+
+type Progresso = {
+  status: 'processando' | 'concluido' | 'erro'
+  total: number
+  processados: number
+  importados: number
+  criados: number
+  erros: ErroImportacao[]
+  mensagem?: string
+}
 
 // ─── Parser CSV inline ────────────────────────────────────────────────────────
 
@@ -101,24 +108,114 @@ function PreviewCsv({ arquivo }: { arquivo: File }) {
   )
 }
 
-// ─── Relatório de importação ──────────────────────────────────────────────────
+// ─── Card de progresso em tempo real ─────────────────────────────────────────
 
-function CardRelatorio({ relatorio, prefersReduced }: { relatorio: Relatorio; prefersReduced: boolean | null }) {
-  if (!relatorio) return null
+function CardProgresso({ progresso, prefersReduced }: { progresso: Progresso; prefersReduced: boolean | null }) {
+  const pct = progresso.total > 0 ? Math.round((progresso.processados / progresso.total) * 100) : 0
 
-  if ('mensagem' in relatorio) {
+  if (progresso.status === 'erro') {
     return (
       <motion.div
         initial={prefersReduced ? false : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: prefersReduced ? 0 : 0.25 }}
-        className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-3"
+        className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3"
       >
-        <p className="font-mono text-sm text-blue-300">{relatorio.mensagem}</p>
+        <p className="font-mono text-sm text-red-400">{progresso.mensagem ?? 'Erro ao processar importação.'}</p>
       </motion.div>
     )
   }
 
+  if (progresso.status === 'concluido') {
+    return (
+      <motion.div
+        initial={prefersReduced ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: prefersReduced ? 0 : 0.25 }}
+        className="space-y-3"
+      >
+        <div className="rounded-lg border border-green-500/20 bg-green-500/5 px-4 py-3 space-y-1">
+          <p className="font-mono text-sm text-green-400">
+            ✓ {progresso.importados} registro{progresso.importados !== 1 ? 's' : ''} processado{progresso.importados !== 1 ? 's' : ''} com sucesso
+          </p>
+          {progresso.criados > 0 && (
+            <p className="font-mono text-xs text-green-300/70">
+              {progresso.criados} usuário{progresso.criados !== 1 ? 's' : ''} novo{progresso.criados !== 1 ? 's' : ''} criado{progresso.criados !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
+
+        {progresso.erros.length > 0 && (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+              <p className="font-mono text-sm text-amber-400">
+                ⚠ {progresso.erros.length} erro{progresso.erros.length !== 1 ? 's' : ''} encontrado{progresso.erros.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+
+            <div className="max-h-48 overflow-y-auto rounded-lg border border-[#2a2a2e]">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-[#2a2a2e] bg-[#111113]">
+                    <th className="w-20 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">Linha</th>
+                    <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">Motivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {progresso.erros.map((erro, i) => (
+                    <tr key={i} className="border-b border-[#1e1e20] last:border-0">
+                      <td className="px-3 py-2 font-mono text-xs text-zinc-400">{erro.linha}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-red-400">{erro.motivo}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    )
+  }
+
+  // processando
+  return (
+    <motion.div
+      initial={prefersReduced ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: prefersReduced ? 0 : 0.25 }}
+      className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-4 space-y-3"
+    >
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-sm text-blue-300">Processando importação…</p>
+        <p className="font-mono text-xs text-blue-400/70">{pct}%</p>
+      </div>
+
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-blue-500/10">
+        <motion.div
+          className="h-full rounded-full bg-blue-500/60"
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        />
+      </div>
+
+      <div className="flex items-center justify-between font-mono text-[11px] text-zinc-500">
+        <span>{progresso.processados} de {progresso.total} linhas analisadas</span>
+        {progresso.importados > 0 && (
+          <span className="text-green-400/70">{progresso.importados} ok</span>
+        )}
+        {progresso.erros.length > 0 && (
+          <span className="text-amber-400/70">{progresso.erros.length} erro{progresso.erros.length !== 1 ? 's' : ''}</span>
+        )}
+      </div>
+
+      <p className="font-mono text-[10px] text-zinc-600">Você pode sair desta página. A importação continuará em segundo plano.</p>
+    </motion.div>
+  )
+}
+
+// ─── Card de relatório (importação síncrona pequena) ─────────────────────────
+
+function CardRelatorio({ relatorio, prefersReduced }: { relatorio: RelatorioFinal; prefersReduced: boolean | null }) {
   const { importados, criados, erros } = relatorio
 
   return (
@@ -151,12 +248,8 @@ function CardRelatorio({ relatorio, prefersReduced }: { relatorio: Relatorio; pr
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-[#2a2a2e] bg-[#111113]">
-                  <th className="w-20 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
-                    Linha
-                  </th>
-                  <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
-                    Motivo
-                  </th>
+                  <th className="w-20 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">Linha</th>
+                  <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">Motivo</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,11 +273,54 @@ function CardRelatorio({ relatorio, prefersReduced }: { relatorio: Relatorio; pr
 export function AdminImportarAddons() {
   const prefersReduced = useReducedMotion()
   const inputRef = useRef<HTMLInputElement>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [dragging, setDragging] = useState(false)
-  const [relatorio, setRelatorio] = useState<Relatorio>(null)
+  const [relatorio, setRelatorio] = useState<RelatorioFinal | null>(null)
+  const [progresso, setProgresso] = useState<Progresso | null>(null)
   const [erroRede, setErroRede] = useState<string | null>(null)
   const [planoPadrao, setPlanoPadrao] = useState('monitor_guerra')
+
+  function pararPolling() {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }
+
+  useEffect(() => () => pararPolling(), [])
+
+  function iniciarPolling(jobId: string) {
+    pararPolling()
+
+    async function verificar() {
+      try {
+        const dados = await adminProdutos.statusImportacaoAddons(jobId)
+
+        if (dados.status === 'nao_encontrado') return
+
+        setProgresso({
+          status: dados.status as Progresso['status'],
+          total: dados.total ?? 0,
+          processados: dados.processados ?? 0,
+          importados: dados.importados ?? 0,
+          criados: dados.criados ?? 0,
+          erros: dados.erros ?? [],
+          mensagem: dados.mensagem,
+        })
+
+        if (dados.status === 'concluido' || dados.status === 'erro') {
+          pararPolling()
+        }
+      } catch {
+        // ignora erros de rede transitórios no polling
+      }
+    }
+
+    verificar()
+    intervalRef.current = setInterval(verificar, 2500)
+  }
 
   const mutacaoExportar = useMutation({
     mutationFn: () => adminProdutos.exportarAddons(),
@@ -194,21 +330,29 @@ export function AdminImportarAddons() {
   const mutacaoImportar = useMutation({
     mutationFn: (file: File) => adminProdutos.importarAddons(file, planoPadrao || undefined),
     onSuccess: (data) => {
-      setRelatorio(data)
       setErroRede(null)
+
+      if ('job_id' in data) {
+        iniciarPolling(data.job_id)
+      } else {
+        setRelatorio(data)
+      }
     },
     onError: (err: { response?: { data?: { message?: string; errors?: Record<string, string[]> } }; message?: string }) => {
       const errosValidacao = err.response?.data?.errors
       const primeiroErro = errosValidacao ? Object.values(errosValidacao).flat()[0] : undefined
       setErroRede(primeiroErro ?? err.response?.data?.message ?? err.message ?? 'Erro ao importar o arquivo.')
       setRelatorio(null)
+      setProgresso(null)
     },
   })
 
   function selecionarArquivo(file: File) {
     setArquivo(file)
     setRelatorio(null)
+    setProgresso(null)
     setErroRede(null)
+    pararPolling()
     if (inputRef.current) inputRef.current.value = ''
   }
 
@@ -221,10 +365,13 @@ export function AdminImportarAddons() {
 
   function handleImportar() {
     if (!arquivo) return
+    setRelatorio(null)
+    setProgresso(null)
     mutacaoImportar.mutate(arquivo)
   }
 
   const importando = mutacaoImportar.isPending
+  const emFila = progresso !== null && progresso.status === 'processando'
 
   return (
     <motion.main
@@ -359,13 +506,13 @@ export function AdminImportarAddons() {
           <button
             type="button"
             onClick={handleImportar}
-            disabled={!arquivo || importando}
+            disabled={!arquivo || importando || emFila}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {importando ? (
               <>
                 <span className="h-3.5 w-3.5 animate-spin rounded-full border border-[#C9B882]/40 border-t-[#C9B882]" />
-                Importando…
+                Enviando…
               </>
             ) : (
               <>
@@ -392,7 +539,18 @@ export function AdminImportarAddons() {
           )}
         </AnimatePresence>
 
-        {/* Relatório */}
+        {/* Progresso em tempo real (fila) */}
+        <AnimatePresence>
+          {progresso && (
+            <CardProgresso
+              key="progresso"
+              progresso={progresso}
+              prefersReduced={prefersReduced}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Relatório síncrono (arquivos pequenos ≤50 linhas) */}
         <AnimatePresence>
           {relatorio && (
             <CardRelatorio
