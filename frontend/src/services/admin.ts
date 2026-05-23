@@ -341,6 +341,7 @@ export interface CriarAddonUsuarioPayload {
   nome: string
   email: string
   addon_key: 'elections' | 'war'
+  plano?: string | null
   expira_em?: string | null
   enviar_email: boolean
 }

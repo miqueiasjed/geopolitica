@@ -551,6 +551,7 @@ export function AdminAssinantes() {
     nome: '',
     email: '',
     addon_key: 'war',
+    plano: null,
     expira_em: null,
     enviar_email: true,
   })
@@ -629,7 +630,7 @@ export function AdminAssinantes() {
     onSuccess: (data) => {
       setAddonFeedback({ tipo: 'sucesso', mensagem: data.message })
       setModalAddonAberto(false)
-      setAddonForm({ nome: '', email: '', addon_key: 'war', expira_em: null, enviar_email: true })
+      setAddonForm({ nome: '', email: '', addon_key: 'war', plano: null, expira_em: null, enviar_email: true })
       void queryClient.invalidateQueries({ queryKey: adminKeys.assinantes({}) })
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
@@ -1100,6 +1101,22 @@ export function AdminAssinantes() {
                 value={addonForm.email}
                 onChange={(e) => setAddonForm((f) => ({ ...f, email: e.target.value }))}
               />
+            </label>
+
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">Plano <Text size="1" color="gray">(opcional — deixe vazio para addon-only)</Text></Text>
+              <Select.Root
+                value={addonForm.plano ?? ''}
+                onValueChange={(v) => setAddonForm((f) => ({ ...f, plano: v || null }))}
+              >
+                <Select.Trigger placeholder="Sem plano (addon-only)" style={{ width: '100%' }} />
+                <Select.Content>
+                  <Select.Item value="">Sem plano (addon-only)</Select.Item>
+                  {(planosQuery.data ?? []).map((p) => (
+                    <Select.Item key={p.slug} value={p.slug}>{p.nome}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
             </label>
 
             <label>

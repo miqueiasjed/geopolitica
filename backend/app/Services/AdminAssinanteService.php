@@ -93,7 +93,7 @@ class AdminAssinanteService
 
         Assinante::create([
             'user_id'    => $usuario->id,
-            'plano'      => null,
+            'plano'      => $dados['plano'] ?? null,
             'ativo'      => true,
             'status'     => 'ativo',
             'assinado_em' => now(),

@@ -55,11 +55,14 @@ class AdminAssinanteController extends Controller
 
     public function criarAddonUsuario(Request $request): JsonResponse
     {
+        $slugsValidos = Plano::where('ativo', true)->pluck('slug')->toArray();
+
         $dados = $request->validate([
-            'nome'        => ['required', 'string', 'max:255'],
-            'email'       => ['required', 'email', 'max:255', 'unique:users,email'],
-            'addon_key'   => ['required', 'string', Rule::in(AssinanteAddon::ADDON_KEYS)],
-            'expira_em'   => ['nullable', 'date', 'after:today'],
+            'nome'         => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
+            'addon_key'    => ['required', 'string', Rule::in(AssinanteAddon::ADDON_KEYS)],
+            'plano'        => ['nullable', 'string', Rule::in($slugsValidos)],
+            'expira_em'    => ['nullable', 'date', 'after:today'],
             'enviar_email' => ['boolean'],
         ]);
 
