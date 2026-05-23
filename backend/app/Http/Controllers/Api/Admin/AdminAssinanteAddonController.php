@@ -396,7 +396,8 @@ class AdminAssinanteAddonController extends Controller
     private function lerArquivo(string $caminho, string $extensao): array
     {
         if (in_array($extensao, ['xlsx', 'xls'], true)) {
-            $dados = Excel::toArray([], $caminho);
+            $readerType = $extensao === 'xlsx' ? \Maatwebsite\Excel\Excel::XLSX : \Maatwebsite\Excel\Excel::XLS;
+            $dados = Excel::toArray([], $caminho, null, $readerType);
             $rows  = $dados[0] ?? [];
 
             if (empty($rows)) {
