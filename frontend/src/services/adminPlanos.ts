@@ -21,6 +21,7 @@ export interface Plano {
   preco: string
   ordem: number
   ativo: boolean
+  exibir_no_upgrade: boolean
   lastlink_url: string | null
   role: string | null
   product_id_hotmart: string | null
@@ -66,6 +67,7 @@ export async function atualizarPlano(
     preco: number
     ordem?: number
     ativo?: boolean
+    exibir_no_upgrade?: boolean
     lastlink_url: string | null
     role: string | null
     product_id_hotmart: string | null
@@ -108,6 +110,7 @@ export async function criarPlano(dados: {
   preco: number
   ordem: number
   ativo: boolean
+  exibir_no_upgrade?: boolean
   lastlink_url: string | null
 }): Promise<Plano> {
   const res = await api.post<{ data: Plano }>('/admin/planos', dados)

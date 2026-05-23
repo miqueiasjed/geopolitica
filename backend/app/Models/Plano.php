@@ -17,6 +17,7 @@ class Plano extends Model
         'preco',
         'ordem',
         'ativo',
+        'exibir_no_upgrade',
         'lastlink_url',
         'role',
         'product_id_hotmart',
@@ -26,9 +27,10 @@ class Plano extends Model
     protected function casts(): array
     {
         return [
-            'ativo'  => 'boolean',
-            'preco'  => 'decimal:2',
-            'ordem'  => 'integer',
+            'ativo'             => 'boolean',
+            'exibir_no_upgrade' => 'boolean',
+            'preco'             => 'decimal:2',
+            'ordem'             => 'integer',
         ];
     }
 

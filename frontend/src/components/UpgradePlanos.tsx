@@ -35,9 +35,11 @@ export function UpgradePlanos({ titulo, descricao, recurso }: UpgradePlanosProps
 
   if (isLoading) return null
 
-  const planosExibidos = recurso && planos
-    ? planosComRecurso(planos, recurso)
-    : (planos ?? [])
+  const planosParaUpgrade = (planos ?? []).filter((p) => p.exibir_no_upgrade)
+
+  const planosExibidos = recurso
+    ? planosComRecurso(planosParaUpgrade, recurso)
+    : planosParaUpgrade
 
   const gridClass =
     planosExibidos.length === 1

@@ -776,12 +776,13 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
           preco:               String(plano.preco),
           ordem:               String(plano.ordem),
           ativo:               plano.ativo,
+          exibir_no_upgrade:   plano.exibir_no_upgrade,
           lastlink_url:        plano.lastlink_url ?? '',
           role:                plano.role ?? '',
           product_id_hotmart:  plano.product_id_hotmart ?? '',
           product_id_lastlink: plano.product_id_lastlink ?? '',
         }
-      : { nome: '', descricao: '', preco: '', ordem: '', ativo: true, lastlink_url: '', role: '', product_id_hotmart: '', product_id_lastlink: '' }
+      : { nome: '', descricao: '', preco: '', ordem: '', ativo: true, exibir_no_upgrade: false, lastlink_url: '', role: '', product_id_hotmart: '', product_id_lastlink: '' }
   )
   const [erro, setErro] = useState<string | null>(null)
 
@@ -793,6 +794,7 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
         preco:               parseFloat(form.preco) || 0,
         ordem:               parseInt(form.ordem) || 0,
         ativo:               form.ativo,
+        exibir_no_upgrade:   form.exibir_no_upgrade,
         lastlink_url:        form.lastlink_url.trim() || null,
         role:                form.role.trim() || null,
         product_id_hotmart:  form.product_id_hotmart.trim() || null,
@@ -901,6 +903,15 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
                       className="h-3.5 w-3.5 accent-[#C9B882]"
                     />
                     <span className="font-mono text-sm text-zinc-300">Plano ativo</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#2a2a2e] bg-[#111113] px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={form.exibir_no_upgrade}
+                      onChange={(e) => set('exibir_no_upgrade', e.target.checked)}
+                      className="h-3.5 w-3.5 accent-[#C9B882]"
+                    />
+                    <span className="font-mono text-sm text-zinc-300">Exibir no upgrade</span>
                   </label>
                 </div>
               </div>
@@ -1066,7 +1077,7 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
   const queryClient = useQueryClient()
 
   const [form, setFormState] = useState({
-    slug: '', nome: '', descricao: '', preco: '', ordem: '', ativo: true, lastlink_url: '',
+    slug: '', nome: '', descricao: '', preco: '', ordem: '', ativo: true, exibir_no_upgrade: false, lastlink_url: '',
   })
   const [erro, setErro] = useState<string | null>(null)
 
@@ -1078,8 +1089,9 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
         descricao:    form.descricao.trim() || null,
         preco:        parseFloat(form.preco) || 0,
         ordem:        parseInt(form.ordem) || 0,
-        ativo:        form.ativo,
-        lastlink_url: form.lastlink_url.trim() || null,
+        ativo:              form.ativo,
+        exibir_no_upgrade:  form.exibir_no_upgrade,
+        lastlink_url:       form.lastlink_url.trim() || null,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
@@ -1190,15 +1202,26 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
             />
           </div>
 
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.ativo}
-              onChange={(e) => set('ativo', e.target.checked)}
-              className="h-4 w-4 accent-[#C9B882]"
-            />
-            <span className="font-mono text-sm text-zinc-300">Plano ativo</span>
-          </label>
+          <div className="flex flex-col gap-2">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={form.ativo}
+                onChange={(e) => set('ativo', e.target.checked)}
+                className="h-4 w-4 accent-[#C9B882]"
+              />
+              <span className="font-mono text-sm text-zinc-300">Plano ativo</span>
+            </label>
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={form.exibir_no_upgrade}
+                onChange={(e) => set('exibir_no_upgrade', e.target.checked)}
+                className="h-4 w-4 accent-[#C9B882]"
+              />
+              <span className="font-mono text-sm text-zinc-300">Exibir no upgrade</span>
+            </label>
+          </div>
 
           {erro && (
             <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[12px] text-red-400">

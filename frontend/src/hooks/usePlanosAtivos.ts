@@ -7,6 +7,7 @@ export interface PlanoPublico {
   nome: string
   descricao: string | null
   preco: string | null
+  exibir_no_upgrade: boolean
   lastlink_url: string | null
   recursos: Record<string, string | null>
 }

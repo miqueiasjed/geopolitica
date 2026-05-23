@@ -38,6 +38,7 @@ class AdminPlanoController extends Controller
                 'preco'               => $plano->preco,
                 'ordem'               => $plano->ordem,
                 'ativo'               => $plano->ativo,
+                'exibir_no_upgrade'   => $plano->exibir_no_upgrade,
                 'lastlink_url'        => $plano->lastlink_url,
                 'role'                => $plano->role,
                 'product_id_hotmart'  => $plano->product_id_hotmart,

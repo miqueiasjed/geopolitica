@@ -20,6 +20,7 @@ class PlanoController extends Controller
                 'nome'        => $plano->nome,
                 'descricao'   => $plano->descricao,
                 'preco'       => $plano->preco,
+                'exibir_no_upgrade' => $plano->exibir_no_upgrade,
                 'lastlink_url' => $plano->lastlink_url,
                 'recursos'    => $plano->recursos
                     ->mapWithKeys(fn ($r) => [$r->chave => $r->valor])
