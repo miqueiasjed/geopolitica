@@ -143,6 +143,22 @@ class PlanoService
         return $plano->fresh();
     }
 
+    /**
+     * Exclui um plano. Bloqueia se houver assinantes ativos vinculados.
+     */
+    public function excluirPlano(Plano $plano): void
+    {
+        $emUso = \App\Models\Assinante::where('plano', $plano->slug)->where('ativo', true)->exists();
+
+        if ($emUso) {
+            throw new \RuntimeException('Não é possível excluir um plano com assinantes ativos.');
+        }
+
+        $this->invalidarCache($plano->slug);
+        $plano->recursos()->delete();
+        $plano->delete();
+    }
+
     // -------------------------------------------------------------------------
     // Invalidação de cache
     // -------------------------------------------------------------------------

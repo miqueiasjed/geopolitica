@@ -259,6 +259,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/planos', [AdminPlanoController::class, 'store']);
     Route::put('/planos/{plano}', [AdminPlanoController::class, 'update']);
     Route::put('/planos/{plano}/recursos/{chave}', [AdminPlanoController::class, 'atualizarRecurso']);
+    Route::delete('/planos/{plano}', [AdminPlanoController::class, 'destroy']);
 
     // Gestão de produtos (addons extra)
     Route::get('/produtos', [AdminProdutoController::class, 'index']);

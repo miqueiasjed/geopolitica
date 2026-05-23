@@ -75,6 +75,20 @@ class AdminPlanoController extends Controller
     }
 
     /**
+     * Exclui um plano.
+     */
+    public function destroy(Plano $plano): JsonResponse
+    {
+        try {
+            $this->planoService->excluirPlano($plano);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(null, 204);
+    }
+
+    /**
      * Atualiza um recurso específico de um plano.
      */
     public function atualizarRecurso(AtualizarPlanoRecursoRequest $request, Plano $plano, string $chave): JsonResponse

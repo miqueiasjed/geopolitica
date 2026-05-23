@@ -7,6 +7,7 @@ import {
   Pencil1Icon,
   PlusIcon,
   Link2Icon,
+  TrashIcon,
 } from '@radix-ui/react-icons'
 import {
   fetchPlanos,
@@ -17,6 +18,7 @@ import {
   atualizarRecurso,
   atualizarPlano,
   criarPlano,
+  excluirPlano,
   adminPlanosKeys,
 } from '../../services/adminPlanos'
 import type { Plano, PlanoRecursoItem } from '../../services/adminPlanos'
@@ -385,13 +387,64 @@ function PainelRecursos({ plano, editavel }: { plano: Plano; editavel: boolean }
 
 // ─── Tabela de planos ─────────────────────────────────────────────────────────
 
+interface ConfirmacaoExcluirPlanoProps {
+  plano: Plano
+  onConfirmar: () => void
+  onCancelar: () => void
+  isPending: boolean
+  erro: string | null
+}
+
+function ConfirmacaoExcluirPlano({ plano, onConfirmar, onCancelar, isPending, erro }: ConfirmacaoExcluirPlanoProps) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-red-500/20 bg-[#0d0d0f] p-6 shadow-2xl">
+        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">
+          <TrashIcon className="h-5 w-5 text-red-400" />
+        </div>
+        <h3 className="mb-1 text-sm font-semibold text-white">Excluir plano</h3>
+        <p className="mb-1 text-xs text-zinc-400">
+          Tem certeza que deseja excluir o plano <span className="font-mono text-zinc-200">{plano.nome}</span>?
+        </p>
+        <p className="mb-5 font-mono text-[10px] text-zinc-600">
+          Todos os recursos associados serão removidos permanentemente.
+        </p>
+        {erro && (
+          <p className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 font-mono text-[11px] text-red-300">
+            {erro}
+          </p>
+        )}
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancelar}
+            disabled={isPending}
+            className="rounded-full border border-zinc-700/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500 hover:border-zinc-600 hover:text-zinc-300 disabled:opacity-40"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirmar}
+            disabled={isPending}
+            className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-red-400 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {isPending ? 'Excluindo…' : 'Excluir'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface TabelaPlanosProps {
   planos: Plano[]
   onVisualizar: (plano: Plano) => void
   onEditar: (plano: Plano) => void
+  onExcluir: (plano: Plano) => void
 }
 
-function TabelaPlanos({ planos, onVisualizar, onEditar }: TabelaPlanosProps) {
+function TabelaPlanos({ planos, onVisualizar, onEditar, onExcluir }: TabelaPlanosProps) {
   return (
     <div className="rounded-xl border border-[#1e1e20] overflow-hidden">
       <table className="w-full text-sm">
@@ -476,6 +529,14 @@ function TabelaPlanos({ planos, onVisualizar, onEditar }: TabelaPlanosProps) {
                     >
                       <Pencil1Icon className="h-3 w-3" />
                       Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onExcluir(plano)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-2.5 py-1.5 font-mono text-[11px] text-red-400 hover:bg-red-500/15 transition-colors"
+                    >
+                      <TrashIcon className="h-3 w-3" />
+                      Excluir
                     </button>
                   </div>
                 </td>
@@ -1190,9 +1251,12 @@ function ModalCriarPlano({ onFechar, onCriado }: ModalCriarPlanoProps) {
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export function AdminPlanos() {
+  const queryClient = useQueryClient()
   const [planoVisualizando, setPlanoVisualizando] = useState<number | null>(null)
   const [planoEditando, setPlanoEditando] = useState<number | null>(null)
   const [modalCriarAberto, setModalCriarAberto] = useState(false)
+  const [planoExcluindo, setPlanoExcluindo] = useState<Plano | null>(null)
+  const [erroExcluir, setErroExcluir] = useState<string | null>(null)
 
   const { data: planos, isLoading, isError } = useQuery({
     queryKey: adminPlanosKeys.lista(),
@@ -1201,6 +1265,20 @@ export function AdminPlanos() {
   })
 
   const planosOrdenados = planos ? [...planos].sort((a, b) => a.ordem - b.ordem) : []
+
+  const mutExcluir = useMutation({
+    mutationFn: (planoId: number) => excluirPlano(planoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminPlanosKeys.lista() })
+      setPlanoExcluindo(null)
+      setErroExcluir(null)
+    },
+    onError: (e: unknown) => {
+      setErroExcluir(
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Erro ao excluir plano.',
+      )
+    },
+  })
 
   return (
     <div className="space-y-6">
@@ -1245,6 +1323,17 @@ export function AdminPlanos() {
           planos={planosOrdenados}
           onVisualizar={(p) => setPlanoVisualizando(p.id)}
           onEditar={(p) => setPlanoEditando(p.id)}
+          onExcluir={(p) => { setPlanoExcluindo(p); setErroExcluir(null) }}
+        />
+      )}
+
+      {planoExcluindo !== null && (
+        <ConfirmacaoExcluirPlano
+          plano={planoExcluindo}
+          onConfirmar={() => mutExcluir.mutate(planoExcluindo.id)}
+          onCancelar={() => { setPlanoExcluindo(null); setErroExcluir(null) }}
+          isPending={mutExcluir.isPending}
+          erro={erroExcluir}
         />
       )}
 

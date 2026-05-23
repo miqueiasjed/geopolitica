@@ -113,3 +113,7 @@ export async function criarPlano(dados: {
   const res = await api.post<{ data: Plano }>('/admin/planos', dados)
   return res.data.data
 }
+
+export async function excluirPlano(planoId: number): Promise<void> {
+  await api.delete(`/admin/planos/${planoId}`)
+}
