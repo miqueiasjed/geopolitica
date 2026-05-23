@@ -78,10 +78,10 @@ export function AdminNovoConteudo() {
 
         try {
           const enriquecido = await enriquecerBriefing(resultado.corpo)
-          if (enriquecido.titulo) setTitulo(enriquecido.titulo)
-          if (enriquecido.regiao) setRegiao(enriquecido.regiao)
-          if (enriquecido.tags?.length) setTags(enriquecido.tags.join(', '))
-          if (enriquecido.resumo) setResumo(enriquecido.resumo)
+          if (enriquecido.titulo) setTitulo(enriquecido.titulo.slice(0, 255))
+          if (enriquecido.regiao) setRegiao(enriquecido.regiao.slice(0, 100))
+          if (enriquecido.tags?.length) setTags(enriquecido.tags.map((t) => t.slice(0, 50)).join(', '))
+          if (enriquecido.resumo) setResumo(enriquecido.resumo.slice(0, 500))
         } catch {
           // enriquecimento é best-effort — falha silenciosa
         }
@@ -429,9 +429,28 @@ export function AdminNovoConteudo() {
 
               {/* Erro da mutation */}
               {mutation.isError && (
-                <Text size="2" color="ruby">
-                  Erro ao salvar o conteúdo. Verifique os dados e tente novamente.
-                </Text>
+                <Box className="space-y-1 rounded-lg border border-red-500/30 bg-red-950/40 p-3">
+                  <Text size="2" color="ruby" weight="medium">
+                    Erro ao salvar o conteúdo.
+                  </Text>
+                  {(() => {
+                    const erroAxios = mutation.error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } }
+                    const errosDados = erroAxios?.response?.data?.errors
+                    const mensagem = erroAxios?.response?.data?.message
+                    if (errosDados) {
+                      return (
+                        <ul className="list-disc pl-4 space-y-0.5">
+                          {Object.entries(errosDados).map(([campo, msgs]) => (
+                            <li key={campo}>
+                              <Text size="1" color="ruby">{campo}: {(msgs as string[]).join(', ')}</Text>
+                            </li>
+                          ))}
+                        </ul>
+                      )
+                    }
+                    return <Text size="1" color="ruby">{mensagem ?? 'Verifique os dados e tente novamente.'}</Text>
+                  })()}
+                </Box>
               )}
 
               <Flex justify="end" gap="3">
