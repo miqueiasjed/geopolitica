@@ -45,6 +45,13 @@ class AdminAssinanteController extends Controller
         );
     }
 
+    public function resetarPrimeiroAcesso(int $id): JsonResponse
+    {
+        $this->adminAssinanteService->resetarPrimeiroAcesso($id);
+
+        return response()->json(['message' => 'Senha redefinida para o padrão de primeiro acesso.']);
+    }
+
     public function reenviarBoasVindas(int $id): JsonResponse
     {
         $this->adminAssinanteService->reenviarBoasVindas($id);

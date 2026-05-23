@@ -332,6 +332,11 @@ export async function reenviarBoasVindasAssinante(id: number): Promise<{ message
   return resposta.data
 }
 
+export async function resetarPrimeiroAcessoAssinante(id: number): Promise<{ message: string }> {
+  const resposta = await api.post<{ message: string }>(`/admin/assinantes/${id}/resetar-primeiro-acesso`)
+  return resposta.data
+}
+
 // --- B2B Admin ---
 
 export async function fetchAdminB2BEmpresas(): Promise<EmpresaB2B[]> {

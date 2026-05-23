@@ -28,8 +28,9 @@ class ConteudoService
         $query = Conteudo::query()
             ->publicados()
             ->acessivelPor($nivelMaximo, $diasHistorico)
-            ->when($cursor > 0, fn ($q) => $q->where('id', '>', $cursor))
-            ->orderBy('id', 'asc');
+            ->when($cursor > 0, fn ($q) => $q->where('id', '<', $cursor))
+            ->orderBy('publicado_em', 'desc')
+            ->orderBy('id', 'desc');
 
         if ($busca = $filtros['q'] ?? null) {
             $query->whereRaw('MATCH(titulo, corpo) AGAINST(? IN BOOLEAN MODE)', [$busca]);

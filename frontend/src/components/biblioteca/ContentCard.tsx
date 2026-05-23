@@ -107,7 +107,7 @@ export function ContentCard({ conteudo, onClick }: ContentCardProps) {
       {/* Tags */}
       {conteudo.tags && conteudo.tags.length > 0 ? (
         <footer className="mt-4 flex flex-wrap gap-2">
-          {conteudo.tags.map((tag) => (
+          {conteudo.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
               className="rounded-full border border-[#BFFF3C]/20 bg-[#BFFF3C]/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#BFFF3C]"
@@ -115,6 +115,11 @@ export function ContentCard({ conteudo, onClick }: ContentCardProps) {
               {tag}
             </span>
           ))}
+          {conteudo.tags.length > 2 ? (
+            <span className="rounded-full border border-zinc-700 bg-zinc-800/60 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+              +{conteudo.tags.length - 2}
+            </span>
+          ) : null}
         </footer>
       ) : null}
     </motion.article>

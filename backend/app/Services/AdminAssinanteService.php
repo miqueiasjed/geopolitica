@@ -7,6 +7,7 @@ use App\Mail\BoasVindasMail;
 use App\Models\Assinante;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -47,6 +48,13 @@ class AdminAssinanteService
             'concluido'   => $concluido,
             'percentual'  => $total > 0 ? round(($processados / $total) * 100) : 0,
         ];
+    }
+
+    public function resetarPrimeiroAcesso(int $assinanteId): void
+    {
+        $assinante = Assinante::with('user')->findOrFail($assinanteId);
+
+        $assinante->user->update(['password' => Hash::make('12345678')]);
     }
 
     public function reenviarBoasVindas(int $assinanteId): void

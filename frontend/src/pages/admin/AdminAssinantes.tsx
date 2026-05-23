@@ -26,6 +26,7 @@ import {
   ChevronRightIcon,
   EnvelopeClosedIcon,
   ExclamationTriangleIcon,
+  LockClosedIcon,
   MagnifyingGlassIcon,
   ResetIcon,
   UpdateIcon,
@@ -42,6 +43,7 @@ import {
   buscarStatusImportacao,
   importarAssinantesLastlink,
   reenviarBoasVindasAssinante,
+  resetarPrimeiroAcessoAssinante,
   trocarPlanoEmMassa,
   buscarStatusTrocaPlano,
 } from '../../services/admin'
@@ -539,6 +541,9 @@ export function AdminAssinantes() {
   const [addonsUserId, setAddonsUserId] = useState<number | null>(null)
   const [reenvioFeedback, setReenvioFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
   const [reenvioEmAndamento, setReenvioEmAndamento] = useState<number | null>(null)
+  const [resetEmAndamento, setResetEmAndamento] = useState<number | null>(null)
+  const [resetFeedback, setResetFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
+  const [confirmarResetId, setConfirmarResetId] = useState<number | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
 
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set())
@@ -590,6 +595,21 @@ export function AdminAssinantes() {
     onError: (err: { response?: { data?: { message?: string } } }) => {
       setReenvioFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao reenviar e-mail.' })
       setReenvioEmAndamento(null)
+    },
+  })
+
+  const mutacaoReset = useMutation({
+    mutationFn: (id: number) => resetarPrimeiroAcessoAssinante(id),
+    onMutate: (id) => setResetEmAndamento(id),
+    onSuccess: (data) => {
+      setResetFeedback({ tipo: 'sucesso', mensagem: data.message })
+      setResetEmAndamento(null)
+      setConfirmarResetId(null)
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      setResetFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao redefinir senha.' })
+      setResetEmAndamento(null)
+      setConfirmarResetId(null)
     },
   })
 
@@ -814,6 +834,24 @@ export function AdminAssinantes() {
               </Callout.Root>
             )}
 
+            {resetFeedback && (
+              <Callout.Root color={resetFeedback.tipo === 'sucesso' ? 'green' : 'ruby'} size="1">
+                <Callout.Icon>
+                  {resetFeedback.tipo === 'sucesso' ? <CheckCircledIcon /> : <ExclamationTriangleIcon />}
+                </Callout.Icon>
+                <Callout.Text>{resetFeedback.mensagem}</Callout.Text>
+                <Button
+                  variant="ghost"
+                  size="1"
+                  color={resetFeedback.tipo === 'sucesso' ? 'green' : 'ruby'}
+                  ml="auto"
+                  onClick={() => setResetFeedback(null)}
+                >
+                  Fechar
+                </Button>
+              </Callout.Root>
+            )}
+
             {query.isLoading ? (
               <Flex justify="center" py="8">
                 <Spinner size="3" />
@@ -919,6 +957,24 @@ export function AdminAssinantes() {
                                   )}
                                 </IconButton>
                               </Tooltip>
+                              <Tooltip content="Resetar para primeiro acesso (senha: 12345678)">
+                                <IconButton
+                                  size="1"
+                                  variant="ghost"
+                                  color="amber"
+                                  disabled={resetEmAndamento === assinante.id}
+                                  onClick={() => {
+                                    setResetFeedback(null)
+                                    setConfirmarResetId(assinante.id)
+                                  }}
+                                >
+                                  {resetEmAndamento === assinante.id ? (
+                                    <Spinner size="1" />
+                                  ) : (
+                                    <LockClosedIcon />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
                             </Flex>
                           </Table.Cell>
                         </Table.Row>
@@ -972,6 +1028,27 @@ export function AdminAssinantes() {
       </div>
 
       <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
+
+      <Dialog.Root open={confirmarResetId !== null} onOpenChange={(aberto) => { if (!aberto) setConfirmarResetId(null) }}>
+        <Dialog.Content maxWidth="420px">
+          <Dialog.Title>Resetar para primeiro acesso</Dialog.Title>
+          <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
+            A senha deste assinante será redefinida para <strong>12345678</strong>. Ele precisará trocar a senha no próximo acesso.
+          </Dialog.Description>
+          <Flex gap="3" justify="end">
+            <Dialog.Close>
+              <Button variant="soft" color="gray">Cancelar</Button>
+            </Dialog.Close>
+            <Button
+              color="amber"
+              loading={mutacaoReset.isPending}
+              onClick={() => { if (confirmarResetId !== null) mutacaoReset.mutate(confirmarResetId) }}
+            >
+              Confirmar reset
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
 
       {addonsUserId !== null && (
         <div
