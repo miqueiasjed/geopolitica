@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EventResource;
+use App\Models\Event;
 use App\Services\WarFeedService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,5 +30,18 @@ class WarFeedController extends Controller
             'events'     => $resultado['events'],
             'nextCursor' => $resultado['nextCursor'],
         ]);
+    }
+
+    public function show(int $id): EventResource|JsonResponse
+    {
+        Gate::authorize('acessar-vertical', 'war');
+
+        $event = Event::find($id);
+
+        if (! $event) {
+            return response()->json(['message' => 'Evento não encontrado.'], 404);
+        }
+
+        return new EventResource($event);
     }
 }

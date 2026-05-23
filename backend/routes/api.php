@@ -132,6 +132,7 @@ Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(func
 // Monitor de Guerra: addon-only users com 'war' podem acessar (gate no controller)
 Route::middleware(['auth:sanctum', 'assinante.ativo'])->group(function () {
     Route::get('/war-feed', [WarFeedController::class, 'index']);
+    Route::get('/war-feed/{id}', [WarFeedController::class, 'show']);
 });
 
 Route::middleware(['auth:sanctum', 'assinante.ativo', 'plano.real'])->group(function () {
