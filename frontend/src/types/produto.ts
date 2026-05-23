@@ -73,3 +73,21 @@ export interface AdicionarAddonPayload {
 
 // Payload para atualizar addon de um assinante
 export type AtualizarAddonPayload = Partial<AdicionarAddonPayload>
+
+// Usuário com acesso a um produto (visão admin)
+export interface ProdutoAssinanteItem {
+  user_id: number
+  email: string | null
+  nome: string | null
+  tipo_acesso: 'addon' | 'plano'
+  fonte: 'lastlink' | 'hotmart' | 'manual' | 'plano'
+  status: string
+  plano?: string
+  iniciado_em: string | null
+  expira_em: string | null
+}
+
+export interface ProdutoAssinantes {
+  total: number
+  usuarios: ProdutoAssinanteItem[]
+}

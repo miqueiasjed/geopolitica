@@ -262,6 +262,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // Gestão de produtos (addons extra)
     Route::get('/produtos', [AdminProdutoController::class, 'index']);
     Route::post('/produtos', [AdminProdutoController::class, 'store']);
+    Route::get('/produtos/{produto}/assinantes', [AdminProdutoController::class, 'assinantes']);
     Route::put('/produtos/{produto}', [AdminProdutoController::class, 'update']);
     Route::delete('/produtos/{produto}', [AdminProdutoController::class, 'destroy']);
 

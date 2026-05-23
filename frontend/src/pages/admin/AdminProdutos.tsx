@@ -6,11 +6,19 @@ import {
   ExternalLinkIcon,
   Link2Icon,
   Pencil1Icon,
+  PersonIcon,
   PlusIcon,
   TrashIcon,
 } from '@radix-ui/react-icons'
 import { adminProdutos, adminProdutosKeys } from '../../services/adminProdutos'
-import type { AdminProduto, CriarProdutoPayload, AtualizarProdutoPayload } from '../../types/produto'
+import type { AdminProduto, CriarProdutoPayload, AtualizarProdutoPayload, ProdutoAssinanteItem } from '../../types/produto'
+
+// ─── Mapeamento chave → rota do produto ──────────────────────────────────────
+
+const ROTAS_PRODUTO: Record<string, string> = {
+  elections: '/dashboard/monitor-eleitoral',
+  war: '/dashboard/monitor-guerra',
+}
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 
@@ -604,6 +612,150 @@ function CelulaLink({ url, titulo }: { url: string | null; titulo: string }) {
   )
 }
 
+// ─── Modal de assinantes do produto ──────────────────────────────────────────
+
+const FONTE_LABEL: Record<string, { label: string; classes: string }> = {
+  lastlink: { label: 'Lastlink',  classes: 'bg-blue-500/10 text-blue-400' },
+  hotmart:  { label: 'Hotmart',   classes: 'bg-orange-500/10 text-orange-400' },
+  manual:   { label: 'Manual',    classes: 'bg-purple-500/10 text-purple-400' },
+  plano:    { label: 'Plano',     classes: 'bg-[#C9B882]/10 text-[#C9B882]' },
+}
+
+const STATUS_LABEL: Record<string, { label: string; classes: string }> = {
+  ativo:      { label: 'Ativo',      classes: 'bg-green-500/10 text-green-400' },
+  cancelado:  { label: 'Cancelado',  classes: 'bg-red-500/10 text-red-400' },
+  expirado:   { label: 'Expirado',   classes: 'bg-zinc-700/40 text-zinc-500' },
+  reembolsado:{ label: 'Reembolsado',classes: 'bg-yellow-500/10 text-yellow-400' },
+}
+
+interface ModalAssinantesProps {
+  produto: AdminProduto
+  onFechar: () => void
+}
+
+function ModalAssinantesProduto({ produto, onFechar }: ModalAssinantesProps) {
+  const reduced = useReducedMotion()
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: adminProdutosKeys.assinantes(produto.id),
+    queryFn: () => adminProdutos.listarAssinantes(produto.id),
+    staleTime: 30_000,
+  })
+
+  function badgeFonte(item: ProdutoAssinanteItem) {
+    const fonte = item.tipo_acesso === 'plano' ? 'plano' : (item.fonte ?? 'manual')
+    const cfg = FONTE_LABEL[fonte] ?? { label: fonte, classes: 'bg-zinc-700/40 text-zinc-400' }
+    return (
+      <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] ${cfg.classes}`}>
+        {cfg.label}
+        {item.plano && <span className="ml-1 opacity-60">· {item.plano}</span>}
+      </span>
+    )
+  }
+
+  function badgeStatus(status: string) {
+    const cfg = STATUS_LABEL[status] ?? { label: status, classes: 'bg-zinc-700/40 text-zinc-400' }
+    return (
+      <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] ${cfg.classes}`}>
+        {cfg.label}
+      </span>
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <motion.div
+        initial={reduced ? false : { opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="flex w-full max-w-2xl flex-col rounded-2xl border border-[#2a2a2e] bg-[#0d0d0f] shadow-2xl max-h-[85vh]"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#1e1e20] px-6 py-4 flex-shrink-0">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C9B882]/70">admin · addons</p>
+            <h2 className="text-base font-semibold text-white">{produto.nome}</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            {data && (
+              <span className="font-mono text-sm text-zinc-400">
+                {data.total} {data.total === 1 ? 'usuário' : 'usuários'}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={onFechar}
+              className="rounded-md p-1.5 text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+              aria-label="Fechar"
+            >
+              <Cross2Icon className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto">
+          {isLoading && (
+            <div className="space-y-2 p-6">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-12 animate-pulse rounded-lg border border-[#1e1e20] bg-[#111113]" />
+              ))}
+            </div>
+          )}
+
+          {isError && (
+            <p className="px-6 py-10 text-center font-mono text-sm text-red-400">
+              Erro ao carregar. Tente novamente.
+            </p>
+          )}
+
+          {data && data.usuarios.length === 0 && (
+            <p className="px-6 py-10 text-center font-mono text-sm text-zinc-600">
+              Nenhum usuário com acesso a este produto.
+            </p>
+          )}
+
+          {data && data.usuarios.length > 0 && (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#1e1e20] bg-[#080809]">
+                  <th className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Usuário</th>
+                  <th className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Origem</th>
+                  <th className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Status</th>
+                  <th className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Desde</th>
+                  <th className="px-5 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Expira</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.usuarios.map((item, idx) => (
+                  <tr
+                    key={`${item.user_id}-${item.fonte}`}
+                    className={`border-b border-[#111113] ${idx % 2 === 0 ? 'bg-[#0d0d0f]' : 'bg-[#0a0a0b]'}`}
+                  >
+                    <td className="px-5 py-3">
+                      <p className="text-zinc-200">{item.nome ?? '—'}</p>
+                      <p className="font-mono text-[11px] text-zinc-500">{item.email ?? '—'}</p>
+                    </td>
+                    <td className="px-5 py-3">{badgeFonte(item)}</td>
+                    <td className="px-5 py-3">{badgeStatus(item.status)}</td>
+                    <td className="px-5 py-3">
+                      <span className="font-mono text-[11px] text-zinc-400">{item.iniciado_em ?? '—'}</span>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className="font-mono text-[11px] text-zinc-400">{item.expira_em ?? '—'}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export function AdminProdutos() {
@@ -614,6 +766,7 @@ export function AdminProdutos() {
   const [modalAberto, setModalAberto] = useState(false)
   const [produtoEditando, setProdutoEditando] = useState<AdminProduto | null>(null)
   const [produtoExcluindo, setProdutoExcluindo] = useState<AdminProduto | null>(null)
+  const [produtoAssinantes, setProdutoAssinantes] = useState<AdminProduto | null>(null)
 
   const { data: produtos, isLoading, isError } = useQuery({
     queryKey: adminProdutosKeys.lista(),
@@ -824,6 +977,26 @@ export function AdminProdutos() {
                     {/* Ações */}
                     <td className="px-4 py-3.5">
                       <div className="flex items-center justify-end gap-1.5">
+                        {ROTAS_PRODUTO[produto.chave] && (
+                          <a
+                            href={ROTAS_PRODUTO[produto.chave]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Ver produto"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700/40 bg-zinc-800/20 px-2.5 py-1.5 font-mono text-[11px] text-zinc-400 hover:bg-zinc-700/30 hover:text-zinc-200 transition-colors"
+                          >
+                            <ExternalLinkIcon className="h-3 w-3" />
+                            Ver
+                          </a>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setProdutoAssinantes(produto)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700/40 bg-zinc-800/20 px-2.5 py-1.5 font-mono text-[11px] text-zinc-400 hover:bg-zinc-700/30 hover:text-zinc-200 transition-colors"
+                        >
+                          <PersonIcon className="h-3 w-3" />
+                          Assinantes
+                        </button>
                         <button
                           type="button"
                           onClick={() => abrirEditar(produto)}
@@ -871,6 +1044,17 @@ export function AdminProdutos() {
             onCancelar={() => setProdutoExcluindo(null)}
             onConfirmar={() => mutacaoExcluir.mutate(produtoExcluindo.id)}
             pending={mutacaoExcluir.isPending}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Modal Assinantes */}
+      <AnimatePresence>
+        {produtoAssinantes && (
+          <ModalAssinantesProduto
+            key="modal-assinantes"
+            produto={produtoAssinantes}
+            onFechar={() => setProdutoAssinantes(null)}
           />
         )}
       </AnimatePresence>

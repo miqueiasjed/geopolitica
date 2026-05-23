@@ -3,6 +3,7 @@ import type {
   AdminProduto,
   CriarProdutoPayload,
   AtualizarProdutoPayload,
+  ProdutoAssinantes,
 } from '../types/produto'
 
 // ─── Query keys ───────────────────────────────────────────────────────────────
@@ -10,6 +11,7 @@ import type {
 export const adminProdutosKeys = {
   all: ['admin', 'produtos'] as const,
   lista: () => [...adminProdutosKeys.all] as const,
+  assinantes: (id: number) => [...adminProdutosKeys.all, id, 'assinantes'] as const,
 }
 
 // ─── Funções de API ───────────────────────────────────────────────────────────
@@ -26,6 +28,9 @@ export const adminProdutos = {
 
   excluir: (id: number): Promise<void> =>
     api.delete(`/admin/produtos/${id}`).then(() => undefined),
+
+  listarAssinantes: (id: number): Promise<ProdutoAssinantes> =>
+    api.get<ProdutoAssinantes>(`/admin/produtos/${id}/assinantes`).then(r => r.data),
 
   importarAddons: (
     arquivo: File,
