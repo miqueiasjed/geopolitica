@@ -173,7 +173,7 @@ class AdminAssinanteAddonController extends Controller
     public function importar(Request $request): JsonResponse
     {
         $request->validate([
-            'arquivo'      => ['required', 'file', 'mimes:csv,txt,xlsx,xls', 'max:5120'],
+            'arquivo'      => ['required', 'file', 'extensions:csv,txt,xlsx,xls', 'max:10240'],
             'plano_padrao' => ['nullable', 'string', 'max:50'],
         ]);
 

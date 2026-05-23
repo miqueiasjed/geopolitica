@@ -197,8 +197,10 @@ export function AdminImportarAddons() {
       setRelatorio(data)
       setErroRede(null)
     },
-    onError: (err: { response?: { data?: { message?: string } }; message?: string }) => {
-      setErroRede(err.response?.data?.message ?? err.message ?? 'Erro ao importar o arquivo.')
+    onError: (err: { response?: { data?: { message?: string; errors?: Record<string, string[]> } }; message?: string }) => {
+      const errosValidacao = err.response?.data?.errors
+      const primeiroErro = errosValidacao ? Object.values(errosValidacao).flat()[0] : undefined
+      setErroRede(primeiroErro ?? err.response?.data?.message ?? err.message ?? 'Erro ao importar o arquivo.')
       setRelatorio(null)
     },
   })
