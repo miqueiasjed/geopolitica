@@ -208,7 +208,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertExactJson(['received' => true]);
 
         $assinante = Assinante::whereHas('user', fn ($q) => $q->where('email', 'novo@teste.com'))->firstOrFail();
-        $this->assertSame('elections', $assinante->plano);
+        $this->assertNull($assinante->plano);
         $this->assertDatabaseHas('assinante_addons', ['addon_key' => 'elections', 'status' => 'ativo']);
         Mail::assertQueued(AddonBoasVindasMail::class);
     }

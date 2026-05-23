@@ -18,7 +18,7 @@ class AddonService
     ): void {
         $assinante = Assinante::query()->firstOrCreate(
             ['user_id' => $userId],
-            ['plano' => $addonKey, 'ativo' => true, 'status' => 'ativo'],
+            ['plano' => null, 'ativo' => true, 'status' => 'ativo'],
         );
 
         if (! $assinante->ativo) {

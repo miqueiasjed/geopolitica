@@ -369,7 +369,7 @@ class LastlinkHandlerService
         if ($usuario->wasRecentlyCreated) {
             Assinante::create([
                 'user_id' => $usuario->id,
-                'plano'   => $addonKey,
+                'plano'   => null,
                 'ativo'   => true,
                 'status'  => 'ativo',
             ]);
