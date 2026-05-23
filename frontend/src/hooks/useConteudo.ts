@@ -21,12 +21,12 @@ async function fetchConteudo(slug: string): Promise<Conteudo | null> {
   }
 }
 
-export function useConteudo(slug: string) {
+export function useConteudo(slug: string, enabled = true) {
   const query = useQuery({
     queryKey: conteudoKeys.detail(slug),
     queryFn: () => fetchConteudo(slug),
     staleTime: 10 * 60 * 1000,
-    enabled: Boolean(slug),
+    enabled: Boolean(slug) && enabled,
   })
 
   const isPlanGate = query.data === null && !query.isError

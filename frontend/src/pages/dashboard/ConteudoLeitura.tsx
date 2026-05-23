@@ -4,6 +4,7 @@ import { useConteudo } from '../../hooks/useConteudo'
 import { ContentReader } from '../../components/biblioteca/ContentReader'
 import { PlanGate } from '../../components/biblioteca/PlanGate'
 import { ExportPdfButton } from '../../components/ExportPdfButton'
+import { useRecurso } from '../../hooks/useRecurso'
 
 function SkeletonLeitura() {
   return (
@@ -58,11 +59,21 @@ export function ConteudoLeitura() {
   const prefersReducedMotion = useReducedMotion()
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const temAcesso = useRecurso('biblioteca_acesso')
 
-  const { conteudo, isLoading, isError, isPlanGate } = useConteudo(slug!)
+  const { conteudo, isLoading, isError, isPlanGate } = useConteudo(slug!, temAcesso)
 
   function handleVoltar() {
     navigate('/dashboard/biblioteca')
+  }
+
+  if (!temAcesso) {
+    return (
+      <div className="space-y-4">
+        <BotaoVoltar onClick={handleVoltar} />
+        <PlanGate />
+      </div>
+    )
   }
 
   return (

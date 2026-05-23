@@ -24,13 +24,14 @@ async function fetchBiblioteca({
   return response.data
 }
 
-export function useBiblioteca(filtros: BibliotecaFiltros) {
+export function useBiblioteca(filtros: BibliotecaFiltros, enabled = true) {
   const query = useInfiniteQuery({
     queryKey: bibliotecaKeys.list(filtros),
     queryFn: ({ pageParam }) => fetchBiblioteca({ cursor: pageParam, filtros }),
     initialPageParam: null as number | null,
     getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
     staleTime: 5 * 60 * 1000,
+    enabled,
   })
 
   const conteudos: ConteudoCard[] = query.data?.pages.flatMap((page) => page.data) ?? []

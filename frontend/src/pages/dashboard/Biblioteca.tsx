@@ -5,6 +5,8 @@ import { useBiblioteca } from '../../hooks/useBiblioteca'
 import { ContentCard } from '../../components/biblioteca/ContentCard'
 import { SearchBar } from '../../components/biblioteca/SearchBar'
 import { FilterBar } from '../../components/biblioteca/FilterBar'
+import { useRecurso } from '../../hooks/useRecurso'
+import { PlanGate } from '../../components/biblioteca/PlanGate'
 import type { BibliotecaFiltros } from '../../types/biblioteca'
 
 function SkeletonCard() {
@@ -36,6 +38,7 @@ function Spinner() {
 export function Biblioteca() {
   const prefersReducedMotion = useReducedMotion()
   const navigate = useNavigate()
+  const temAcesso = useRecurso('biblioteca_acesso')
   const [filtros, setFiltros] = useState<BibliotecaFiltros>({})
   const sentinelaRef = useRef<HTMLDivElement | null>(null)
 
@@ -46,7 +49,7 @@ export function Biblioteca() {
     isFetchingNextPage,
     isLoading,
     isError,
-  } = useBiblioteca(filtros)
+  } = useBiblioteca(filtros, temAcesso)
 
   useEffect(() => {
     const sentinela = sentinelaRef.current
@@ -72,6 +75,10 @@ export function Biblioteca() {
 
   function handleFilterChange(novosFiltros: BibliotecaFiltros) {
     setFiltros(novosFiltros)
+  }
+
+  if (!temAcesso) {
+    return <PlanGate />
   }
 
   if (isError) {
