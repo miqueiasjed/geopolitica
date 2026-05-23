@@ -517,7 +517,8 @@ function badgeColorDoStatus(status: string) {
   return 'gray'
 }
 
-function badgeColorDoPlano(plano: string) {
+function badgeColorDoPlano(plano: string | null) {
+  if (!plano) return 'gray'
   const normalizado = plano.toLowerCase()
 
   if (normalizado.includes('reservado')) return 'purple'
@@ -859,7 +860,7 @@ export function AdminAssinantes() {
                           <Table.Cell>{assinante.name}</Table.Cell>
                           <Table.Cell>
                             <Badge color={badgeColorDoPlano(assinante.plano)} variant="soft">
-                              {(produtosQuery.data ?? []).find((p) => p.chave === assinante.plano)?.nome ?? assinante.plano}
+                              {(produtosQuery.data ?? []).find((p) => p.chave === assinante.plano)?.nome ?? assinante.plano ?? 'addon only'}
                             </Badge>
                           </Table.Cell>
                           <Table.Cell>

@@ -13,7 +13,7 @@ export interface AdminAssinante {
   user_id: number
   email: string
   name: string
-  plano: string
+  plano: string | null
   status: string
   ativo: boolean
   assinado_em: string | null
