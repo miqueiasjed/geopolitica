@@ -183,7 +183,7 @@ class AdminAssinanteAddonController extends Controller
         $linhas      = $this->lerArquivo($arquivo->getRealPath(), $extensao);
         $linhas      = $this->normalizarLinhasHotmart($linhas);
 
-        if (count($linhas) > 2000) {
+        if (count($linhas) > 50) {
             $jobId   = uniqid('import_addons_', true);
             $caminho = $arquivo->store('imports/addons', 'local');
 
