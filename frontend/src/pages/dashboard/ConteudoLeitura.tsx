@@ -74,7 +74,7 @@ export function ConteudoLeitura() {
     >
       {/* Breadcrumb */}
       <div className="flex items-center justify-between gap-4">
-        <nav aria-label="Navegação" className="flex items-center gap-2 text-sm text-zinc-500">
+        <nav aria-label="Navegação" className="flex min-w-0 items-center gap-2 text-sm text-zinc-500">
           <Link
             to="/dashboard/biblioteca"
             className="inline-flex items-center gap-1.5 transition-colors hover:text-zinc-300"
@@ -104,7 +104,9 @@ export function ConteudoLeitura() {
           )}
         </nav>
         {conteudo && (
-          <ExportPdfButton tipo="briefing" id={String(conteudo.id)} label="Exportar PDF" />
+          <div className="shrink-0">
+            <ExportPdfButton tipo="briefing" id={String(conteudo.id)} label="Exportar PDF" />
+          </div>
         )}
       </div>
 
