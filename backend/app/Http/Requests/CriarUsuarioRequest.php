@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Plano;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -16,9 +15,7 @@ class CriarUsuarioRequest extends FormRequest
 
     public function rules(): array
     {
-        $rolesExistentes = Role::where('guard_name', 'sanctum')->pluck('name');
-        $slugsPlanos     = Plano::pluck('slug')->map(fn ($s) => 'assinante_' . $s);
-        $rolesValidas    = $rolesExistentes->merge($slugsPlanos)->unique()->values();
+        $rolesValidas = Role::where('guard_name', 'sanctum')->pluck('name');
 
         return [
             'name'     => ['required', 'string', 'max:255'],

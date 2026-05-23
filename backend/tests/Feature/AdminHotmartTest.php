@@ -99,7 +99,7 @@ class AdminHotmartTest extends TestCase
     public function test_nao_admin_nao_acessa_rotas_admin(): void
     {
         $usuario = User::factory()->create();
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
 
         Sanctum::actingAs($usuario, guard: 'sanctum');
 
@@ -160,7 +160,7 @@ class AdminHotmartTest extends TestCase
         $this->assertSame('Assinante Importado', $usuario->name);
         $this->assertTrue(Hash::check('senha1234', $usuario->password));
         $this->assertTrue($usuario->deve_alterar_senha);
-        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertSame('pro', $usuario->assinante->plano);
         $this->assertSame('ativo', $usuario->assinante->status);
         $this->assertTrue($usuario->assinante->ativo);

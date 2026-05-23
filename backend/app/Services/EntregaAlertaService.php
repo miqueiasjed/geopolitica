@@ -10,7 +10,11 @@ class EntregaAlertaService
 {
     public function enviarEmails(AlertaPreditivo $alerta): void
     {
-        $usuarios = \App\Models\User::role(['assinante_reservado', 'admin'])->get();
+        $usuarios = \App\Models\User::where(function ($q) {
+                $q->whereHas('assinante', fn ($a) => $a->where('plano', 'reservado'))
+                  ->whereHas('roles', fn ($r) => $r->where('name', 'assinante'));
+            })->orWhereHas('roles', fn ($r) => $r->where('name', 'admin'))
+            ->get();
 
         $usuarios->chunk(50, function ($lote) use ($alerta) {
             foreach ($lote as $usuario) {

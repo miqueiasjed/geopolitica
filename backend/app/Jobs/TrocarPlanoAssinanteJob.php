@@ -18,8 +18,6 @@ class TrocarPlanoAssinanteJob implements ShouldQueue
     public function __construct(
         private readonly int $assinanteId,
         private readonly string $novoPlano,
-        private readonly string $novaRole,
-        private readonly array $todasRoles,
         private readonly string $operacaoId,
     ) {
         $this->onQueue('default');
@@ -40,15 +38,7 @@ class TrocarPlanoAssinanteJob implements ShouldQueue
             $usuario = $assinante->user;
 
             if ($usuario) {
-                foreach ($this->todasRoles as $role) {
-                    if ($role !== $this->novaRole && $usuario->hasRole($role)) {
-                        $usuario->removeRole($role);
-                    }
-                }
-
-                if (! $usuario->hasRole($this->novaRole)) {
-                    $usuario->assignRole($this->novaRole);
-                }
+                $usuario->syncRoles(['assinante']);
             }
 
             Cache::increment("troca_plano:{$this->operacaoId}:sucesso");

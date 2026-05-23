@@ -17,12 +17,6 @@ use RuntimeException;
 
 class LastlinkHandlerService
 {
-    private const ROLES_ASSINANTE = [
-        'assinante_essencial',
-        'assinante_pro',
-        'assinante_reservado',
-    ];
-
     private const EVENTOS_IGNORADOS = [
         'LASTLINK_REFUND_REQUESTED',
         'LASTLINK_REFUND_PERIOD_OVER',
@@ -307,7 +301,7 @@ class LastlinkHandlerService
 
         $assinante->fill($fillData)->save();
 
-        $this->sincronizarRolePlano($usuario, $plano);
+        $usuario->syncRoles(['assinante']);
 
         if ($usuario->wasRecentlyCreated || $eraNovo) {
             Mail::to($email)->send(new BoasVindasMail($usuario, $this->montarLinkAcesso(), $plano));
@@ -341,11 +335,7 @@ class LastlinkHandlerService
             'status' => $status,
         ])->save();
 
-        foreach (self::ROLES_ASSINANTE as $role) {
-            if ($usuario->hasRole($role)) {
-                $usuario->removeRole($role);
-            }
-        }
+        $usuario->syncRoles([]);
 
         if ($status === 'reembolsado') {
             Mail::to($usuario->email)->send(new ReembolsoMail($usuario, $assinante));
@@ -396,28 +386,6 @@ class LastlinkHandlerService
         (new AddonService())->ativar($usuario->id, $addonKey, 'lastlink', $orderId, $productId);
 
         return "Addon {$addonKey} ativado para {$email}";
-    }
-
-    private function sincronizarRolePlano(User $usuario, string $plano): void
-    {
-        $registro = Plano::where('slug', $plano)->first();
-        $novaRole = $registro?->role ?? ('assinante_' . $plano);
-
-        $todasRoles = Plano::pluck('role')
-            ->filter()
-            ->merge(self::ROLES_ASSINANTE)
-            ->unique()
-            ->values();
-
-        foreach ($todasRoles as $role) {
-            if ($role !== $novaRole && $usuario->hasRole($role)) {
-                $usuario->removeRole($role);
-            }
-        }
-
-        if (! $usuario->hasRole($novaRole)) {
-            $usuario->assignRole($novaRole);
-        }
     }
 
     // -------------------------------------------------------------------------

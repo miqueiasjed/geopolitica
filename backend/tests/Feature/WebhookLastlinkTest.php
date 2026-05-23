@@ -66,7 +66,7 @@ class WebhookLastlinkTest extends TestCase
 
         $usuario = User::where('email', 'novo@teste.com')->firstOrFail();
 
-        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertSame('pro', $usuario->assinante->plano);
         $this->assertTrue($usuario->assinante->ativo);
 
@@ -83,7 +83,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario = User::where('email', 'essencial@teste.com')->firstOrFail();
-        $this->assertTrue($usuario->hasRole('assinante_essencial'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertSame('essencial', $usuario->assinante->plano);
     }
 
@@ -94,7 +94,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario = User::where('email', 'reservado2@teste.com')->firstOrFail();
-        $this->assertTrue($usuario->hasRole('assinante_reservado'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertSame('reservado', $usuario->assinante->plano);
     }
 
@@ -118,7 +118,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_upgrade_de_plano_troca_role_sem_enviar_email(): void
     {
         $usuario = User::factory()->create(['email' => 'upgrade@teste.com']);
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -126,8 +126,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario->refresh();
-        $this->assertFalse($usuario->hasRole('assinante_essencial'));
-        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertSame('pro', $usuario->assinante->plano);
 
         $this->assertStringContainsString('Plano atualizado', WebhookEvento::latest()->first()->log_acao);
@@ -155,7 +154,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_cancelamento_plano_desativa_assinatura_e_envia_email(): void
     {
         $usuario = User::factory()->create(['email' => 'cancelar@teste.com']);
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -165,7 +164,7 @@ class WebhookLastlinkTest extends TestCase
         $usuario->refresh();
         $this->assertFalse($usuario->assinante->ativo);
         $this->assertSame('cancelado', $usuario->assinante->status);
-        $this->assertFalse($usuario->hasRole('assinante_pro'));
+        $this->assertFalse($usuario->hasRole('assinante'));
 
         $this->assertStringContainsString('cancelado', WebhookEvento::latest()->first()->log_acao);
         $this->assertStringContainsString('cancelar@teste.com', WebhookEvento::latest()->first()->log_acao);
@@ -176,7 +175,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_reembolso_plano_desativa_e_envia_email_reembolso(): void
     {
         $usuario = User::factory()->create(['email' => 'reembolso@teste.com']);
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
 
         $payload = array_merge(
@@ -255,7 +254,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario = User::where('email', 'pascal@teste.com')->firstOrFail();
-        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertNotNull($usuario->assinante->expira_em);
         Mail::assertQueued(BoasVindasMail::class);
     }
@@ -263,7 +262,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_renovacao_de_assinatura_atualiza_expira_em(): void
     {
         $usuario = User::factory()->create(['email' => 'renovar@teste.com']);
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
 
         $nextBilling = '2026-06-30T03:00:00.0000000Z';
@@ -285,7 +284,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario = User::where('email', 'access@teste.com')->firstOrFail();
-        $this->assertTrue($usuario->hasRole('assinante_essencial'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertTrue($usuario->assinante->ativo);
         Mail::assertQueued(BoasVindasMail::class);
     }
@@ -297,7 +296,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_subscription_expired_desativa_com_status_expirado(): void
     {
         $usuario = User::factory()->create(['email' => 'expirar@teste.com']);
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -307,14 +306,14 @@ class WebhookLastlinkTest extends TestCase
         $usuario->refresh();
         $this->assertFalse($usuario->assinante->ativo);
         $this->assertSame('expirado', $usuario->assinante->status);
-        $this->assertFalse($usuario->hasRole('assinante_pro'));
+        $this->assertFalse($usuario->hasRole('assinante'));
         Mail::assertQueued(CancelamentoMail::class);
     }
 
     public function test_product_access_ended_desativa_com_status_expirado(): void
     {
         $usuario = User::factory()->create(['email' => 'acesso-fim@teste.com']);
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -329,7 +328,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_payment_refund_desativa_como_reembolsado(): void
     {
         $usuario = User::factory()->create(['email' => 'refund@teste.com']);
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -345,7 +344,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_payment_chargeback_desativa_como_reembolsado(): void
     {
         $usuario = User::factory()->create(['email' => 'chargeback@teste.com']);
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -364,7 +363,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_recurrent_payment_renova_assinatura(): void
     {
         $usuario = User::factory()->create(['email' => 'renovar2@teste.com']);
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'pro', 'ativo' => true, 'status' => 'ativo']);
 
         $nextBilling = '2026-07-30T03:00:00.0000000Z';
@@ -383,7 +382,7 @@ class WebhookLastlinkTest extends TestCase
     public function test_switch_plan_atualiza_plano_e_role(): void
     {
         $usuario = User::factory()->create(['email' => 'switch@teste.com']);
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
         Assinante::create(['user_id' => $usuario->id, 'plano' => 'essencial', 'ativo' => true, 'status' => 'ativo']);
 
         $this->withHeader('x-lastlink-token', 'test-lastlink-token')
@@ -391,8 +390,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario->refresh();
-        $this->assertFalse($usuario->hasRole('assinante_essencial'));
-        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertSame('pro', $usuario->assinante->plano);
     }
 
@@ -403,7 +401,7 @@ class WebhookLastlinkTest extends TestCase
             ->assertOk();
 
         $usuario = User::where('email', 'sub-access@teste.com')->firstOrFail();
-        $this->assertTrue($usuario->hasRole('assinante_essencial'));
+        $this->assertTrue($usuario->hasRole('assinante'));
     }
 
     // -----------------------------------------------------------------------

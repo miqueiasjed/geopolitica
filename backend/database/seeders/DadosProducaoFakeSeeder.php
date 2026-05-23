@@ -52,9 +52,7 @@ class DadosProducaoFakeSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         foreach ([
-            'assinante_essencial',
-            'assinante_pro',
-            'assinante_reservado',
+            'assinante',
             'admin',
             'company_admin',
             'reader',
@@ -73,7 +71,7 @@ class DadosProducaoFakeSeeder extends Seeder
                 'name' => 'Marina Torres',
                 'email' => 'marina.essencial@geopolitica.test',
                 'plano' => 'essencial',
-                'role' => 'assinante_essencial',
+                'role' => 'assinante',
                 'status' => 'ativo',
                 'ativo' => true,
                 'assinado_em' => now()->subMonths(2),
@@ -83,7 +81,7 @@ class DadosProducaoFakeSeeder extends Seeder
                 'name' => 'Rafael Nogueira',
                 'email' => 'rafael.pro@geopolitica.test',
                 'plano' => 'pro',
-                'role' => 'assinante_pro',
+                'role' => 'assinante',
                 'status' => 'ativo',
                 'ativo' => true,
                 'assinado_em' => now()->subMonths(5),
@@ -93,7 +91,7 @@ class DadosProducaoFakeSeeder extends Seeder
                 'name' => 'Helena Andrade',
                 'email' => 'helena.reservado@geopolitica.test',
                 'plano' => 'reservado',
-                'role' => 'assinante_reservado',
+                'role' => 'assinante',
                 'status' => 'ativo',
                 'ativo' => true,
                 'assinado_em' => now()->subYear(),

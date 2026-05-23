@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-05-18 (Plano 30 concluído — Mapeamento Dinâmico de product_id)
+> Última atualização: 2026-05-23 (Plano 31 concluído — Unificação de Role de Assinante)
 
 ## Legenda
 - ✅ Concluído
@@ -42,6 +42,7 @@
 | 28 | [Multi-Produtos: Frontend Core (Tipos, Serviços, Hooks e Componentes)](28.md) | ✅ | 26 | 6 |
 | 29 | [Multi-Produtos: Frontend Admin UI (Produtos, Addons e Importação)](29.md) | ✅ | 27, 28 | 7 |
 | 30 | [Multi-Produtos: Mapeamento Dinâmico de product_id (Lastlink + Hotmart)](30.md) | ✅ | 26, 29 | 6 |
+| 31 | [Unificação de Role de Assinante (role única `assinante`)](31.md) | ✅ | 2, 3, 19, 20, 25, 26, 27, 30 | 11 |
 
 ## Ordem de execução recomendada
 

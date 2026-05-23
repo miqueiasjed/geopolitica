@@ -23,7 +23,7 @@ class PerfilTest extends TestCase
     public function test_usuario_ativo_pode_ver_e_atualizar_perfil(): void
     {
         $usuario = User::factory()->create();
-        $usuario->assignRole('assinante_pro');
+        $usuario->assignRole('assinante');
         Assinante::query()->create([
             'user_id' => $usuario->id,
             'plano' => 'pro',
@@ -50,7 +50,7 @@ class PerfilTest extends TestCase
     public function test_assinante_inativo_recebe_403_no_perfil(): void
     {
         $usuario = User::factory()->create();
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
         Assinante::query()->create([
             'user_id' => $usuario->id,
             'plano' => 'essencial',

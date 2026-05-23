@@ -69,6 +69,7 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
   const temAcessoRiskScore = useRecurso('risk_score')
   const [painelAberto, setPainelAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
+  const [saindo, setSaindo] = useState(false)
 
   const navItems: NavItem[] = [
     {
@@ -214,8 +215,14 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
     }`
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/login', { replace: true })
+    if (saindo) return
+    setSaindo(true)
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } finally {
+      setSaindo(false)
+    }
   }
 
   const navContent = (
@@ -277,10 +284,11 @@ export function TopNav({ lastUpdatedLabel }: TopNavProps) {
         <button
           type="button"
           onClick={handleLogout}
-          className="flex h-10 flex-1 items-center justify-center gap-2 rounded-md border border-white/8 bg-white/[0.03] font-mono text-xs uppercase tracking-[0.16em] text-zinc-300 transition-colors hover:border-[#BFFF3C]/30 hover:text-[#D7FF69]"
+          disabled={saindo}
+          className="flex h-10 flex-1 items-center justify-center gap-2 rounded-md border border-white/8 bg-white/[0.03] font-mono text-xs uppercase tracking-[0.16em] text-zinc-300 transition-colors hover:border-[#BFFF3C]/30 hover:text-[#D7FF69] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ExitIcon />
-          Sair
+          {saindo ? 'Saindo...' : 'Sair'}
         </button>
       </div>
     </div>

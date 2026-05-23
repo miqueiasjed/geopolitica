@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Admin\AdminEnriquecerBriefingController;
 use App\Http\Controllers\Api\Admin\AdminProdutoController;
 use App\Http\Controllers\Api\MeusProdutosController;
 use App\Http\Controllers\Api\PlanoController;
+use App\Http\Controllers\Api\Admin\AdminRolesPermissoesController;
 use App\Http\Controllers\Api\Admin\ImportarAssinantesController;
 use App\Http\Controllers\Api\SuporteController;
 use App\Http\Controllers\Api\CarteiraRiscoController;
@@ -265,6 +266,15 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/produtos/{produto}/assinantes', [AdminProdutoController::class, 'assinantes']);
     Route::put('/produtos/{produto}', [AdminProdutoController::class, 'update']);
     Route::delete('/produtos/{produto}', [AdminProdutoController::class, 'destroy']);
+
+    // Gestão de roles e permissões
+    Route::get('/roles', [AdminRolesPermissoesController::class, 'indexRoles']);
+    Route::post('/roles', [AdminRolesPermissoesController::class, 'storeRole']);
+    Route::delete('/roles/{id}', [AdminRolesPermissoesController::class, 'destroyRole']);
+    Route::post('/roles/{id}/permissions/sync', [AdminRolesPermissoesController::class, 'syncPermissoesRole']);
+    Route::get('/permissions', [AdminRolesPermissoesController::class, 'indexPermissions']);
+    Route::post('/permissions', [AdminRolesPermissoesController::class, 'storePermission']);
+    Route::delete('/permissions/{id}', [AdminRolesPermissoesController::class, 'destroyPermission']);
 
     // Gestão de addons por assinante (manual + importação)
     Route::get('/assinantes/addons/exportar', [AdminAssinanteAddonController::class, 'exportar']);

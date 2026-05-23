@@ -247,8 +247,18 @@ interface LinhaRecursoProps {
   editavel: boolean
 }
 
+function recursoAtivo(valor: PlanoRecursoItem | undefined, chave: string): boolean {
+  if (valor === undefined) return false
+  const tipo = inferirTipo(chave)
+  if (tipo === 'boolean') return valor === 'true'
+  if (tipo === 'numero') return valor === null || (valor !== '0' && valor !== '')
+  // alertas_nivel e conteudo_nivel: qualquer valor definido é ativo
+  return valor !== null && valor !== '' && valor !== 'false'
+}
+
 function LinhaRecurso({ planoId, chave, valor, editavel }: LinhaRecursoProps) {
   const [editando, setEditando] = useState(false)
+  const ativo = recursoAtivo(valor, chave)
 
   return (
     <tr className="border-b border-[#111113] group hover:bg-[#111115] transition-colors last:border-0">
@@ -265,8 +275,22 @@ function LinhaRecurso({ planoId, chave, valor, editavel }: LinhaRecursoProps) {
             onConcluir={() => setEditando(false)}
           />
         ) : (
-          <div className="flex items-center gap-2">
-            <BadgeValor valor={valor} chave={chave} />
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Badge Ativo / Inativo */}
+            {ativo ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 font-mono text-[10px] text-green-400 flex-shrink-0">
+                <CheckCircledIcon className="h-3 w-3" />
+                Ativo
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-zinc-700/30 px-2 py-0.5 font-mono text-[10px] text-zinc-500 flex-shrink-0">
+                Inativo
+              </span>
+            )}
+
+            {/* Valor/Detalhe — só exibe quando ativo */}
+            {ativo && <BadgeValor valor={valor} chave={chave} />}
+
             {editavel && (
               <button
                 type="button"
@@ -340,7 +364,6 @@ function TabelaPlanos({ planos, onVisualizar, onEditar }: TabelaPlanosProps) {
             <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Plano</th>
             <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Preço</th>
             <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Status</th>
-            <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Role</th>
             <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Recursos</th>
             <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Lastlink</th>
             <th className="px-4 py-3 text-right font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Ações</th>
@@ -379,15 +402,6 @@ function TabelaPlanos({ planos, onVisualizar, onEditar }: TabelaPlanosProps) {
                     <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 font-mono text-[10px] text-red-400">
                       Inativo
                     </span>
-                  )}
-                </td>
-                <td className="px-4 py-3.5">
-                  {plano.role ? (
-                    <span className="inline-flex items-center rounded-full bg-zinc-700/40 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
-                      {plano.role}
-                    </span>
-                  ) : (
-                    <span className="font-mono text-[10px] text-zinc-700">—</span>
                   )}
                 </td>
                 <td className="px-4 py-3.5">

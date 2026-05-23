@@ -41,24 +41,38 @@ import { formatarDataCurta } from '../../utils/formatters'
 
 const VALOR_TODOS = 'all'
 
-const BADGE_COLORS_FIXOS: Record<string, string> = {
+type BadgeColor = 'ruby' | 'blue' | 'cyan' | 'amber' | 'purple' | 'green' | 'gray'
+
+const BADGE_COLORS_ROLE: Record<string, BadgeColor> = {
   admin: 'ruby',
   company_admin: 'blue',
-  assinante_reservado: 'purple',
-  assinante_pro: 'cyan',
-  assinante_essencial: 'amber',
 }
 
-type BadgeColor = 'ruby' | 'blue' | 'cyan' | 'amber' | 'purple' | 'green' | 'gray'
+type PlamoSlug = 'essencial' | 'pro' | 'reservado'
+
+const BADGE_COLORS_PLANO: Record<PlamoSlug, BadgeColor> = {
+  essencial: 'gray',
+  pro: 'blue',
+  reservado: 'amber',
+}
 
 function badgeColorDaRole(role: string | null): BadgeColor {
   if (!role) return 'gray'
-  return (BADGE_COLORS_FIXOS[role] ?? (role.startsWith('assinante_') ? 'green' : 'gray')) as BadgeColor
+  return BADGE_COLORS_ROLE[role] ?? 'gray'
 }
 
 function labelDaRole(role: string | null, roles: AdminRole[]) {
   if (!role) return '—'
-  return roles.find((r) => r.role === role)?.label ?? role
+  const encontrada = roles.find((r) => r.role === role)
+  if (encontrada?.assinante) return 'assinante'
+  return encontrada?.label ?? role
+}
+
+function planoDeRole(role: string | null): PlamoSlug | null {
+  if (!role || !role.startsWith('assinante_')) return null
+  const sufixo = role.replace('assinante_', '') as PlamoSlug
+  if (['essencial', 'pro', 'reservado'].includes(sufixo)) return sufixo
+  return null
 }
 
 function ehAssinanteRole(role: string | null | undefined, roles: AdminRole[]) {
@@ -655,9 +669,20 @@ export function AdminUsuarios() {
                           <Table.Cell className="font-medium text-cyan-50">{usuario.name}</Table.Cell>
                           <Table.Cell className="text-zinc-300">{usuario.email}</Table.Cell>
                           <Table.Cell>
-                            <Badge color={badgeColorDaRole(usuario.role)} variant="soft">
-                              {labelDaRole(usuario.role, rolesListagem)}
-                            </Badge>
+                            <Flex gap="2" align="center" wrap="wrap">
+                              <Badge color={badgeColorDaRole(usuario.role)} variant="soft">
+                                {labelDaRole(usuario.role, rolesListagem)}
+                              </Badge>
+                              {(() => {
+                                const plano = planoDeRole(usuario.role)
+                                if (!plano) return null
+                                return (
+                                  <Badge color={BADGE_COLORS_PLANO[plano]} variant="surface">
+                                    {plano}
+                                  </Badge>
+                                )
+                              })()}
+                            </Flex>
                           </Table.Cell>
                           <Table.Cell className="text-zinc-400">
                             {formatarDataCurta(usuario.created_at)}

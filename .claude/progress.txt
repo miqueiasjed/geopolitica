@@ -196,3 +196,24 @@
 - Atualizados: AdminLayout.tsx (sidebar — itens "Produtos" e "Importar Addons" adicionados), router/index.tsx (rotas /admin/produtos e /admin/assinantes/importar-addons), AdminAssinantes.tsx (botão "Addons" por linha + modal overlay com AdminAssinanteAddons).
 - Padrão visual: dark theme #C9B882 gold, fonte mono, Framer Motion com useReducedMotion() em todos os componentes.
 - Validações: tsc --noEmit sem erros, npm run build 1575 módulos OK.
+
+2026-05-23 (Plano 31)
+- Plano 31 concluído: Unificação de Role de Assinante (role única `assinante`).
+- Removidas as 3 roles específicas `assinante_essencial`, `assinante_pro`, `assinante_reservado` do sistema inteiro; controle de nível agora exclusivamente via `assinantes.plano`.
+- Migration idempotente `2026_05_23_000002_unificar_role_assinante.php`: converte model_has_roles em produção, remove roles específicas da tabela roles, limpa cache Spatie.
+- RolesSeeder atualizado: cria apenas `assinante` + `admin`.
+- HotmartHandlerService + LastlinkHandlerService: removidos constante ROLES_ASSINANTE e método sincronizarRolePlano(); substituído por syncRoles(['assinante']); cancelamento usa syncRoles([]).
+- ImportacaoAssinantesService + TrocarPlanoAssinanteJob + ImportarAddonsJob: mapa plano→role removido; syncRoles(['assinante']) em todos.
+- AdminAssinanteService: 'assinante' fixo em vez de $plano?->role ?? 'assinante_'.$plano.
+- EntregaAlertaService: substituído role('assinante_reservado') por whereHas('assinante', fn => plano='reservado') preservando admins.
+- AdminUsuarioController: removido planoFromRole(); plano derivado de assinante?->plano; roles() retorna ['assinante'] estático.
+- AdminPlanoController: removida geração de role ao criar plano.
+- AdminAssinanteAddonController: syncRoles(['assinante']) nas duas linhas de criação de usuário.
+- FormRequests (CriarUsuarioRequest + AtualizarUsuarioRequest): regra de role usa Role::pluck() dinâmico (só roles que existem no banco).
+- Commands CorrigirRolesAssinantesSemRole + CorrigirPlanoAddonOnly: atribuem assinante sem mapeamento por plano.
+- DadosProducaoFakeSeeder: syncRoles(['assinante']) mantendo variação de plano por usuário.
+- Testes (6 arquivos — 46 testes, 173 assertions, 0 falhas): HotmartHandlerTest, WebhookLastlinkTest, AdminHotmartTest, FeedTest, PerfilTest — roles específicas substituídas por assinante; AuthTest não precisou de alteração.
+- Frontend AdminUsuarios: badge role (neutro) + badge plano separado (essencial=gray, pro=blue, reservado=amber).
+- Frontend AdminPlanos: coluna Role removida; LinhaRecurso reformulada com badge Ativo/Inativo antes do detalhe.
+- Gotcha: migration usa guard 'sanctum' (não 'web') — verificar ao criar roles; grep confirmou que a única referência remanescente de assinante_* é a própria migration.
+- Validações: 46 testes verdes, tsc --noEmit zero erros.

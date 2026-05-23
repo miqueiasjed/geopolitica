@@ -213,7 +213,6 @@ class AdminAssinanteAddonController extends Controller
         $usuariosPorEmail = User::whereIn('email', $emails)->get()->keyBy(fn ($u) => strtolower($u->email));
 
         $registroPlano = $planoPadrao ? Plano::where('slug', $planoPadrao)->first() : null;
-        $rolePlano     = $planoPadrao ? ($registroPlano?->role ?? ('assinante_' . $planoPadrao)) : null;
 
         $importados = 0;
         $criados    = 0;
@@ -259,7 +258,7 @@ class AdminAssinanteAddonController extends Controller
                         continue;
                     }
 
-                    $user = DB::transaction(function () use ($email, $nome, $planoPadrao, $rolePlano, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
+                    $user = DB::transaction(function () use ($email, $nome, $planoPadrao, $addonKey, $status, $fonte, $iniciadoEm, $expiraEm) {
                         $nomeUsuario = $nome ?: Str::of($email)->before('@')->replace(['.', '_', '-'], ' ')->title()->value();
 
                         $novoUsuario = new User;
@@ -270,7 +269,7 @@ class AdminAssinanteAddonController extends Controller
                             'deve_alterar_senha' => true,
                         ])->save();
 
-                        $novoUsuario->assignRole($rolePlano);
+                        $novoUsuario->syncRoles(['assinante']);
 
                         Assinante::create([
                             'user_id'     => $novoUsuario->id,

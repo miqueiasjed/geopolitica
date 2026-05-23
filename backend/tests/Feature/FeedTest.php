@@ -34,7 +34,7 @@ class FeedTest extends TestCase
 
     public function test_inactive_subscriber_returns_403(): void
     {
-        $usuario = $this->criarAssinante('assinante_essencial', ativo: false);
+        $usuario = $this->criarAssinante('essencial', ativo: false);
 
         Sanctum::actingAs($usuario, guard: 'sanctum');
 
@@ -45,7 +45,7 @@ class FeedTest extends TestCase
 
     public function test_essencial_subscriber_gets_max_20_events(): void
     {
-        $usuario = $this->criarAssinante('assinante_essencial');
+        $usuario = $this->criarAssinante('essencial');
 
         Event::factory()->count(30)->relevante()->ultimas48h()->create();
 
@@ -58,7 +58,7 @@ class FeedTest extends TestCase
 
     public function test_reservado_subscriber_gets_full_history(): void
     {
-        $usuario = $this->criarAssinante('assinante_reservado');
+        $usuario = $this->criarAssinante('reservado');
 
         Event::factory()->count(10)->relevante()->ultimas48h()->create();
         Event::factory()->count(15)->relevante()->create([
@@ -74,7 +74,7 @@ class FeedTest extends TestCase
 
     public function test_category_filter_works(): void
     {
-        $usuario = $this->criarAssinante('assinante_pro');
+        $usuario = $this->criarAssinante('pro');
 
         Event::factory()->relevante()->ultimas48h()->create([
             'categorias' => ['energia'],
@@ -111,7 +111,7 @@ class FeedTest extends TestCase
     {
         Queue::fake();
 
-        $usuario = $this->criarAssinante('assinante_pro');
+        $usuario = $this->criarAssinante('pro');
 
         Sanctum::actingAs($usuario, guard: 'sanctum');
 
@@ -119,14 +119,14 @@ class FeedTest extends TestCase
         Queue::assertNothingPushed();
     }
 
-    private function criarAssinante(string $role, bool $ativo = true): User
+    private function criarAssinante(string $plano, bool $ativo = true): User
     {
         $usuario = User::factory()->create();
-        $usuario->assignRole($role);
+        $usuario->assignRole('assinante');
 
         Assinante::query()->create([
             'user_id' => $usuario->id,
-            'plano' => str_replace('assinante_', '', $role),
+            'plano' => $plano,
             'ativo' => $ativo,
             'status' => $ativo ? 'ativo' : 'cancelado',
             'assinado_em' => now(),

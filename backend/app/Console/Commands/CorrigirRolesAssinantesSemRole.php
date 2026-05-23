@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Assinante;
-use App\Models\Plano;
 use Illuminate\Console\Command;
 
 class CorrigirRolesAssinantesSemRole extends Command
@@ -21,17 +20,13 @@ class CorrigirRolesAssinantesSemRole extends Command
             $this->warn('MODO DRY-RUN — nenhuma alteração será salva.');
         }
 
-        $mapaRoles = Plano::whereNotNull('role')
-            ->pluck('role', 'slug')
-            ->all();
-
         $corrigidos = 0;
         $ignorados  = 0;
 
         Assinante::with('user')
             ->whereNotNull('plano')
             ->orderBy('id')
-            ->chunk(200, function ($assinantes) use ($dryRun, $mapaRoles, &$corrigidos, &$ignorados) {
+            ->chunk(200, function ($assinantes) use ($dryRun, &$corrigidos, &$ignorados) {
                 foreach ($assinantes as $assinante) {
                     $user = $assinante->user;
 
@@ -39,18 +34,17 @@ class CorrigirRolesAssinantesSemRole extends Command
                         continue;
                     }
 
-                    if ($user->roles()->count() > 0) {
+                    if ($user->hasRole('assinante')) {
                         $ignorados++;
                         continue;
                     }
 
-                    $plano    = $assinante->plano;
-                    $rolePlano = $mapaRoles[$plano] ?? ('assinante_' . $plano);
+                    $plano = $assinante->plano;
 
-                    $this->line("  [{$user->email}] plano={$plano} → role={$rolePlano}");
+                    $this->line("  [{$user->email}] plano={$plano} → role=assinante");
 
                     if (! $dryRun) {
-                        $user->assignRole($rolePlano);
+                        $user->syncRoles(['assinante']);
                     }
 
                     $corrigidos++;

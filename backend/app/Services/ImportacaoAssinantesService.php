@@ -222,38 +222,13 @@ class ImportacaoAssinantesService
 
     private function sincronizarRole(User $usuario, string $plano, bool $ativo): void
     {
-        $roles = ['assinante_essencial', 'assinante_pro', 'assinante_reservado'];
-
         if (! $ativo) {
-            foreach ($roles as $role) {
-                if ($usuario->hasRole($role)) {
-                    $usuario->removeRole($role);
-                }
-            }
+            $usuario->syncRoles([]);
 
             return;
         }
 
-        $novaRole = match ($plano) {
-            'essencial' => 'assinante_essencial',
-            'pro' => 'assinante_pro',
-            'reservado' => 'assinante_reservado',
-            default => null,
-        };
-
-        if (! $novaRole) {
-            return;
-        }
-
-        foreach ($roles as $role) {
-            if ($role !== $novaRole && $usuario->hasRole($role)) {
-                $usuario->removeRole($role);
-            }
-        }
-
-        if (! $usuario->hasRole($novaRole)) {
-            $usuario->assignRole($novaRole);
-        }
+        $usuario->syncRoles(['assinante']);
     }
 
     private function montarLinkAcesso(): string

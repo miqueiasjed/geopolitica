@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, startTransition, useEffect, useState } from 'react'
+import { createContext, startTransition, useEffect, useRef, useState } from 'react'
 import { consultarUsuarioAutenticado, login as loginServico, logout as logoutServico } from '../services/auth'
 import type { UsuarioAutenticado } from '../types/auth'
 import {
@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UsuarioAutenticado | null>(usuarioCacheado)
   const [token, setToken] = useState<string | null>(tokenInicial)
   const [isLoading, setIsLoading] = useState(!usuarioCacheado && Boolean(tokenInicial))
+  const logoutEmAndamento = useRef(false)
 
   async function checkAuth() {
     const tokenAtual = obterTokenAutenticacao()
@@ -77,9 +78,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function logout() {
+    if (logoutEmAndamento.current) return
+    logoutEmAndamento.current = true
     try {
       await logoutServico()
     } finally {
+      logoutEmAndamento.current = false
       removerTokenAutenticacao()
       startTransition(() => {
         setToken(null)

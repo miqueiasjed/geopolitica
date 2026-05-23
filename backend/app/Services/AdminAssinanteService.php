@@ -5,9 +5,7 @@ namespace App\Services;
 use App\Jobs\TrocarPlanoAssinanteJob;
 use App\Mail\BoasVindasMail;
 use App\Models\Assinante;
-use App\Models\Plano;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -16,10 +14,6 @@ class AdminAssinanteService
 {
     public function trocarPlanoBulk(array $ids, string $novoPlano): array
     {
-        $plano = Plano::where('slug', $novoPlano)->first();
-        $novaRole = $plano?->role ?? ('assinante_' . $novoPlano);
-        $todasRoles = Plano::pluck('role')->filter()->unique()->values()->all();
-
         $operacaoId = (string) Str::uuid();
         $total = count($ids);
 
@@ -29,7 +23,7 @@ class AdminAssinanteService
         Cache::put("troca_plano:{$operacaoId}:erros_count", 0, now()->addHours(2));
 
         foreach ($ids as $id) {
-            TrocarPlanoAssinanteJob::dispatch($id, $novoPlano, $novaRole, $todasRoles, $operacaoId);
+            TrocarPlanoAssinanteJob::dispatch($id, $novoPlano, $operacaoId);
         }
 
         return ['operacao_id' => $operacaoId, 'total' => $total];

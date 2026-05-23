@@ -18,12 +18,6 @@ use RuntimeException;
 
 class HotmartHandlerService
 {
-    private const ROLES_ASSINANTE = [
-        'assinante_essencial',
-        'assinante_pro',
-        'assinante_reservado',
-    ];
-
     private const EVENTOS_ACEITOS = [
         'PURCHASE_APPROVED',
         'PURCHASE_COMPLETE',
@@ -172,7 +166,7 @@ class HotmartHandlerService
             'expira_em' => $this->extrairData($payload, ['subscription.access_date', 'subscription.next_billing_date']),
         ])->save();
 
-        $this->sincronizarRolePlano($usuario, $plano);
+        $usuario->syncRoles(['assinante']);
 
         if (! $assinante->getOriginal('ativo')) {
             Mail::to($usuario->email)->send(new AcessoLiberadoMail(
@@ -286,7 +280,7 @@ class HotmartHandlerService
         ]);
         $assinante->save();
 
-        $this->sincronizarRolePlano($usuario, $plano);
+        $usuario->syncRoles(['assinante']);
 
         if ($enviarBoasVindas && ($usuario->wasRecentlyCreated || $eraNovo)) {
             Mail::to($usuario->email)->send(new BoasVindasMail(
@@ -317,11 +311,7 @@ class HotmartHandlerService
             'expira_em' => $this->extrairData($payload, ['subscription.access_date', 'purchase.access_until']) ?? $assinante->expira_em,
         ])->save();
 
-        foreach (self::ROLES_ASSINANTE as $role) {
-            if ($usuario->hasRole($role)) {
-                $usuario->removeRole($role);
-            }
-        }
+        $usuario->syncRoles([]);
 
         if ($enviarReembolso) {
             Mail::to($usuario->email)->send(new ReembolsoMail($usuario, $assinante));
@@ -348,28 +338,6 @@ class HotmartHandlerService
         }
 
         return [$assinante->user, $assinante];
-    }
-
-    private function sincronizarRolePlano(User $usuario, string $plano): void
-    {
-        $registro = Plano::where('slug', $plano)->first();
-        $novaRole = $registro?->role ?? ('assinante_' . $plano);
-
-        $todasRoles = Plano::pluck('role')
-            ->filter()
-            ->merge(self::ROLES_ASSINANTE)
-            ->unique()
-            ->values();
-
-        foreach ($todasRoles as $role) {
-            if ($role !== $novaRole && $usuario->hasRole($role)) {
-                $usuario->removeRole($role);
-            }
-        }
-
-        if (! $usuario->hasRole($novaRole)) {
-            $usuario->assignRole($novaRole);
-        }
     }
 
     private function normalizarPlano(array $payload): string

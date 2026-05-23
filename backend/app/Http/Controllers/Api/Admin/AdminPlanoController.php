@@ -9,7 +9,6 @@ use App\Http\Requests\Admin\CriarPlanoRequest;
 use App\Models\Plano;
 use App\Services\PlanoService;
 use Illuminate\Http\JsonResponse;
-use Spatie\Permission\Models\Role;
 
 class AdminPlanoController extends Controller
 {
@@ -57,16 +56,7 @@ class AdminPlanoController extends Controller
     {
         $dados = $request->validated();
 
-        if (empty($dados['role'])) {
-            $dados['role'] = 'assinante_' . $dados['slug'];
-        }
-
         $plano = $this->planoService->criarPlano($dados);
-
-        Role::firstOrCreate([
-            'name'       => $plano->role ?? ('assinante_' . $plano->slug),
-            'guard_name' => 'sanctum',
-        ]);
 
         return response()->json(['data' => $plano], 201);
     }

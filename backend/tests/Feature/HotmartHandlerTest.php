@@ -41,7 +41,7 @@ class HotmartHandlerTest extends TestCase
 
         $usuario = User::query()->where('email', 'novo@teste.com')->firstOrFail();
 
-        $this->assertTrue($usuario->hasRole('assinante_pro'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertDatabaseHas('assinantes', [
             'user_id' => $usuario->id,
             'plano' => 'pro',
@@ -87,7 +87,7 @@ class HotmartHandlerTest extends TestCase
         $usuario = User::factory()->create([
             'email' => 'troca@teste.com',
         ]);
-        $usuario->assignRole('assinante_essencial');
+        $usuario->assignRole('assinante');
 
         Assinante::query()->create([
             'user_id' => $usuario->id,
@@ -112,8 +112,7 @@ class HotmartHandlerTest extends TestCase
 
         $usuario->refresh();
 
-        $this->assertTrue($usuario->hasRole('assinante_reservado'));
-        $this->assertFalse($usuario->hasRole('assinante_essencial'));
+        $this->assertTrue($usuario->hasRole('assinante'));
         $this->assertDatabaseHas('assinantes', [
             'user_id' => $usuario->id,
             'plano' => 'reservado',

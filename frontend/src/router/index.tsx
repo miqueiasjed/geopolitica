@@ -44,6 +44,7 @@ import { RiskScore } from '../pages/dashboard/RiskScore'
 import { Suporte } from '../pages/dashboard/Suporte'
 import { AdminSuporte } from '../pages/admin/AdminSuporte'
 import { AdminEventosSemEditorial } from '../pages/admin/AdminEventosSemEditorial'
+import { AdminRolesPermissoes } from '../pages/admin/AdminRolesPermissoes'
 import { AssinaturaInativa } from '../pages/AssinaturaInativa'
 import { Manual } from '../pages/Manual'
 
@@ -109,6 +110,7 @@ export function AppRouter() {
           <Route path="ia/uso" element={<UsoPage />} />
           <Route path="suporte" element={<AdminSuporte />} />
           <Route path="eventos-sem-editorial" element={<AdminEventosSemEditorial />} />
+          <Route path="roles-permissions" element={<AdminRolesPermissoes />} />
         </Route>
       </Route>
     </Routes>

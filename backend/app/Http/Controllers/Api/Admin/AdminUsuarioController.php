@@ -7,11 +7,9 @@ use App\Http\Requests\AtualizarUsuarioRequest;
 use App\Http\Requests\CriarUsuarioRequest;
 use App\Mail\BoasVindasMail;
 use App\Models\Assinante;
-use App\Models\Plano;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
@@ -20,20 +18,16 @@ class AdminUsuarioController extends Controller
 {
     public function roles(): JsonResponse
     {
-        $assinante = Cache::remember('admin_planos_roles', 3600, fn () => Plano::orderBy('ordem')
-            ->get()
-            ->map(fn (Plano $plano) => [
-                'role'      => 'assinante_' . $plano->slug,
-                'label'     => $plano->nome,
-                'assinante' => true,
-            ])->toArray());
+        $assinante = collect([
+            ['role' => 'assinante', 'label' => 'Assinante', 'assinante' => true],
+        ]);
 
         $fixas = collect([
             ['role' => 'admin',         'label' => 'Admin',         'assinante' => false],
             ['role' => 'company_admin', 'label' => 'Empresa Admin', 'assinante' => false],
         ]);
 
-        return response()->json(['data' => collect($assinante)->concat($fixas)->values()]);
+        return response()->json(['data' => $assinante->concat($fixas)->values()]);
     }
 
     public function index(Request $request): JsonResponse
@@ -81,7 +75,7 @@ class AdminUsuarioController extends Controller
         Role::firstOrCreate(['name' => $dados['role'], 'guard_name' => 'sanctum']);
         $user->assignRole($dados['role']);
 
-        $plano = $this->planoFromRole($dados['role']);
+        $plano = ($dados['role'] === 'assinante') ? ($dados['plano'] ?? null) : null;
         if ($plano !== null) {
             Assinante::create([
                 'user_id'     => $user->id,
@@ -124,8 +118,12 @@ class AdminUsuarioController extends Controller
         if (isset($dados['role'])) {
             Role::firstOrCreate(['name' => $dados['role'], 'guard_name' => 'sanctum']);
             $user->syncRoles([$dados['role']]);
-            $novoPlano = $this->planoFromRole($dados['role']);
+            $novoPlano = ($dados['role'] === 'assinante') ? ($dados['plano'] ?? $user->assinante?->plano) : null;
             unset($dados['role']);
+        }
+
+        if (isset($dados['plano'])) {
+            unset($dados['plano']);
         }
 
         if (! empty($dados)) {
@@ -169,19 +167,6 @@ class AdminUsuarioController extends Controller
         $alvo->delete();
 
         return response()->json(['message' => 'Usuário excluído com sucesso.']);
-    }
-
-    private function planoFromRole(string $role): ?string
-    {
-        if (! str_starts_with($role, 'assinante_')) {
-            return null;
-        }
-
-        $slug = substr($role, strlen('assinante_'));
-
-        $existe = Cache::remember("plano_slug_{$slug}", 600, fn () => Plano::where('slug', $slug)->exists());
-
-        return $existe ? $slug : null;
     }
 
     private function serializar(User $user, bool $detalhado = false): array

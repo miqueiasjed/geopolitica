@@ -39,6 +39,7 @@ const itens = [
   { label: 'B2B / Empresas', rota: '/admin/b2b', icone: FileTextIcon },
   { label: 'Webhook Eventos', rota: '/admin/webhook-eventos', icone: ActivityLogIcon },
   { label: 'Webhook Tokens', rota: '/admin/webhook-tokens', icone: LockClosedIcon },
+  { label: 'Roles & Perms', rota: '/admin/roles-permissions', icone: LockClosedIcon },
   { label: 'Configurações', rota: '/admin/configuracoes', icone: GearIcon },
 ]
 

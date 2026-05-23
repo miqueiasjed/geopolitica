@@ -10,9 +10,7 @@ class CorrigirPlanoAddonOnly extends Command
     protected $signature = 'assinantes:corrigir-plano-addon-only
                             {--dry-run : Apenas mostra o que seria alterado, sem salvar}';
 
-    protected $description = 'Corrige assinantes com plano "essencial" que são na verdade addon-only (sem role de plano)';
-
-    private const ROLES_PLANO = ['assinante_essencial', 'assinante_pro', 'assinante_reservado'];
+    protected $description = 'Corrige assinantes com plano "essencial" que são na verdade addon-only (sem role de assinante)';
 
     public function handle(): int
     {
@@ -38,10 +36,10 @@ class CorrigirPlanoAddonOnly extends Command
                 continue;
             }
 
-            // Tem role de plano real → comprou um plano de fato, não tocar
-            if ($usuario->hasAnyRole(self::ROLES_PLANO)) {
+            // Já tem role de assinante → não tocar
+            if ($usuario->hasRole('assinante')) {
                 $ignorados++;
-                $this->line("  <fg=gray>IGNORADO</> {$usuario->email} — tem role de plano real");
+                $this->line("  <fg=gray>IGNORADO</> {$usuario->email} — já tem role assinante");
                 continue;
             }
 
