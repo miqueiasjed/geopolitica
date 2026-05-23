@@ -166,6 +166,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/assinantes', [AdminAssinanteController::class, 'index']);
     Route::patch('/assinantes/plano-em-massa', [AdminAssinanteController::class, 'trocarPlanoBulk']);
     Route::get('/assinantes/plano-em-massa/{operacaoId}/status', [AdminAssinanteController::class, 'statusTrocaPlano']);
+    Route::post('/assinantes/addon', [AdminAssinanteController::class, 'criarAddonUsuario']);
     Route::post('/assinantes/{id}/reenviar-boas-vindas', [AdminAssinanteController::class, 'reenviarBoasVindas']);
     Route::post('/assinantes/{id}/resetar-primeiro-acesso', [AdminAssinanteController::class, 'resetarPrimeiroAcesso']);
     Route::post('/assinantes/importar', [ImportarAssinantesController::class, 'store']);

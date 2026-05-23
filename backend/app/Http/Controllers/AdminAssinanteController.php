@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ListarAssinantesRequest;
+use App\Models\AssinanteAddon;
 use App\Models\Plano;
 use App\Services\AdminAssinanteService;
 use Illuminate\Http\JsonResponse;
@@ -50,6 +51,25 @@ class AdminAssinanteController extends Controller
         $this->adminAssinanteService->resetarPrimeiroAcesso($id);
 
         return response()->json(['message' => 'Senha redefinida para o padrão de primeiro acesso.']);
+    }
+
+    public function criarAddonUsuario(Request $request): JsonResponse
+    {
+        $dados = $request->validate([
+            'nome'        => ['required', 'string', 'max:255'],
+            'email'       => ['required', 'email', 'max:255', 'unique:users,email'],
+            'addon_key'   => ['required', 'string', Rule::in(AssinanteAddon::ADDON_KEYS)],
+            'expira_em'   => ['nullable', 'date', 'after:today'],
+            'enviar_email' => ['boolean'],
+        ]);
+
+        try {
+            $resultado = $this->adminAssinanteService->criarAddonUsuario($dados);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json($resultado, 201);
     }
 
     public function reenviarBoasVindas(int $id): JsonResponse

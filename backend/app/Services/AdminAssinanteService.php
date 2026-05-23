@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Jobs\TrocarPlanoAssinanteJob;
+use App\Mail\AddonBoasVindasMail;
 use App\Mail\BoasVindasMail;
 use App\Models\Assinante;
+use App\Models\AssinanteAddon;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -69,6 +72,55 @@ class AdminAssinanteService
             $assinante->plano ?? 'essencial',
             reenvio: true,
         ));
+    }
+
+    public function criarAddonUsuario(array $dados): array
+    {
+        $usuario = User::firstOrCreate(
+            ['email' => $dados['email']],
+            [
+                'name'               => $dados['nome'],
+                'password'           => Hash::make('12345678'),
+                'deve_alterar_senha' => true,
+            ],
+        );
+
+        if (! $usuario->wasRecentlyCreated) {
+            throw new \RuntimeException('Já existe um usuário com este e-mail.');
+        }
+
+        $usuario->syncRoles(['assinante']);
+
+        Assinante::create([
+            'user_id'    => $usuario->id,
+            'plano'      => null,
+            'ativo'      => true,
+            'status'     => 'ativo',
+            'assinado_em' => now(),
+        ]);
+
+        AssinanteAddon::create([
+            'user_id'     => $usuario->id,
+            'addon_key'   => $dados['addon_key'],
+            'status'      => 'ativo',
+            'fonte'       => 'manual',
+            'iniciado_em' => now(),
+            'expira_em'   => $dados['expira_em'] ?? null,
+        ]);
+
+        if ($dados['enviar_email'] ?? true) {
+            $linkAcesso = rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/').'/login';
+
+            Mail::to($usuario->email)->send(new AddonBoasVindasMail(
+                nome: $usuario->name,
+                addonKey: $dados['addon_key'],
+                linkAcesso: $linkAcesso,
+                contaNova: true,
+                email: $usuario->email,
+            ));
+        }
+
+        return ['message' => 'Usuário addon criado com sucesso.', 'user_id' => $usuario->id];
     }
 
     public function listar(array $filtros): LengthAwarePaginator

@@ -28,6 +28,7 @@ import {
   ExclamationTriangleIcon,
   LockClosedIcon,
   MagnifyingGlassIcon,
+  PersonIcon,
   ResetIcon,
   UpdateIcon,
   UploadIcon,
@@ -41,13 +42,14 @@ import {
   buscarPlanosAtivos,
   buscarProdutos,
   buscarStatusImportacao,
+  criarAddonUsuario,
   importarAssinantesLastlink,
   reenviarBoasVindasAssinante,
   resetarPrimeiroAcessoAssinante,
   trocarPlanoEmMassa,
   buscarStatusTrocaPlano,
 } from '../../services/admin'
-import type { TrocaPlanoStatus } from '../../services/admin'
+import type { CriarAddonUsuarioPayload, TrocaPlanoStatus } from '../../services/admin'
 import type { ImportacaoAssinantesPayload, ImportacaoAssinantesStatus, LinhaImportacaoAssinante } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
@@ -544,6 +546,15 @@ export function AdminAssinantes() {
   const [resetEmAndamento, setResetEmAndamento] = useState<number | null>(null)
   const [resetFeedback, setResetFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
   const [confirmarResetId, setConfirmarResetId] = useState<number | null>(null)
+  const [modalAddonAberto, setModalAddonAberto] = useState(false)
+  const [addonForm, setAddonForm] = useState<CriarAddonUsuarioPayload>({
+    nome: '',
+    email: '',
+    addon_key: 'war',
+    expira_em: null,
+    enviar_email: true,
+  })
+  const [addonFeedback, setAddonFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
 
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set())
@@ -610,6 +621,19 @@ export function AdminAssinantes() {
       setResetFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao redefinir senha.' })
       setResetEmAndamento(null)
       setConfirmarResetId(null)
+    },
+  })
+
+  const mutacaoAddon = useMutation({
+    mutationFn: (payload: CriarAddonUsuarioPayload) => criarAddonUsuario(payload),
+    onSuccess: (data) => {
+      setAddonFeedback({ tipo: 'sucesso', mensagem: data.message })
+      setModalAddonAberto(false)
+      setAddonForm({ nome: '', email: '', addon_key: 'war', expira_em: null, enviar_email: true })
+      void queryClient.invalidateQueries({ queryKey: adminKeys.assinantes({}) })
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      setAddonFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao criar usuário addon.' })
     },
   })
 
@@ -680,6 +704,10 @@ export function AdminAssinantes() {
             <Badge size="3" color="cyan" variant="soft">
               {total} registros
             </Badge>
+            <Button size="2" variant="soft" color="amber" onClick={() => { setAddonFeedback(null); setModalAddonAberto(true) }}>
+              <PersonIcon />
+              Novo addon
+            </Button>
             <Button size="2" variant="soft" onClick={() => setImportando(true)}>
               <UploadIcon />
               Importar assinantes
@@ -846,6 +874,24 @@ export function AdminAssinantes() {
                   color={resetFeedback.tipo === 'sucesso' ? 'green' : 'ruby'}
                   ml="auto"
                   onClick={() => setResetFeedback(null)}
+                >
+                  Fechar
+                </Button>
+              </Callout.Root>
+            )}
+
+            {addonFeedback && (
+              <Callout.Root color={addonFeedback.tipo === 'sucesso' ? 'green' : 'ruby'} size="1">
+                <Callout.Icon>
+                  {addonFeedback.tipo === 'sucesso' ? <CheckCircledIcon /> : <ExclamationTriangleIcon />}
+                </Callout.Icon>
+                <Callout.Text>{addonFeedback.mensagem}</Callout.Text>
+                <Button
+                  variant="ghost"
+                  size="1"
+                  color={addonFeedback.tipo === 'sucesso' ? 'green' : 'ruby'}
+                  ml="auto"
+                  onClick={() => setAddonFeedback(null)}
                 >
                   Fechar
                 </Button>
@@ -1028,6 +1074,83 @@ export function AdminAssinantes() {
       </div>
 
       <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
+
+      <Dialog.Root open={modalAddonAberto} onOpenChange={(aberto) => { if (!aberto) setModalAddonAberto(false) }}>
+        <Dialog.Content maxWidth="460px">
+          <Dialog.Title>Novo usuário addon</Dialog.Title>
+          <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
+            Cria um usuário sem plano, com acesso apenas ao addon selecionado. Senha padrão: <strong>12345678</strong>.
+          </Dialog.Description>
+
+          <Flex direction="column" gap="3">
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">Nome</Text>
+              <TextField.Root
+                placeholder="Nome completo"
+                value={addonForm.nome}
+                onChange={(e) => setAddonForm((f) => ({ ...f, nome: e.target.value }))}
+              />
+            </label>
+
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">E-mail</Text>
+              <TextField.Root
+                type="email"
+                placeholder="email@exemplo.com"
+                value={addonForm.email}
+                onChange={(e) => setAddonForm((f) => ({ ...f, email: e.target.value }))}
+              />
+            </label>
+
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">Addon</Text>
+              <Select.Root
+                value={addonForm.addon_key}
+                onValueChange={(v) => setAddonForm((f) => ({ ...f, addon_key: v as 'war' | 'elections' }))}
+              >
+                <Select.Trigger style={{ width: '100%' }} />
+                <Select.Content>
+                  <Select.Item value="war">Monitor de Guerra</Select.Item>
+                  <Select.Item value="elections">Monitor Eleitoral</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </label>
+
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">Expira em <Text size="1" color="gray">(opcional)</Text></Text>
+              <TextField.Root
+                type="date"
+                value={addonForm.expira_em ?? ''}
+                onChange={(e) => setAddonForm((f) => ({ ...f, expira_em: e.target.value || null }))}
+              />
+            </label>
+
+            <Flex align="center" gap="2" asChild>
+              <label style={{ cursor: 'pointer' }}>
+                <Checkbox
+                  checked={addonForm.enviar_email}
+                  onCheckedChange={(v) => setAddonForm((f) => ({ ...f, enviar_email: v === true }))}
+                />
+                <Text size="2">Enviar e-mail de boas-vindas</Text>
+              </label>
+            </Flex>
+          </Flex>
+
+          <Flex gap="3" justify="end" mt="5">
+            <Dialog.Close>
+              <Button variant="soft" color="gray">Cancelar</Button>
+            </Dialog.Close>
+            <Button
+              color="amber"
+              loading={mutacaoAddon.isPending}
+              disabled={!addonForm.nome.trim() || !addonForm.email.trim()}
+              onClick={() => mutacaoAddon.mutate(addonForm)}
+            >
+              Criar usuário
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
 
       <Dialog.Root open={confirmarResetId !== null} onOpenChange={(aberto) => { if (!aberto) setConfirmarResetId(null) }}>
         <Dialog.Content maxWidth="420px">

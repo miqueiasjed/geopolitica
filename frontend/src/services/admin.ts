@@ -337,6 +337,19 @@ export async function resetarPrimeiroAcessoAssinante(id: number): Promise<{ mess
   return resposta.data
 }
 
+export interface CriarAddonUsuarioPayload {
+  nome: string
+  email: string
+  addon_key: 'elections' | 'war'
+  expira_em?: string | null
+  enviar_email: boolean
+}
+
+export async function criarAddonUsuario(payload: CriarAddonUsuarioPayload): Promise<{ message: string; user_id: number }> {
+  const resposta = await api.post<{ message: string; user_id: number }>('/admin/assinantes/addon', payload)
+  return resposta.data
+}
+
 // --- B2B Admin ---
 
 export async function fetchAdminB2BEmpresas(): Promise<EmpresaB2B[]> {
