@@ -66,7 +66,7 @@ class AdminAssinanteService
         Mail::to($assinante->user->email)->send(new BoasVindasMail(
             $assinante->user,
             $linkAcesso,
-            $assinante->plano,
+            $assinante->plano ?? 'essencial',
             reenvio: true,
         ));
     }
