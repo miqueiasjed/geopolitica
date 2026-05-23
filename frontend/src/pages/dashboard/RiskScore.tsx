@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import api from '../../lib/axios'
 import { useRecurso } from '../../hooks/useRecurso'
-import { usePlanosAtivos, planosComRecurso } from '../../hooks/usePlanosAtivos'
+import { UpgradePlanos } from '../../components/UpgradePlanos'
 import { ScoreGauge } from '../../components/ScoreGauge'
 import { ExportPdfButton } from '../../components/ExportPdfButton'
 
@@ -48,55 +48,12 @@ function nivelAlerta(level: string): string {
 // ─── Gate de recurso (dinâmico via plano_recursos) ───────────────────────────
 
 function RiskScoreGate() {
-  const { data: planos } = usePlanosAtivos()
-  const planosHabilitados = planos ? planosComRecurso(planos, 'risk_score') : []
-  const nomes = planosHabilitados.map((p) => p.nome)
-
-  const descricaoPlanos =
-    nomes.length === 0
-      ? 'um plano com Risk Score habilitado'
-      : nomes.length === 1
-        ? `o plano ${nomes[0]}`
-        : `os planos ${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}`
-
-  const upgradeUrl = import.meta.env.VITE_UPGRADE_PRO_URL || '#'
-
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-6 py-16">
-      <div className="flex max-w-md flex-col items-center gap-6 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#BFFF3C]/60">
-          acesso exclusivo
-        </p>
-        <h2 className="font-serif text-3xl font-bold text-white">Risk Score de Portfólio</h2>
-        <p className="text-sm leading-6 text-zinc-400">
-          Calcule a exposição geopolítica da sua carteira com base nos eventos ativos. Disponível
-          para assinantes de {descricaoPlanos}.
-        </p>
-        {planosHabilitados.length > 0 && (
-          <div className="w-full rounded-xl border border-[#BFFF3C]/30 bg-zinc-900/60 px-6 py-5">
-            <p className="text-xs uppercase tracking-widest text-zinc-500">Planos com acesso</p>
-            <div className="mt-2 flex flex-wrap justify-center gap-2">
-              {planosHabilitados.map((p) => (
-                <span
-                  key={p.slug}
-                  className="rounded-full border border-[#BFFF3C]/40 bg-[#BFFF3C]/10 px-3 py-1 font-mono text-xs font-semibold text-[#BFFF3C]"
-                >
-                  {p.nome}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-        <a
-          href={upgradeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex w-full items-center justify-center rounded-lg bg-[#BFFF3C] px-6 py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BFFF3C]"
-        >
-          Fazer upgrade de plano
-        </a>
-      </div>
-    </div>
+    <UpgradePlanos
+      titulo="Risk Score de Portfólio"
+      descricao="Calcule a exposição geopolítica da sua carteira com base nos eventos ativos."
+      recurso="risk_score"
+    />
   )
 }
 

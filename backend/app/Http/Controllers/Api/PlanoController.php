@@ -15,10 +15,13 @@ class PlanoController extends Controller
             ->orderBy('ordem')
             ->get()
             ->map(fn (Plano $plano) => [
-                'id'     => $plano->id,
-                'slug'   => $plano->slug,
-                'nome'   => $plano->nome,
-                'recursos' => $plano->recursos
+                'id'          => $plano->id,
+                'slug'        => $plano->slug,
+                'nome'        => $plano->nome,
+                'descricao'   => $plano->descricao,
+                'preco'       => $plano->preco,
+                'lastlink_url' => $plano->lastlink_url,
+                'recursos'    => $plano->recursos
                     ->mapWithKeys(fn ($r) => [$r->chave => $r->valor])
                     ->all(),
             ]);

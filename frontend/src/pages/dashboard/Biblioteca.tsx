@@ -6,7 +6,7 @@ import { ContentCard } from '../../components/biblioteca/ContentCard'
 import { SearchBar } from '../../components/biblioteca/SearchBar'
 import { FilterBar } from '../../components/biblioteca/FilterBar'
 import { useRecurso } from '../../hooks/useRecurso'
-import { PlanGate } from '../../components/biblioteca/PlanGate'
+import { UpgradePlanos } from '../../components/UpgradePlanos'
 import type { BibliotecaFiltros } from '../../types/biblioteca'
 
 function SkeletonCard() {
@@ -77,20 +77,13 @@ export function Biblioteca() {
     setFiltros(novosFiltros)
   }
 
-  if (!temAcesso) {
-    return <PlanGate />
-  }
-
-  if (isError) {
+  if (!temAcesso || isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <span className="mb-4 text-4xl text-zinc-700" aria-hidden="true">🔒</span>
-        <p className="text-lg font-semibold text-zinc-300">Biblioteca não inclusa no seu plano</p>
-        <p className="mt-2 max-w-sm text-sm text-zinc-500">
-          A biblioteca de análises está disponível nos planos que incluem o recurso{' '}
-          <span className="font-mono text-zinc-400">biblioteca_acesso</span>. Entre em contato com o suporte para fazer upgrade.
-        </p>
-      </div>
+      <UpgradePlanos
+        titulo="Biblioteca de Análises"
+        descricao="Briefings, mapas estratégicos e teses de investimento disponíveis nos planos abaixo."
+        recurso="biblioteca_acesso"
+      />
     )
   }
 

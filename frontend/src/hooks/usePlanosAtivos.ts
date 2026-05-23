@@ -5,6 +5,9 @@ export interface PlanoPublico {
   id: number
   slug: string
   nome: string
+  descricao: string | null
+  preco: string | null
+  lastlink_url: string | null
   recursos: Record<string, string | null>
 }
 
