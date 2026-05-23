@@ -61,7 +61,8 @@ function labelDaRole(role: string | null, roles: AdminRole[]) {
   return roles.find((r) => r.role === role)?.label ?? role
 }
 
-function ehAssinanteRole(role: string, roles: AdminRole[]) {
+function ehAssinanteRole(role: string | null | undefined, roles: AdminRole[]) {
+  if (!role) return false
   return roles.find((r) => r.role === role)?.assinante ?? role.startsWith('assinante_')
 }
 
