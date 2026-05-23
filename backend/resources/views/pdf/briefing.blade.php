@@ -13,7 +13,7 @@
             letter-spacing: 0.25em;
             color: #C9B882;
             margin-bottom: 4pt;
-        ">Geopolítica para Investidores@if (!empty($conteudo->edicao)), Nº {{ str_pad($conteudo->edicao, 3, '0', STR_PAD_LEFT) }}@endif</div>
+        ">Geopolítica para Investidores{{ !empty($conteudo->edicao) ? ', Nº ' . str_pad($conteudo->edicao, 3, '0', STR_PAD_LEFT) : '' }}</div>
 
         <div style="
             font-size: 8pt;
