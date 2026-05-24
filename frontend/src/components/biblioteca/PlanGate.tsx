@@ -153,7 +153,7 @@ export function PlanGate({ tipo }: PlanGateProps) {
           </div>
         ) : (
           <a
-            href="mailto:contato@geopoliticaparainvestidores.com.br"
+            href="mailto:danuzionews@gmail.com"
             className="inline-flex items-center gap-2 rounded-xl bg-[#BFFF3C] px-5 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-[#D7FF69]"
           >
             Falar com o time
