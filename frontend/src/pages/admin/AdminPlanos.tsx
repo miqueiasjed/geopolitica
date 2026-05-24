@@ -446,8 +446,8 @@ interface TabelaPlanosProps {
 
 function TabelaPlanos({ planos, onVisualizar, onEditar, onExcluir }: TabelaPlanosProps) {
   return (
-    <div className="rounded-xl border border-[#1e1e20] overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-xl border border-[#1e1e20]">
+      <table className="min-w-[560px] w-full text-sm">
         <thead>
           <tr className="border-b border-[#1e1e20] bg-[#080809]">
             <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Plano</th>
@@ -838,7 +838,7 @@ function ModalEditarPlano({ planoId, onFechar }: { planoId: number; onFechar: ()
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-[#1e1e20] px-6 flex-shrink-0">
+        <div className="flex overflow-x-auto border-b border-[#1e1e20] px-6 flex-shrink-0">
           {(['dados', 'recursos', 'identificadores'] as AbaEditar[]).map((a) => (
             <button
               key={a}
@@ -1319,7 +1319,7 @@ export function AdminPlanos() {
           className="inline-flex items-center gap-2 rounded-xl border border-[#C9B882]/25 bg-[#C9B882]/8 px-4 py-3 font-mono text-sm text-[#C9B882] transition-colors hover:bg-[#C9B882]/15"
         >
           <PlusIcon className="h-4 w-4" />
-          Novo Plano
+          <span className="hidden sm:inline">Novo Plano</span>
         </button>
       </div>
 

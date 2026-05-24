@@ -95,7 +95,7 @@ export function RelatoriosIA() {
       className="space-y-6"
     >
       {/* Cabeçalho */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <p className="font-mono text-[10px] uppercase tracking-widest text-[#BFFF3C]/70">
             Inteligência Artificial

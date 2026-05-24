@@ -108,59 +108,63 @@ export function MonitorGuerra() {
         </p>
       </div>
 
-      <section className="space-y-4">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">
-          FEED DE TENSÕES MILITARES
-        </p>
-
-        {isFeedLoading ? (
-          <div className="flex justify-center py-16">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : events.length === 0 ? (
-          <p className="py-12 text-center text-sm text-zinc-500">
-            Nenhum evento militar registrado no momento.
+      <div className="flex flex-col gap-4 lg:flex-row">
+        {/* Feed de eventos — ocupa espaço restante */}
+        <section className="flex-1 min-h-0 space-y-4">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">
+            FEED DE TENSÕES MILITARES
           </p>
-        ) : (
-          <div className="space-y-4">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
 
-            <div ref={sentinelaRef} aria-hidden="true" className="h-6 w-full" />
+          {isFeedLoading ? (
+            <div className="flex justify-center py-16">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : events.length === 0 ? (
+            <p className="py-12 text-center text-sm text-zinc-500">
+              Nenhum evento militar registrado no momento.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
 
-            {isFetchingNextPage ? (
-              <div className="flex justify-center py-4">
-                <LoadingSpinner size="md" />
-              </div>
-            ) : null}
-          </div>
-        )}
-      </section>
+              <div ref={sentinelaRef} aria-hidden="true" className="h-6 w-full" />
 
-      <section className="space-y-4">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">
-          BRIEFINGS DE GUERRA
-        </p>
+              {isFetchingNextPage ? (
+                <div className="flex justify-center py-4">
+                  <LoadingSpinner size="md" />
+                </div>
+              ) : null}
+            </div>
+          )}
+        </section>
 
-        {isBriefingsLoading ? (
-          <div className="space-y-4">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
-        ) : !briefings || briefings.length === 0 ? (
-          <p className="py-12 text-center text-sm text-zinc-500">
-            Nenhum briefing de guerra disponível no momento.
+        {/* Painel lateral de briefings */}
+        <section className="w-full space-y-4 overflow-y-auto max-h-[400px] lg:w-80 lg:max-h-none">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">
+            BRIEFINGS DE GUERRA
           </p>
-        ) : (
-          <div className="space-y-4">
-            {briefings.map((conteudo) => (
-              <BriefingCard key={conteudo.id} conteudo={conteudo} />
-            ))}
-          </div>
-        )}
-      </section>
+
+          {isBriefingsLoading ? (
+            <div className="space-y-4">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          ) : !briefings || briefings.length === 0 ? (
+            <p className="py-12 text-center text-sm text-zinc-500">
+              Nenhum briefing de guerra disponível no momento.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {briefings.map((conteudo) => (
+                <BriefingCard key={conteudo.id} conteudo={conteudo} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </motion.div>
   )
 }

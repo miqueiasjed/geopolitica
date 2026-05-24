@@ -707,11 +707,11 @@ export function AdminAssinantes() {
             </Badge>
             <Button size="2" variant="soft" color="amber" onClick={() => { setAddonFeedback(null); setModalAddonAberto(true) }}>
               <PersonIcon />
-              Novo addon
+              <span className="hidden sm:inline ml-1">Novo addon</span>
             </Button>
             <Button size="2" variant="soft" onClick={() => setImportando(true)}>
               <UploadIcon />
-              Importar assinantes
+              <span className="hidden sm:inline ml-1">Importar assinantes</span>
             </Button>
           </Flex>
         </Flex>

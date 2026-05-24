@@ -79,7 +79,8 @@ export function AdminCrises() {
           <Flex align="center" gap="3">
             <Badge size="3" color="cyan" variant="soft">{crises.length} crises</Badge>
             <Button size="3" variant="solid" color="amber" onClick={abrirModalCriacao}>
-              <PlusIcon /> Nova Crise
+              <PlusIcon />
+              <span className="hidden sm:inline ml-1">Nova Crise</span>
             </Button>
           </Flex>
         </Flex>

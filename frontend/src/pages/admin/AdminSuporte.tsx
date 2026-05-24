@@ -282,7 +282,7 @@ export function AdminSuporte() {
             transition={{ duration: 0.2 }}
             className="space-y-4"
           >
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-2">
               {filtros.map((f) => (
                 <button
                   key={f.value}

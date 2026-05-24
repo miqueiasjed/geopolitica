@@ -589,7 +589,7 @@ function GrupoCard({ grupo, configs, valores, onChange, onSalvar, salvando, salv
   return (
     <div className="rounded-xl border border-[#1e1e20] bg-[#0d0d0f]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#1e1e20] px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1e1e20] px-5 py-4">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold text-zinc-100">
             {LABEL_GRUPO[grupo]}
@@ -823,7 +823,7 @@ export function AdminConfiguracoes() {
   return (
     <div className="space-y-6">
       {/* Cabeçalho */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#C9B882]/70">
             admin

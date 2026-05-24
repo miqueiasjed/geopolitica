@@ -88,9 +88,9 @@ function RadarSection() {
         <EleicaoFilterBar filtros={filtros} onChange={setFiltros} />
       </div>
 
-      <div className="rounded-lg border border-zinc-800 bg-[#111318] p-4">
+      <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-[#111318] p-4">
         {isLoading ? (
-          <div className="grid min-w-[900px] grid-cols-12 overflow-x-auto">
+          <div className="grid min-w-[900px] grid-cols-12">
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
@@ -184,8 +184,10 @@ export function MonitorEleitoral() {
         <p className="text-sm text-zinc-500">Eleições globais com impacto para investidores</p>
       </div>
 
-      <RadarSection />
-      <BriefingsSection />
+      <div className="flex flex-col gap-10">
+        <RadarSection />
+        <BriefingsSection />
+      </div>
     </motion.div>
   )
 }

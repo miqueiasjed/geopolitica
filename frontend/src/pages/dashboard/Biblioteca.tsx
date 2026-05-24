@@ -109,11 +109,13 @@ export function Biblioteca() {
 
       {/* Busca e filtros */}
       <div className="space-y-3">
-        <SearchBar
-          value={filtros.q ?? ''}
-          onChange={handleSearchChange}
-          placeholder="Buscar por título, tema ou palavra-chave..."
-        />
+        <div className="w-full sm:w-64">
+          <SearchBar
+            value={filtros.q ?? ''}
+            onChange={handleSearchChange}
+            placeholder="Buscar por título, tema ou palavra-chave..."
+          />
+        </div>
         <FilterBar filtros={filtros} onChange={handleFilterChange} />
       </div>
 

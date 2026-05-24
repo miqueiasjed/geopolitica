@@ -6,7 +6,144 @@ import { CriseDetailPanel } from '../components/timeline/CriseDetailPanel'
 import { EventoDetailPanel } from '../components/timeline/EventoDetailPanel'
 import { CATEGORY_COLORS } from '../components/timeline/CriseMarker'
 import { PlanoGate } from '../components/PlanoGate'
-import type { CategoriaCrise, FiltrosTimeline } from '../types/timeline'
+import type { CategoriaCrise, CriseHistorica, EventoTimeline, FiltrosTimeline } from '../types/timeline'
+
+interface TimelineVerticalMobileProps {
+  crises: CriseHistorica[]
+  eventos: EventoTimeline[]
+  onCriseClick: (slug: string) => void
+  onEventoClick: (id: number) => void
+}
+
+function getCategoryColor(categoria: CategoriaCrise): string {
+  return CATEGORY_COLORS[categoria] ?? '#6B7280'
+}
+
+function getImpactColor(impactScore: number): string {
+  if (impactScore >= 7) return '#EF4444'
+  if (impactScore >= 4) return '#FACC15'
+  return '#4ade80'
+}
+
+function TimelineVerticalMobile({
+  crises,
+  eventos,
+  onCriseClick,
+  onEventoClick,
+}: TimelineVerticalMobileProps) {
+  // Ordenar crises por ano desc, depois eventos por data desc
+  const crisesSorted = [...crises].sort((a, b) => b.ano - a.ano)
+  const eventosSorted = [...eventos].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )
+
+  return (
+    <div className="space-y-6">
+      {/* Crises */}
+      {crisesSorted.length > 0 && (
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#BFFF3C] mb-3">
+            Crises Históricas
+          </p>
+          <ul className="border-l-2 border-[#2D3240] pl-4 space-y-4">
+            {crisesSorted.map((crise) => {
+              const corCategoria = crise.categorias[0]
+                ? getCategoryColor(crise.categorias[0])
+                : '#6B7280'
+              return (
+                <li key={crise.id} className="relative">
+                  {/* Marcador na linha */}
+                  <span
+                    className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-sm border border-[#1C1F26]"
+                    style={{ background: corCategoria }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onCriseClick(crise.slug)}
+                    className="w-full text-left"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-sm font-medium text-[#F7F7F2] leading-snug">
+                        {crise.titulo}
+                      </span>
+                      <span className="font-mono text-xs text-[#BFFF3C] shrink-0">{crise.ano}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {crise.categorias.slice(0, 2).map((cat) => (
+                        <span
+                          key={cat}
+                          className="rounded px-1.5 py-0.5 font-mono text-[10px] capitalize"
+                          style={{
+                            color: getCategoryColor(cat),
+                            background: `${getCategoryColor(cat)}1A`,
+                          }}
+                        >
+                          {cat}
+                        </span>
+                      ))}
+                      {crise.data_fim === null && (
+                        <span className="rounded px-1.5 py-0.5 font-mono text-[10px] text-[#BFFF3C] bg-[#BFFF3C]/10">
+                          em andamento
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+
+      {/* Eventos */}
+      {eventosSorted.length > 0 && (
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-3">
+            Eventos Ativos
+          </p>
+          <ul className="border-l-2 border-[#2D3240] pl-4 space-y-4">
+            {eventosSorted.map((evento) => {
+              const cor = getImpactColor(evento.impact_score)
+              const ano = new Date(evento.created_at).getFullYear()
+              return (
+                <li key={evento.id} className="relative">
+                  <span
+                    className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border border-[#1C1F26]"
+                    style={{ background: cor }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onEventoClick(evento.id)}
+                    className="w-full text-left"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-sm font-medium text-[#F7F7F2] leading-snug">
+                        {evento.titulo}
+                      </span>
+                      <span className="font-mono text-xs text-zinc-500 shrink-0">{ano}</span>
+                    </div>
+                    <span
+                      className="inline-block mt-1 rounded px-1.5 py-0.5 font-mono text-[10px]"
+                      style={{ color: cor, background: `${cor}1A` }}
+                    >
+                      {evento.impact_label}
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+
+      {crisesSorted.length === 0 && eventosSorted.length === 0 && (
+        <p className="text-center text-sm text-zinc-500 py-8">
+          Nenhum resultado para os filtros selecionados.
+        </p>
+      )}
+    </div>
+  )
+}
 
 export function Timeline() {
   const prefersReduced = useReducedMotion()
@@ -120,17 +257,37 @@ export function Timeline() {
       </div>
       </div>
 
-      {/* Timeline */}
-      {isLoading ? (
-        <div className="h-[220px] bg-[#1C1F26] rounded-lg animate-pulse" />
-      ) : (
-        <TimelineBar
-          crises={crises}
-          eventos={eventos}
-          onCriseClick={handleCriseClick}
-          onEventoClick={handleEventoClick}
-        />
-      )}
+      {/* Timeline — desktop: SVG horizontal com scroll */}
+      <div className="hidden sm:block">
+        {isLoading ? (
+          <div className="h-[220px] bg-[#1C1F26] rounded-lg animate-pulse" />
+        ) : (
+          <TimelineBar
+            crises={crises}
+            eventos={eventos}
+            onCriseClick={handleCriseClick}
+            onEventoClick={handleEventoClick}
+          />
+        )}
+      </div>
+
+      {/* Timeline — mobile: lista vertical */}
+      <div className="block sm:hidden">
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-16 bg-[#1C1F26] rounded-lg animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <TimelineVerticalMobile
+            crises={crises}
+            eventos={eventos}
+            onCriseClick={handleCriseClick}
+            onEventoClick={handleEventoClick}
+          />
+        )}
+      </div>
 
       {/* Painéis de detalhe */}
       <CriseDetailPanel slug={slugSelecionado} onClose={() => setSlugSelecionado(null)} />

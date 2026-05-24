@@ -149,7 +149,7 @@ export function AdminBiblioteca() {
               onClick={() => navigate('/admin/novo-conteudo')}
             >
               <PlusIcon />
-              Novo conteúdo
+              <span className="hidden sm:inline ml-1">Novo conteúdo</span>
             </Button>
           </Flex>
         </Flex>
@@ -161,7 +161,7 @@ export function AdminBiblioteca() {
               placeholder="Buscar por título…"
               value={buscaInput}
               onChange={(e) => setBuscaInput(e.target.value)}
-              className="w-56"
+              className="w-full sm:w-64"
             >
               <TextField.Slot>
                 <MagnifyingGlassIcon />

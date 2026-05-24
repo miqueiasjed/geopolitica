@@ -287,7 +287,7 @@ export function AdminB2BPage() {
             </Badge>
             <Button size="3" onClick={() => setModalNovaLicenca(true)}>
               <PlusIcon />
-              Nova Licença
+              <span className="hidden sm:inline">Nova Licença</span>
             </Button>
           </Flex>
         </Flex>

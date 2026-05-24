@@ -217,3 +217,10 @@
 - Frontend AdminPlanos: coluna Role removida; LinhaRecurso reformulada com badge Ativo/Inativo antes do detalhe.
 - Gotcha: migration usa guard 'sanctum' (não 'web') — verificar ao criar roles; grep confirmou que a única referência remanescente de assinante_* é a própria migration.
 - Validações: 46 testes verdes, tsc --noEmit zero erros.
+- Planos 33 e 34 concluídos em paralelo (Mobile Admin Pages + Subscriber Pages).
+- Plano 33: tabelas admin já usavam Radix ScrollArea — ajustes focaram em flex-wrap nos filtros, hidden sm:inline nos botões, grid-cols responsivos em cards de Produtos/Planos/B2B, formulários com grid-cols-1 md:grid-cols-2, dropzone com min-h-[120px] e overflow-x-auto no preview CSV.
+- Plano 34: MapaPage com touchAction:none + altura responsiva; RiskScore com grid-cols-2 sm:grid-cols-4; MonitorGuerra/Eleitoral com flex flex-col lg:flex-row (mapa no topo, painel abaixo em mobile); Biblioteca assinante (busca w-full sm:w-64); RelatoriosIA (flex-wrap no header); PerfilPaisPage (w-full + overflow-x-auto nos eventos); Timeline SVG 3000px — implementada versão vertical mobile com TimelineVerticalMobile (block sm:hidden); EleicaoDetailPanel já era full-screen em mobile — adicionado header sm:hidden com botão Voltar; ChatBriefings era chat único — sidebar hidden em mobile com suggestions num strip horizontal scrollável, input sticky bottom-0.
+- Gotcha: Vários componentes já tinham ScrollArea + min-w fixo — inspecionar antes de adicionar wrapper duplicado.
+- Gotcha: Timeline usava SVG de 3000px — sem opção de scroll simples, criou-se componente vertical alternativo para mobile.
+- Gotcha: ChatBriefings não é lista de conversas — é chat único com sugestões em sidebar; a adaptação foi ocultar sidebar e mover sugestões para strip horizontal em mobile.
+- Build: 1581 módulos, 0 erros TypeScript, 0 erros de lint.

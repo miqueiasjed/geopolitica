@@ -478,8 +478,8 @@ export function AdminWebhookEventos() {
                                 </Text>
                               </Flex>
                             </Table.Cell>
-                            <Table.Cell>
-                              <Text size="2">{evento.email ?? '—'}</Text>
+                            <Table.Cell className="max-w-[200px]">
+                              <Text size="2" className="block truncate">{evento.email ?? '—'}</Text>
                             </Table.Cell>
                             <Table.Cell>
                               <Badge

@@ -262,7 +262,8 @@ export function AdminWebhookTokens() {
                 <Text size="3" className="text-cyan-100/50">Nenhum token cadastrado.</Text>
               </Box>
             ) : (
-              <Table.Root>
+              <div className="overflow-x-auto">
+              <Table.Root className="min-w-[560px] w-full">
                 <Table.Header>
                   <Table.Row className="border-b border-cyan-400/10">
                     <Table.ColumnHeaderCell>Plataforma</Table.ColumnHeaderCell>
@@ -315,6 +316,7 @@ export function AdminWebhookTokens() {
                   ))}
                 </Table.Body>
               </Table.Root>
+              </div>
             )}
           </Card>
         </div>
@@ -415,7 +417,8 @@ export function AdminWebhookTokens() {
                 <Text size="3" className="text-cyan-100/50">Nenhum mapeamento cadastrado.</Text>
               </Box>
             ) : (
-              <Table.Root>
+              <div className="overflow-x-auto">
+              <Table.Root className="min-w-[560px] w-full">
                 <Table.Header>
                   <Table.Row className="border-b border-cyan-400/10">
                     <Table.ColumnHeaderCell>Plataforma</Table.ColumnHeaderCell>
@@ -468,6 +471,7 @@ export function AdminWebhookTokens() {
                   ))}
                 </Table.Body>
               </Table.Root>
+              </div>
             )}
           </Card>
         </div>

@@ -188,7 +188,7 @@ export function AdminFontes() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[700px] text-sm">
+              <table className="w-full min-w-[560px] text-sm">
                 <thead>
                   <tr className="border-b border-zinc-800">
                     <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Nome</th>
@@ -204,7 +204,7 @@ export function AdminFontes() {
                     <tr key={source.id} className="border-b border-zinc-800/50 transition-colors hover:bg-zinc-800/20">
                       <td className="px-4 py-3">
                         <div className="font-medium text-zinc-200">{source.nome}</div>
-                        <div className="mt-0.5 font-mono text-[11px] text-zinc-600 truncate max-w-[280px]" title={source.rss_url}>
+                        <div className="mt-0.5 font-mono text-[11px] text-zinc-600 truncate max-w-[200px]" title={source.rss_url}>
                           {source.rss_url}
                         </div>
                       </td>

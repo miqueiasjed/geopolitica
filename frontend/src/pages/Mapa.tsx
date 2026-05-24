@@ -39,7 +39,7 @@ export function Mapa() {
   return (
     <PlanoGate>
     <motion.div
-      className="relative -mx-4 -my-6 flex h-[calc(100vh-13rem)] min-h-[620px] flex-col overflow-hidden bg-[#0a0a0b] sm:-mx-6 lg:-my-8 lg:h-[calc(100vh-14rem)]"
+      className="relative -mx-4 -my-6 flex h-[400px] min-h-0 flex-col bg-[#0a0a0b] sm:-mx-6 sm:h-[600px] lg:-my-8 lg:h-[calc(100vh-14rem)]"
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReduced ? 0 : 0.3, ease: 'easeOut' }}
@@ -55,7 +55,7 @@ export function Mapa() {
       </div>
 
       {/* Área do mapa */}
-      <div className="relative flex-1 overflow-hidden">
+      <div className="relative flex-1 overflow-hidden" style={{ touchAction: 'none' }}>
         {isLoading ? (
           <MapaLoadingSkeleton />
         ) : (

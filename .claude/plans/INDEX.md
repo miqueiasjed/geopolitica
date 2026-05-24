@@ -44,8 +44,8 @@
 | 30 | [Multi-Produtos: Mapeamento Dinâmico de product_id (Lastlink + Hotmart)](30.md) | ✅ | 26, 29 | 6 |
 | 31 | [Unificação de Role de Assinante (role única `assinante`)](31.md) | ✅ | 2, 3, 19, 20, 25, 26, 27, 30 | 11 |
 | 32 | [Mobile: AdminLayout com Hamburger + Drawer](32.md) | ✅ | 31 | 3 |
-| 33 | [Mobile: Admin Pages (Tabelas, Formulários e Grids)](33.md) | ⏳ | 32 | 6 |
-| 34 | [Mobile: Subscriber Pages (Refinamento)](34.md) | ⏳ | 31 | 8 |
+| 33 | [Mobile: Admin Pages (Tabelas, Formulários e Grids)](33.md) | ✅ | 32 | 6 |
+| 34 | [Mobile: Subscriber Pages (Refinamento)](34.md) | ✅ | 31 | 8 |
 | 35 | [Mobile: Componentes Compartilhados (Painéis, Modais, Toasts)](35.md) | ⏳ | 32, 33 | 4 |
 
 ## Ordem de execução recomendada
@@ -116,6 +116,6 @@
 | Multi-Produtos: Frontend admin UI | Plano 29 | ✅ |
 | Multi-Produtos: Mapeamento dinâmico de product_id | Plano 30 | ✅ |
 | Mobile – AdminLayout | Plano 32 | ✅ |
-| Mobile – Admin Pages | Plano 33 | ⏳ |
-| Mobile – Subscriber Pages | Plano 34 | ⏳ |
+| Mobile – Admin Pages | Plano 33 | ✅ |
+| Mobile – Subscriber Pages | Plano 34 | ✅ |
 | Mobile – Componentes Compartilhados | Plano 35 | ⏳ |

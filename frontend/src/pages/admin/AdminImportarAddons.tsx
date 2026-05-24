@@ -79,7 +79,7 @@ function PreviewCsv({ arquivo }: { arquivo: File }) {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-[#2a2a2e]">
-      <table className="w-full min-w-max text-left">
+      <table className="w-full min-w-[400px] text-left">
         <thead>
           <tr className="border-b border-[#2a2a2e] bg-[#111113]">
             {dados.cabecalhos.map((col, i) => (
@@ -432,7 +432,7 @@ export function AdminImportarAddons() {
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
               className={[
-                'flex cursor-pointer select-none flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-6 py-8 transition-colors',
+                'flex min-h-[120px] w-full cursor-pointer select-none flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-6 py-8 transition-colors',
                 importando ? 'cursor-not-allowed opacity-50' : '',
                 dragging
                   ? 'border-[#C9B882]/60 bg-[#C9B882]/5'
@@ -507,7 +507,7 @@ export function AdminImportarAddons() {
             type="button"
             onClick={handleImportar}
             disabled={!arquivo || importando || emFila}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {importando ? (
               <>

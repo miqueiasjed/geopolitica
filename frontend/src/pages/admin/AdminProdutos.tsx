@@ -854,7 +854,7 @@ export function AdminProdutos() {
           className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#C9B882] hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <PlusIcon className="h-3.5 w-3.5" />
-          Novo Produto
+          <span className="hidden sm:inline">Novo Produto</span>
         </button>
       </motion.div>
 

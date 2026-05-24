@@ -575,7 +575,7 @@ export function AdminUsuarios() {
             </Badge>
             <Button size="2" onClick={() => setCriando(true)}>
               <PlusIcon />
-              Novo usuário
+              <span className="hidden sm:inline ml-1">Novo usuário</span>
             </Button>
           </Flex>
         </Flex>

@@ -166,7 +166,7 @@ export function AdminNovoConteudo() {
         {/* Importar DOCX */}
         {tipo === 'briefing' && (
           <Card size="3" className="border border-cyan-400/10 bg-slate-950/60">
-            <Flex align="center" justify="between" gap="4" wrap="wrap">
+            <Flex direction={{ initial: 'column', sm: 'row' }} align={{ sm: 'center' }} justify="between" gap="4">
               <Box className="space-y-1">
                 <Text size="2" weight="medium">
                   Importar briefing via DOCX
@@ -225,8 +225,8 @@ export function AdminNovoConteudo() {
 
               {/* Edição e Autor — apenas briefing */}
               {tipo === 'briefing' && (
-                <Flex gap="4" wrap="wrap">
-                  <label className="w-32 space-y-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <label className="space-y-2">
                     <Text size="2" weight="medium">
                       Nº edição
                     </Text>
@@ -237,10 +237,11 @@ export function AdminNovoConteudo() {
                       value={edicao}
                       onChange={(e) => setEdicao(e.target.value)}
                       placeholder="001"
+                      className="w-full"
                     />
                   </label>
 
-                  <label className="min-w-[200px] flex-1 space-y-2">
+                  <label className="space-y-2">
                     <Text size="2" weight="medium">
                       Autor
                     </Text>
@@ -249,9 +250,10 @@ export function AdminNovoConteudo() {
                       value={autor}
                       onChange={(e) => setAutor(e.target.value)}
                       placeholder="Ex: Danuzio Neto"
+                      className="w-full"
                     />
                   </label>
-                </Flex>
+                </div>
               )}
 
               {/* Título */}
@@ -301,9 +303,9 @@ export function AdminNovoConteudo() {
                 </label>
               )}
 
-              <Flex gap="4" wrap="wrap">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Região */}
-                <label className="min-w-[200px] flex-1 space-y-2">
+                <label className="space-y-2">
                   <Text size="2" weight="medium">
                     Região
                   </Text>
@@ -312,11 +314,12 @@ export function AdminNovoConteudo() {
                     value={regiao}
                     onChange={(e) => setRegiao(e.target.value)}
                     placeholder="Ex: América Latina, Europa..."
+                    className="w-full"
                   />
                 </label>
 
                 {/* Tags */}
-                <label className="min-w-[200px] flex-1 space-y-2">
+                <label className="space-y-2">
                   <Text size="2" weight="medium">
                     Tags
                   </Text>
@@ -325,12 +328,13 @@ export function AdminNovoConteudo() {
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     placeholder="tag1, tag2, tag3"
+                    className="w-full"
                   />
                   <Text size="1" className="text-cyan-100/45">
                     Separadas por vírgula
                   </Text>
                 </label>
-              </Flex>
+              </div>
 
               {/* Resumo */}
               <label className="space-y-2">
@@ -453,7 +457,7 @@ export function AdminNovoConteudo() {
                 </Box>
               )}
 
-              <Flex justify="end" gap="3">
+              <Flex justify="end" gap="3" wrap="wrap">
                 <Button
                   type="button"
                   size="3"
@@ -461,6 +465,7 @@ export function AdminNovoConteudo() {
                   color="gray"
                   onClick={() => navigate('/admin/biblioteca')}
                   disabled={mutation.isPending}
+                  className="w-full sm:w-auto"
                 >
                   Cancelar
                 </Button>
@@ -469,6 +474,7 @@ export function AdminNovoConteudo() {
                   size="3"
                   color="cyan"
                   disabled={mutation.isPending}
+                  className="w-full sm:w-auto"
                 >
                   {mutation.isPending && <Spinner size="1" />}
                   {mutation.isPending ? 'Salvando...' : 'Salvar conteúdo'}

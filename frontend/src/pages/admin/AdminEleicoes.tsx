@@ -131,7 +131,7 @@ export function AdminEleicoes() {
             </Badge>
             <Button size="3" variant="solid" color="amber" onClick={abrirModalCriacao}>
               <PlusIcon />
-              Nova Eleição
+              <span className="hidden sm:inline ml-1">Nova Eleição</span>
             </Button>
           </Flex>
         </Flex>

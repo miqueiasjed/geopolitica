@@ -185,7 +185,7 @@ function RiskScoreContent({ prefersReduced }: { prefersReduced: boolean }) {
       </div>
 
       {/* ── Formulário de ativos ─────────────────────────────────────────── */}
-      <section className="rounded-xl border border-[#BFFF3C]/20 p-6">
+      <section className="w-full rounded-xl border border-[#BFFF3C]/20 p-6">
         <p className="mb-4 font-mono text-xs uppercase tracking-widest text-white/40">
           Composição da carteira
         </p>
@@ -203,7 +203,7 @@ function RiskScoreContent({ prefersReduced }: { prefersReduced: boolean }) {
                 variants={itemVariants}
                 layout={!prefersReduced}
                 exit={{ opacity: 0, x: -10, transition: { duration: 0.2, ease: 'easeIn' } }}
-                className="flex items-center gap-3"
+                className="flex flex-wrap items-center gap-3"
               >
                 {/* Ticker */}
                 <input
@@ -339,7 +339,7 @@ function RiskScoreContent({ prefersReduced }: { prefersReduced: boolean }) {
             </div>
 
             {/* Breakdown por categoria */}
-            <div className="grid grid-cols-2 gap-3 mt-6">
+            <div className="grid grid-cols-2 gap-3 mt-6 sm:grid-cols-4">
               <ScoreGauge valor={score.breakdown.energia} label="Energia" />
               <ScoreGauge valor={score.breakdown.alimentos} label="Alimentos" />
               <ScoreGauge valor={score.breakdown.cambio} label="Câmbio" />

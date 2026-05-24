@@ -76,7 +76,7 @@ export function PerfilPaisPage() {
 
   if (isLoadingPerfil) {
     return (
-      <section className="mx-auto max-w-3xl space-y-8 py-8">
+      <section className="mx-auto w-full max-w-3xl space-y-8 py-8">
         <div className="flex items-center gap-2">
           <SkeletonBlock className="h-8 w-8 rounded-full" />
           <SkeletonBlock className="h-4 w-24" />
@@ -108,7 +108,7 @@ export function PerfilPaisPage() {
 
   if (!perfil) {
     return (
-      <section className="mx-auto max-w-3xl py-16 text-center">
+      <section className="mx-auto w-full max-w-3xl py-16 text-center">
         <p className="text-zinc-400">Perfil do país não encontrado.</p>
         <button
           type="button"
@@ -128,7 +128,7 @@ export function PerfilPaisPage() {
 
   return (
     <motion.section
-      className="mx-auto max-w-3xl space-y-6 py-6"
+      className="mx-auto w-full max-w-3xl space-y-6 py-6"
       initial={prefersReduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReduced ? 0 : 0.3, ease: 'easeOut' }}
@@ -286,7 +286,7 @@ export function PerfilPaisPage() {
         ) : eventos.length === 0 ? (
           <p className="text-sm text-zinc-500">Nenhum evento recente encontrado.</p>
         ) : (
-          <ul className="space-y-3">
+          <ul className="space-y-3 overflow-x-auto">
             {eventos.map((evento) => {
               const nivelTensao = evento.impact_label ?? 'MONITORAR'
 

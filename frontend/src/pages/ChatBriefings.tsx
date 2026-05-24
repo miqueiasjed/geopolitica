@@ -37,7 +37,7 @@ export function ChatBriefings() {
 
   return (
     <PlanoGate>
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {/* Cabeçalho */}
       <div>
         <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Chat com os Briefings</h1>
@@ -46,13 +46,39 @@ export function ChatBriefings() {
         </p>
       </div>
 
+      {/* Indicador de uso — mobile: compacto no topo */}
+      <div className="flex items-center gap-3 lg:hidden">
+        <div
+          className={`h-2 w-2 rounded-full shrink-0 ${
+            limiteAtingido ? 'bg-red-500' : 'bg-green-500'
+          }`}
+          aria-hidden="true"
+        />
+        <span className="font-mono text-xs text-zinc-400">{labelContagem}</span>
+        {limite !== null && limite !== undefined && (
+          <div className="flex-1 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className={`h-full rounded-full transition-all ${
+                limiteAtingido ? 'bg-red-500' : 'bg-[#BFFF3C]'
+              }`}
+              style={{ width: `${Math.min((perguntaCount / limite) * 100, 100)}%` }}
+              role="progressbar"
+              aria-valuenow={perguntaCount}
+              aria-valuemin={0}
+              aria-valuemax={limite}
+              aria-label={`${perguntaCount} de ${limite} perguntas utilizadas`}
+            />
+          </div>
+        )}
+      </div>
+
       {/* Layout principal */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
-        {/* Coluna principal — 70% */}
-        <div className="flex min-h-[600px] flex-col gap-3 rounded-xl border border-zinc-800 bg-[#0f1117] lg:w-[70%]">
+        {/* Coluna principal — chat */}
+        <div className="flex flex-col rounded-xl border border-zinc-800 bg-[#0f1117] lg:w-[70%] h-[calc(100dvh-280px)] sm:h-[calc(100dvh-220px)] lg:min-h-[600px] lg:h-auto">
           {/* Banner de limite */}
           {limiteAtingido && limiteErro && (
-            <div className="px-4 pt-4">
+            <div className="px-4 pt-4 shrink-0">
               <ChatLimitWarning
                 mensagem={limiteErro}
                 onUpgrade={() => navigate('/planos')}
@@ -60,11 +86,13 @@ export function ChatBriefings() {
             </div>
           )}
 
-          {/* Área de mensagens */}
-          <ChatMessages mensagens={mensagens} isLoading={isLoading && mensagens.length === 0} />
+          {/* Área de mensagens — cresce para preencher */}
+          <div className="flex-1 overflow-hidden">
+            <ChatMessages mensagens={mensagens} isLoading={isLoading && mensagens.length === 0} />
+          </div>
 
-          {/* Input */}
-          <div className="border-t border-zinc-800 p-4">
+          {/* Input — sticky no mobile para não ser coberto pelo teclado virtual */}
+          <div className="border-t border-zinc-800 p-4 shrink-0 sticky bottom-0 bg-[#0f1117] rounded-b-xl">
             <ChatInput
               onEnviar={enviar}
               disabled={isLoading || limiteAtingido}
@@ -72,8 +100,8 @@ export function ChatBriefings() {
           </div>
         </div>
 
-        {/* Sidebar — 30% */}
-        <aside className="flex flex-col gap-4 lg:w-[30%]">
+        {/* Sidebar — 30% (oculta em mobile, visível em lg+) */}
+        <aside className="hidden lg:flex flex-col gap-4 lg:w-[30%]">
           {/* Badge de contagem */}
           <div className="rounded-xl border border-zinc-800 bg-[#0f1117] p-4">
             <div className="flex items-center gap-2">
@@ -153,6 +181,30 @@ export function ChatBriefings() {
             </ul>
           </div>
         </aside>
+      </div>
+
+      {/* Sugestões de perguntas — mobile: abaixo do chat */}
+      <div className="lg:hidden rounded-xl border border-zinc-800 bg-[#0f1117] p-4">
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-widest text-zinc-500">
+          Sugestões
+        </h2>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {SUGESTOES_PERGUNTAS.map((sugestao) => (
+            <button
+              key={sugestao}
+              type="button"
+              onClick={() => {
+                if (!isLoading && !limiteAtingido) {
+                  enviar(sugestao)
+                }
+              }}
+              disabled={isLoading || limiteAtingido}
+              className="shrink-0 max-w-[220px] rounded-lg border border-zinc-800 bg-transparent px-3 py-2 text-left text-xs text-zinc-400 transition-colors hover:border-[#BFFF3C]/20 hover:bg-[#BFFF3C]/5 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {sugestao}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
     </PlanoGate>
