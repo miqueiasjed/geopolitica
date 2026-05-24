@@ -1219,8 +1219,8 @@ export function AdminAssinantes() {
 
       {/* Barra de ação em massa */}
       {selecionados.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
-          <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/20 bg-slate-900/95 px-5 py-3 shadow-2xl shadow-black/50 backdrop-blur">
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 max-w-[calc(100vw-2rem)] overflow-x-auto">
+          <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/20 bg-slate-900/95 px-5 py-3 shadow-2xl shadow-black/50 backdrop-blur w-max">
             <Text size="2" className="text-cyan-100/80 whitespace-nowrap">
               <strong className="text-cyan-300">{selecionados.size}</strong> selecionado(s)
             </Text>
