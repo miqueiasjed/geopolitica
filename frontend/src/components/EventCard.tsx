@@ -67,8 +67,8 @@ export function EventCard({ event }: EventCardProps) {
       </header>
 
       <div className="mt-4 space-y-3">
-        <p title={event.resumo} className="line-clamp-3 text-sm leading-6 text-zinc-400">
-          {event.resumo}
+        <p title={event.analise_ia ?? event.resumo} className="line-clamp-3 text-sm leading-6 text-zinc-400">
+          {event.analise_ia ?? event.resumo}
         </p>
       </div>
 
