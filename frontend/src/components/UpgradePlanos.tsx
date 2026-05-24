@@ -1,5 +1,26 @@
 import { usePlanosAtivos, planosComRecurso, type PlanoPublico } from '../hooks/usePlanosAtivos'
 
+const BENEFICIO_PREFIXOS = [
+  'Feed',
+  'Mapa',
+  'Indicadores',
+  'Alertas',
+  'Perfis',
+  'Linha',
+  'Chat',
+  'Briefing',
+  'Tudo',
+  'Biblioteca',
+  'Grupo',
+  'Monitor',
+  'Eleições',
+  'A Tese',
+  'Cenário',
+  'Arquivo',
+  'Videochamada',
+  'Toda',
+]
+
 const COR_PLANO: Record<
   string,
   { label: string; botao: string; anel: string; glow: string; badge: string }
@@ -56,7 +77,7 @@ export function UpgradePlanos({ titulo, descricao, recurso }: UpgradePlanosProps
     planosExibidos.length === 1
       ? 'max-w-xs'
       : planosExibidos.length === 2
-        ? 'grid-cols-2 max-w-md'
+        ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl'
         : 'grid-cols-1 sm:grid-cols-3'
 
   return (
@@ -119,10 +140,11 @@ function CartaoPlano({ plano, destaque }: { plano: PlanoPublico; destaque?: bool
   const cor = COR_PLANO[plano.slug] ?? COR_PADRAO
   const preco = plano.preco ? formatarPreco(plano.preco) : null
   const mensal = plano.preco ? formatarMensal(plano.preco) : null
+  const beneficios = plano.descricao ? parseBeneficiosPlano(plano.descricao) : []
 
   return (
     <div
-      className={`relative flex flex-col gap-5 rounded-2xl border px-6 py-7 text-left transition-transform hover:-translate-y-1 ${cor.anel}`}
+      className={`relative flex min-h-[25rem] flex-col rounded-2xl border px-6 py-7 text-left transition-transform hover:-translate-y-1 ${cor.anel}`}
     >
       {/* Linha de gradiente no topo do card */}
       <div
@@ -137,7 +159,7 @@ function CartaoPlano({ plano, destaque }: { plano: PlanoPublico; destaque?: bool
         </span>
       )}
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <p className={`font-mono text-xs uppercase tracking-[0.22em] ${cor.label}`}>
           {plano.nome}
         </p>
@@ -148,10 +170,24 @@ function CartaoPlano({ plano, destaque }: { plano: PlanoPublico; destaque?: bool
             {mensal && <p className="text-xs text-zinc-500">{mensal}</p>}
           </div>
         ) : null}
+      </div>
 
-        {plano.descricao && (
-          <p className="whitespace-pre-wrap pt-1 text-xs leading-5 text-zinc-400">{plano.descricao}</p>
-        )}
+      <div className="mt-5 flex-1">
+        {beneficios.length > 0 ? (
+          <ul className="space-y-2.5">
+            {beneficios.map((beneficio, index) => (
+              <li key={`${beneficio}-${index}`} className="flex gap-2.5 text-sm leading-5 text-zinc-300">
+                <span
+                  className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${cor.badge}`}
+                  aria-hidden="true"
+                />
+                <span>{beneficio}</span>
+              </li>
+            ))}
+          </ul>
+        ) : plano.descricao ? (
+          <p className="text-sm leading-6 text-zinc-300">{plano.descricao}</p>
+        ) : null}
       </div>
 
       {plano.lastlink_url ? (
@@ -159,7 +195,7 @@ function CartaoPlano({ plano, destaque }: { plano: PlanoPublico; destaque?: bool
           href={plano.lastlink_url}
           target="_blank"
           rel="noopener noreferrer"
-          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-lg transition-all ${cor.botao}`}
+          className={`mt-7 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-lg transition-all ${cor.botao}`}
         >
           Assinar agora
           <svg
@@ -179,13 +215,39 @@ function CartaoPlano({ plano, destaque }: { plano: PlanoPublico; destaque?: bool
       ) : (
         <button
           disabled
-          className="inline-flex cursor-not-allowed items-center justify-center rounded-xl bg-zinc-800 px-4 py-3 text-sm font-semibold text-zinc-500"
+          className="mt-7 inline-flex cursor-not-allowed items-center justify-center rounded-xl bg-zinc-800 px-4 py-3 text-sm font-semibold text-zinc-500"
         >
           Em breve
         </button>
       )}
     </div>
   )
+}
+
+function parseBeneficiosPlano(descricao: string): string[] {
+  const texto = descricao.trim().replace(/\r\n?/g, '\n')
+  if (!texto) return []
+
+  const separados = texto
+    .split(/\n+|[;•|]+|(?:\.\s+)/)
+    .map((item) => item.trim().replace(/\s+/g, ' ').replace(/[.,;]+$/g, ''))
+    .filter(Boolean)
+
+  if (separados.length > 1) return separados
+
+  const prefixos = BENEFICIO_PREFIXOS.join('|')
+  const textoEmLinha = texto.replace(/\s+/g, ' ').replace(/,\s*mais\s+/gi, '\n')
+  const comQuebras = textoEmLinha.replace(
+    new RegExp(`\\s+((?:${prefixos})(?=\\s|$))`, 'g'),
+    '\n$1',
+  )
+
+  const beneficios = comQuebras
+    .split('\n')
+    .map((item) => item.trim().replace(/[.,;]+$/g, ''))
+    .filter(Boolean)
+
+  return beneficios.length > 1 ? beneficios : []
 }
 
 function formatarPreco(preco: string): string {
