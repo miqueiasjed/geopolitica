@@ -1,6 +1,6 @@
 # INDEX – Planos do Projeto Geopolítica para Investidores
 
-> Última atualização: 2026-05-23 (Plano 31 concluído — Unificação de Role de Assinante)
+> Última atualização: 2026-05-23 (Planos 32–35 criados — Otimização Mobile Frontend)
 
 ## Legenda
 - ✅ Concluído
@@ -43,6 +43,10 @@
 | 29 | [Multi-Produtos: Frontend Admin UI (Produtos, Addons e Importação)](29.md) | ✅ | 27, 28 | 7 |
 | 30 | [Multi-Produtos: Mapeamento Dinâmico de product_id (Lastlink + Hotmart)](30.md) | ✅ | 26, 29 | 6 |
 | 31 | [Unificação de Role de Assinante (role única `assinante`)](31.md) | ✅ | 2, 3, 19, 20, 25, 26, 27, 30 | 11 |
+| 32 | [Mobile: AdminLayout com Hamburger + Drawer](32.md) | ✅ | 31 | 3 |
+| 33 | [Mobile: Admin Pages (Tabelas, Formulários e Grids)](33.md) | ⏳ | 32 | 6 |
+| 34 | [Mobile: Subscriber Pages (Refinamento)](34.md) | ⏳ | 31 | 8 |
+| 35 | [Mobile: Componentes Compartilhados (Painéis, Modais, Toasts)](35.md) | ⏳ | 32, 33 | 4 |
 
 ## Ordem de execução recomendada
 
@@ -77,6 +81,9 @@
 ## Multi-Produtos por Assinante — ordem de execução
 `26 → 27 (paralelo com 28) → 29`
 
+## Otimização Mobile — ordem de execução
+`32 → 33 (paralelo com 34) → 35`
+
 ## Módulos do PRD cobertos
 
 | Módulo PRD | Planos | Status |
@@ -108,3 +115,7 @@
 | Multi-Produtos: Frontend core (tipos, hooks, componentes) | Plano 28 | ✅ |
 | Multi-Produtos: Frontend admin UI | Plano 29 | ✅ |
 | Multi-Produtos: Mapeamento dinâmico de product_id | Plano 30 | ✅ |
+| Mobile – AdminLayout | Plano 32 | ✅ |
+| Mobile – Admin Pages | Plano 33 | ⏳ |
+| Mobile – Subscriber Pages | Plano 34 | ⏳ |
+| Mobile – Componentes Compartilhados | Plano 35 | ⏳ |

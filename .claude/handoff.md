@@ -1,31 +1,16 @@
 # Handoff – Último estado
-Plano: 25
-Task: T5
+Plano: 32
+Task: T3
 Status: Concluído/Vazio
 O que foi feito:
-- Plano 25 concluído: Admin Gerenciamento de Planos e Recursos (M17)
-- Backend: migration planos+plano_recursos, Models Plano+PlanoRecurso, PlanoService com cache Redis, PlanoSeeder (3 planos, 9 recursos cada)
-- Refatoração: ChatService, RelatorioIaService, CarteiraRiscoController removeram constantes hardcoded e passaram a usar PlanoService
-- Admin API: AdminPlanoController (index/update/atualizarRecurso) + FormRequests + rotas
-- Frontend: AdminPlanos.tsx com edição inline, badges visuais, sidebar e rota registradas
-- Build limpo: `npx tsc --noEmit ✓`, `npm run build ✓` (1557 módulos)
+- Plano 32 concluído: Mobile AdminLayout com Hamburger + Drawer
+- Task 32.1: Estado menuAberto + header mobile sticky h-14 com HamburgerMenuIcon/Cross2Icon do @radix-ui/react-icons
+- Task 32.2: Drawer mobile com AnimatePresence + motion.aside deslizando da esquerda (x: -224 → 0), backdrop semitransparente z-40, drawer z-50, useReducedMotion respeitado
+- Task 32.3: onClick={() => setMenuAberto(false)} em todos os links do drawer, sidebar desktop `hidden lg:flex`, layout reestruturado para flex-col (header + div.flex-1 com sidebar + main)
+- Build limpo: npx tsc --noEmit ✓, npm run build ✓ (1581 módulos)
 O que falta:
-- Nenhum plano pendente.
+- Planos 33 e 34 podem rodar em paralelo (ambos dependem do Plano 32 ✅)
+- Plano 35 aguarda 33 e 34
 Arquivos modificados:
-- backend/app/Models/Plano.php (novo)
-- backend/app/Models/PlanoRecurso.php (novo)
-- backend/app/Services/PlanoService.php (novo)
-- backend/database/migrations/2026_04_29_000001_create_planos_table.php (novo)
-- backend/database/seeders/PlanoSeeder.php (novo)
-- backend/app/Http/Controllers/Api/Admin/AdminPlanoController.php (novo)
-- backend/app/Http/Requests/Admin/AtualizarPlanoRequest.php (novo)
-- backend/app/Http/Requests/Admin/AtualizarPlanoRecursoRequest.php (novo)
-- backend/app/Services/ChatService.php (refatorado)
-- backend/app/Services/RelatorioIaService.php (refatorado)
-- backend/app/Http/Controllers/Api/CarteiraRiscoController.php (refatorado)
-- backend/routes/api.php (rotas admin adicionadas)
-- frontend/src/services/adminPlanos.ts (novo)
-- frontend/src/pages/admin/AdminPlanos.tsx (novo)
-- frontend/src/components/AdminLayout.tsx (sidebar)
-- frontend/src/router/index.tsx (rota)
-Próxima ação: Nenhuma. Plano 25 concluído e commitado.
+- frontend/src/components/AdminLayout.tsx (modificado: hamburger + drawer mobile + Framer Motion)
+Próxima ação: Executar Planos 33 e 34 em paralelo.
