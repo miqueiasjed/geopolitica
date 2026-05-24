@@ -150,7 +150,7 @@ function CartaoPlano({ plano, destaque }: { plano: PlanoPublico; destaque?: bool
         ) : null}
 
         {plano.descricao && (
-          <p className="pt-1 text-xs leading-5 text-zinc-400">{plano.descricao}</p>
+          <p className="whitespace-pre-wrap pt-1 text-xs leading-5 text-zinc-400">{plano.descricao}</p>
         )}
       </div>
 
