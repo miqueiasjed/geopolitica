@@ -61,7 +61,7 @@ export function InviteMemberModal({ isOpen, onClose, onSuccess }: InviteMemberMo
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <Dialog.Content maxWidth="440px">
+      <Dialog.Content maxWidth="440px" className="w-full max-w-[calc(100vw-2rem)]">
         <Dialog.Title>Convidar membro</Dialog.Title>
         <Dialog.Description size="2" mb="4" color="gray">
           Envie um convite por e-mail para adicionar um novo membro à sua equipe.

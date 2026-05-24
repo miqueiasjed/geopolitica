@@ -38,19 +38,48 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                 : { type: 'spring', damping: 25, stiffness: 200 }
             }
             className="fixed right-0 top-0 h-full w-full overflow-y-auto bg-[#1C1F26] z-50 border-l border-[#2D3240] sm:w-[480px]"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Detalhes da crise"
           >
-            <div className="p-6">
-              {/* Botão fechar */}
-              <div className="flex justify-end mb-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Fechar painel"
-                  className="text-[#6B7280] hover:text-[#F7F7F2] transition-colors text-xl leading-none"
+            {/* Header sticky com botão fechar */}
+            <div className="sticky top-0 bg-[#1C1F26]/95 backdrop-blur z-10 border-b border-[#2D3240] flex items-center justify-between px-4 py-3">
+              {/* Mobile: botão voltar */}
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Voltar"
+                className="sm:hidden flex items-center gap-1 text-sm text-[#BFFF3C] hover:text-[#F7F7F2] transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
                 >
-                  ✕
-                </button>
-              </div>
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                Voltar
+              </button>
+              <span className="sm:hidden" />
+              {/* Botão fechar — alinhado à direita */}
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Fechar painel"
+                className="ml-auto text-[#6B7280] hover:text-[#F7F7F2] transition-colors text-xl leading-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6">
 
               {isLoading ? (
                 /* Skeleton loading */
@@ -102,7 +131,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                       {crise.impacto_global}
                     </p>
                     {crise.metricas_globais.length > 0 && (
-                      <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         {crise.metricas_globais.map((m) => (
                           <div key={m.label} className="bg-[#0F1117] rounded p-3">
                             <div className="text-xs text-[#6B7280]">{m.label}</div>
@@ -123,7 +152,7 @@ export function CriseDetailPanel({ slug, onClose }: CriseDetailPanelProps) {
                       {crise.impacto_brasil}
                     </p>
                     {crise.metricas_brasil.length > 0 && (
-                      <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         {crise.metricas_brasil.map((m) => (
                           <div key={m.label} className="bg-[#0F1117] rounded p-3">
                             <div className="text-xs text-[#6B7280]">{m.label}</div>

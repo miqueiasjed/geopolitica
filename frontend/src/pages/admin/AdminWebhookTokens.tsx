@@ -129,7 +129,7 @@ export function AdminWebhookTokens() {
     <>
     {/* Dialog de edição de mapeamento */}
     <Dialog.Root open={!!editOffer} onOpenChange={(open) => { if (!open) setEditOffer(null) }}>
-      <Dialog.Content maxWidth="480px">
+      <Dialog.Content maxWidth="480px" className="w-full max-w-[calc(100vw-2rem)]">
         <Dialog.Title>Editar mapeamento</Dialog.Title>
         <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
           Offer ID <code className="font-mono">{editOffer?.offer_id}</code> — {editOffer?.fonte}
@@ -197,7 +197,7 @@ export function AdminWebhookTokens() {
                   Novo token
                 </Button>
               </Dialog.Trigger>
-              <Dialog.Content maxWidth="480px">
+              <Dialog.Content maxWidth="480px" className="w-full max-w-[calc(100vw-2rem)]">
                 <Dialog.Title>Adicionar token de webhook</Dialog.Title>
                 <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
                   Cole o token/secret exatamente como está na plataforma de pagamentos.
@@ -298,7 +298,7 @@ export function AdminWebhookTokens() {
                           <AlertDialog.Trigger>
                             <Button size="1" variant="ghost" color="red"><TrashIcon /></Button>
                           </AlertDialog.Trigger>
-                          <AlertDialog.Content maxWidth="400px">
+                          <AlertDialog.Content maxWidth="400px" className="w-full max-w-[calc(100vw-2rem)]">
                             <AlertDialog.Title>Remover token</AlertDialog.Title>
                             <AlertDialog.Description size="2">
                               Webhooks usando <strong>{t.descricao}</strong> passarão a falhar na autenticação.
@@ -341,7 +341,7 @@ export function AdminWebhookTokens() {
                   Novo mapeamento
                 </Button>
               </Dialog.Trigger>
-              <Dialog.Content maxWidth="480px">
+              <Dialog.Content maxWidth="480px" className="w-full max-w-[calc(100vw-2rem)]">
                 <Dialog.Title>Mapear offer para plano</Dialog.Title>
                 <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
                   Copie o Offer ID do payload do webhook (campo <code>Data.Offer.Id</code>).
@@ -452,7 +452,7 @@ export function AdminWebhookTokens() {
                             <AlertDialog.Trigger>
                               <Button size="1" variant="ghost" color="red"><TrashIcon /></Button>
                             </AlertDialog.Trigger>
-                            <AlertDialog.Content maxWidth="400px">
+                            <AlertDialog.Content maxWidth="400px" className="w-full max-w-[calc(100vw-2rem)]">
                               <AlertDialog.Title>Remover mapeamento</AlertDialog.Title>
                               <AlertDialog.Description size="2">
                                 Webhooks com offer <strong>{o.offer_id}</strong> não terão plano identificado.

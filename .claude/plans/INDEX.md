@@ -46,7 +46,7 @@
 | 32 | [Mobile: AdminLayout com Hamburger + Drawer](32.md) | ✅ | 31 | 3 |
 | 33 | [Mobile: Admin Pages (Tabelas, Formulários e Grids)](33.md) | ✅ | 32 | 6 |
 | 34 | [Mobile: Subscriber Pages (Refinamento)](34.md) | ✅ | 31 | 8 |
-| 35 | [Mobile: Componentes Compartilhados (Painéis, Modais, Toasts)](35.md) | ⏳ | 32, 33 | 4 |
+| 35 | [Mobile: Componentes Compartilhados (Painéis, Modais, Toasts)](35.md) | ✅ | 32, 33 | 4 |
 
 ## Ordem de execução recomendada
 
@@ -118,4 +118,4 @@
 | Mobile – AdminLayout | Plano 32 | ✅ |
 | Mobile – Admin Pages | Plano 33 | ✅ |
 | Mobile – Subscriber Pages | Plano 34 | ✅ |
-| Mobile – Componentes Compartilhados | Plano 35 | ⏳ |
+| Mobile – Componentes Compartilhados | Plano 35 | ✅ |

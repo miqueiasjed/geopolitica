@@ -224,3 +224,14 @@
 - Gotcha: Timeline usava SVG de 3000px — sem opção de scroll simples, criou-se componente vertical alternativo para mobile.
 - Gotcha: ChatBriefings não é lista de conversas — é chat único com sugestões em sidebar; a adaptação foi ocultar sidebar e mover sugestões para strip horizontal em mobile.
 - Build: 1581 módulos, 0 erros TypeScript, 0 erros de lint.
+
+2026-05-23 (Plano 35)
+- Plano 35 concluído: Mobile – Componentes Compartilhados (Painéis, Modais, Toasts).
+- AlertaPanel: fixed inset-0 (full-screen) em mobile, sm:inset-auto sm:right-0 sm:h-full sm:w-80 (lateral) em desktop; header sticky top-0 z-10 backdrop-blur; botão fechar 44x44px; corpo já tinha overflow-y-auto.
+- EleicaoDetailPanel: header unificado sticky com backdrop-blur; botão Voltar sm:hidden + ✕ ml-auto; candidatos com min-w-0 break-words para nomes longos em 375px; largura já era w-full sm:w-[440px].
+- CriseDetailPanel: idem header sticky; metricas_globais e metricas_brasil grid-cols-1 sm:grid-cols-2 (evita squeeze em 375px); role dialog + aria-modal para acessibilidade.
+- Dialog.Content audit: 6 arquivos, 17 instâncias corrigidas — max-w-[calc(100vw-2rem)] adicionado em todos; modais de formulário longo receberam overflow-y-auto max-h-[90vh]; inline styles substituídos por classes Tailwind.
+- Toasts: projeto usa toasts customizados (não Sonner/Radix library) — AdminProdutos e AdminAssinanteAddons usavam fixed top/right fixo; corrigidos para left-4 right-4 em mobile, sm:left-auto sm:w-80 em desktop.
+- Gotcha: CriseDetailPanel estava em components/timeline/ (não em components/crises/ como o plano indicava) — grep revelou o caminho correto antes de editar.
+- Gotcha: Projeto não usa Sonner global — toasts são componentes locais por página; audit de grep revelou apenas 2 arquivos com posicionamento fixed problemático.
+- Build: tsc --noEmit zero erros, npm run build OK (1581 módulos).

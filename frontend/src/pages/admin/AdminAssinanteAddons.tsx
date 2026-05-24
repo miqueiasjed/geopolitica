@@ -36,7 +36,7 @@ function Toast({ toast, onFechar }: { toast: ToastState; onFechar: () => void })
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: prefersReduced ? 0 : 0.2 }}
-      className={`fixed right-6 top-6 z-[60] flex items-center gap-3 rounded-xl border px-4 py-3 shadow-2xl ${
+      className={`fixed left-4 right-4 top-4 z-[60] flex items-center gap-3 rounded-xl border px-4 py-3 shadow-2xl sm:left-auto sm:right-6 sm:top-6 sm:w-auto ${
         toast.tipo === 'sucesso'
           ? 'border-green-500/20 bg-green-500/10 text-green-400'
           : 'border-red-500/20 bg-red-500/10 text-red-400'

@@ -318,7 +318,7 @@ function ModalImportacao({ aberto, onFechar }: { aberto: boolean; onFechar: () =
         if (!v) { limpar(); onFechar() }
       }}
     >
-      <Dialog.Content maxWidth="960px">
+      <Dialog.Content maxWidth="960px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">
         <Dialog.Title>Importar assinantes da Lastlink</Dialog.Title>
         <Dialog.Description size="2" mb="4" className="text-zinc-400">
           Envie o XLSX ou CSV exportado da Lastlink, revise os campos, escolha o plano e enfileire a importação.
@@ -1077,7 +1077,7 @@ export function AdminAssinantes() {
       <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
 
       <Dialog.Root open={modalAddonAberto} onOpenChange={(aberto) => { if (!aberto) setModalAddonAberto(false) }}>
-        <Dialog.Content maxWidth="460px">
+        <Dialog.Content maxWidth="460px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">
           <Dialog.Title>Novo usuário manual</Dialog.Title>
           <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
             Cria um usuário com plano, addon ou ambos. Ao menos um dos dois deve ser informado. Senha padrão: <strong>12345678</strong>.
@@ -1109,7 +1109,7 @@ export function AdminAssinantes() {
                 value={addonForm.plano ?? '__none__'}
                 onValueChange={(v) => setAddonForm((f) => ({ ...f, plano: v === '__none__' ? null : v }))}
               >
-                <Select.Trigger placeholder="Sem plano (addon-only)" style={{ width: '100%' }} />
+                <Select.Trigger placeholder="Sem plano (addon-only)" className="w-full" />
                 <Select.Content>
                   <Select.Item value="__none__">Sem plano (addon-only)</Select.Item>
                   {(planosQuery.data ?? []).map((p) => (
@@ -1125,7 +1125,7 @@ export function AdminAssinantes() {
                 value={addonForm.addon_key ?? '__none__'}
                 onValueChange={(v) => setAddonForm((f) => ({ ...f, addon_key: v === '__none__' ? null : v as 'war' | 'elections' }))}
               >
-                <Select.Trigger placeholder="Sem addon" style={{ width: '100%' }} />
+                <Select.Trigger placeholder="Sem addon" className="w-full" />
                 <Select.Content>
                   <Select.Item value="__none__">Sem addon</Select.Item>
                   <Select.Item value="war">Monitor de Guerra</Select.Item>
@@ -1144,7 +1144,7 @@ export function AdminAssinantes() {
             </label>
 
             <Flex align="center" gap="2" asChild>
-              <label style={{ cursor: 'pointer' }}>
+              <label className="cursor-pointer">
                 <Checkbox
                   checked={addonForm.enviar_email}
                   onCheckedChange={(v) => setAddonForm((f) => ({ ...f, enviar_email: v === true }))}
@@ -1171,7 +1171,7 @@ export function AdminAssinantes() {
       </Dialog.Root>
 
       <Dialog.Root open={confirmarResetId !== null} onOpenChange={(aberto) => { if (!aberto) setConfirmarResetId(null) }}>
-        <Dialog.Content maxWidth="420px">
+        <Dialog.Content maxWidth="420px" className="w-full max-w-[calc(100vw-2rem)]">
           <Dialog.Title>Resetar para primeiro acesso</Dialog.Title>
           <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
             A senha deste assinante será redefinida para <strong>12345678</strong>. Ele precisará trocar a senha no próximo acesso.
@@ -1249,7 +1249,7 @@ export function AdminAssinantes() {
                   Aplicar
                 </Button>
               </Dialog.Trigger>
-              <Dialog.Content maxWidth="420px">
+              <Dialog.Content maxWidth="420px" className="w-full max-w-[calc(100vw-2rem)]">
                 <Dialog.Title>Confirmar troca de plano</Dialog.Title>
                 <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
                   O plano de <strong>{selecionados.size}</strong> assinante(s) será trocado para{' '}

@@ -377,7 +377,7 @@ export function AdminWebhookEventos() {
                       Excluir {qtdSelecionados} {qtdSelecionados === 1 ? 'evento' : 'eventos'}
                     </Button>
                   </AlertDialog.Trigger>
-                  <AlertDialog.Content maxWidth="420px">
+                  <AlertDialog.Content maxWidth="420px" className="w-full max-w-[calc(100vw-2rem)]">
                     <AlertDialog.Title>Excluir eventos</AlertDialog.Title>
                     <AlertDialog.Description size="2">
                       Tem certeza que deseja excluir {qtdSelecionados}{' '}

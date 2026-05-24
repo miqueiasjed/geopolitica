@@ -76,7 +76,7 @@ function ModalNovaLicenca({ aberto, onFechar }: ModalNovaLicencaProps) {
 
   return (
     <Dialog.Root open={aberto} onOpenChange={(open) => !open && onFechar()}>
-      <Dialog.Content maxWidth="480px">
+      <Dialog.Content maxWidth="480px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">
         <Dialog.Title>Nova Licença B2B</Dialog.Title>
         <Dialog.Description size="2" color="gray" mb="4">
           Crie uma nova licença corporativa e convide o administrador da empresa.
@@ -208,7 +208,7 @@ function ModalRenovar({ empresa, onFechar }: ModalRenovarProps) {
 
   return (
     <Dialog.Root open={!!empresa} onOpenChange={(open) => !open && onFechar()}>
-      <Dialog.Content maxWidth="400px">
+      <Dialog.Content maxWidth="400px" className="w-full max-w-[calc(100vw-2rem)]">
         <Dialog.Title>Renovar Licença</Dialog.Title>
         <Dialog.Description size="2" color="gray" mb="4">
           Renovando licença de <strong>{empresa?.nome}</strong>.

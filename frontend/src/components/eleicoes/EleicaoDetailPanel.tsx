@@ -101,47 +101,51 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
             aria-modal="true"
             aria-label="Detalhes da eleição"
           >
-            {/* Header mobile — apenas em mobile */}
-            <div className="sm:hidden flex items-center gap-2 px-4 py-3 border-b border-[#2D3240] sticky top-0 bg-[#1C1F26] z-10">
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Voltar para a lista de eleições"
-                className="flex items-center gap-1 text-sm text-[#BFFF3C] hover:text-[#F7F7F2] transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+            {/* Header sticky — mobile e desktop */}
+            <div className="sticky top-0 bg-[#1C1F26]/95 backdrop-blur z-10 border-b border-[#2D3240]">
+              {/* Mobile: botão voltar */}
+              <div className="sm:hidden flex items-center gap-2 px-4 py-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Voltar para a lista de eleições"
+                  className="flex items-center gap-1 text-sm text-[#BFFF3C] hover:text-[#F7F7F2] transition-colors"
                 >
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-                Voltar
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Voltar
+                </button>
+              </div>
+              {/* Desktop: botão fechar */}
+              <div className="hidden sm:flex justify-end px-4 py-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Fechar painel"
+                  className="text-[#6B7280] transition-colors hover:text-[#F7F7F2] text-xl leading-none"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {isLoading ? (
               <SkeletonPanel />
             ) : eleicao ? (
               <div className="p-6">
-                {/* Botão fechar — apenas em desktop */}
-                <div className="mb-4 hidden sm:flex justify-end">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    aria-label="Fechar painel"
-                    className="text-[#6B7280] transition-colors hover:text-[#F7F7F2] text-xl leading-none"
-                  >
-                    ✕
-                  </button>
-                </div>
+                {/* Espaço reservado — botão fechar movido para header sticky */}
 
                 {/* Header: bandeira + país + badge relevância */}
                 <div className="mb-5">
@@ -180,11 +184,11 @@ export function EleicaoDetailPanel({ eleicaoId, onClose }: EleicaoDetailPanelPro
                         {eleicao.candidatos_principais.map((candidato, index) => (
                           <li
                             key={index}
-                            className="flex items-center justify-between rounded bg-[#0F1117] px-3 py-2"
+                            className="flex items-start justify-between gap-2 rounded bg-[#0F1117] px-3 py-2"
                           >
-                            <span className="text-sm text-[#F7F7F2]">{candidato.nome}</span>
+                            <span className="text-sm text-[#F7F7F2] min-w-0 break-words">{candidato.nome}</span>
                             {candidato.partido && (
-                              <span className="ml-2 font-mono text-xs text-zinc-500">
+                              <span className="shrink-0 font-mono text-xs text-zinc-500">
                                 {candidato.partido}
                               </span>
                             )}

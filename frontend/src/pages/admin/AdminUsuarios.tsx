@@ -152,7 +152,7 @@ function ModalCriacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => v
         }
       }}
     >
-      <Dialog.Content maxWidth="480px">
+      <Dialog.Content maxWidth="480px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">
         <Dialog.Title>Novo usuário</Dialog.Title>
         <Dialog.Description size="2" mb="4" className="text-zinc-400">
           Crie um usuário manualmente e atribua um perfil de acesso.
@@ -331,7 +331,7 @@ function ModalEdicao({
 
   return (
     <Dialog.Root open={aberto} onOpenChange={(v) => !v && onFechar()}>
-      <Dialog.Content maxWidth="480px">
+      <Dialog.Content maxWidth="480px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">
         <Dialog.Title>Editar usuário</Dialog.Title>
         <Dialog.Description size="2" mb="4" className="text-zinc-400">
           ID #{usuario.id}
@@ -490,7 +490,7 @@ function ModalExclusao({
 
   return (
     <Dialog.Root open={aberto} onOpenChange={(v) => !v && onFechar()}>
-      <Dialog.Content maxWidth="420px">
+      <Dialog.Content maxWidth="420px" className="w-full max-w-[calc(100vw-2rem)]">
         <Dialog.Title>Confirmar exclusão</Dialog.Title>
         <Dialog.Description size="2" mb="4">
           Tem certeza que deseja excluir{' '}

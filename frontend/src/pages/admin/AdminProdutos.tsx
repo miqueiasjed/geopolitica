@@ -826,7 +826,7 @@ export function AdminProdutos() {
   return (
     <div className="space-y-6">
       {/* Toasts */}
-      <div className="fixed top-4 right-4 z-[60] flex flex-col gap-2 w-80">
+      <div className="fixed left-4 right-4 top-4 z-[60] flex flex-col gap-2 sm:left-auto sm:w-80">
         <AnimatePresence>
           {toasts.map(t => (
             <Toast key={t.id} toast={t} onRemover={() => removerToast(t.id)} />

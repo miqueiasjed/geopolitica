@@ -11,10 +11,10 @@
 
 | # | Título | Tipo | Status | Complexidade |
 |---|--------|------|--------|-------------|
-| 35.1 | AlertaPanel Mobile: w-full, header fixo e scroll interno | frontend-componente | ⏳ | baixa |
-| 35.2 | EleicaoDetailPanel e CriseDetailPanel: w-full em 375px | frontend-componente | ⏳ | baixa |
-| 35.3 | Audit de Dialog.Content (Radix UI): max-w correto em mobile | frontend-componente | ⏳ | média |
-| 35.4 | Toasts Mobile: posição e tamanho adequados em 375px | frontend-componente | ⏳ | baixa |
+| 35.1 | AlertaPanel Mobile: w-full, header fixo e scroll interno | frontend-componente | ✅ | baixa |
+| 35.2 | EleicaoDetailPanel e CriseDetailPanel: w-full em 375px | frontend-componente | ✅ | baixa |
+| 35.3 | Audit de Dialog.Content (Radix UI): max-w correto em mobile | frontend-componente | ✅ | média |
+| 35.4 | Toasts Mobile: posição e tamanho adequados em 375px | frontend-componente | ✅ | baixa |
 
 ## Ordem de execução
 35.1 → 35.2 → 35.3 → 35.4

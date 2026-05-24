@@ -165,14 +165,14 @@ export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Painel de alertas"
-            className="fixed right-0 top-0 z-50 flex h-full w-full flex-col bg-zinc-950 border-l border-zinc-800 sm:w-80 md:w-96"
+            className="fixed inset-0 z-50 flex w-full flex-col bg-zinc-950 sm:inset-auto sm:right-0 sm:top-0 sm:h-full sm:w-80 sm:border-l sm:border-zinc-800 md:w-96"
             initial={panelInitial}
             animate={panelAnimate}
             exit={panelExit}
             transition={panelTransition}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-800 bg-zinc-950/95 px-5 py-4 backdrop-blur">
               <h2 className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-zinc-100">
                 Alertas
               </h2>
@@ -180,7 +180,7 @@ export function AlertaPanel({ isOpen, onClose }: AlertaPanelProps) {
                 type="button"
                 onClick={onClose}
                 aria-label="Fechar painel de alertas"
-                className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]/50"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFFF3C]/50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
