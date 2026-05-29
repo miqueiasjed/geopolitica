@@ -64,43 +64,10 @@ export function Login() {
         </div>
       </header>
 
-      <section className="relative z-10 mx-auto grid min-h-[calc(100vh-73px)] max-w-[1500px] items-center gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_430px] lg:py-16">
-        <motion.div
-          className="max-w-5xl"
-          initial={prefersReduced ? false : { opacity: 0, y: 14 }}
-          animate={prefersReduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: prefersReduced ? 0 : 0.4, ease: 'easeOut' }}
-        >
-          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#BFFF3C]/30 bg-[#BFFF3C]/8 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#D7FF69]">
-            <StarFilledIcon className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">Plataforma de inteligência geopolítica aplicada</span>
-          </div>
-
-          <h1 className="mt-7 max-w-5xl text-[clamp(3.2rem,8vw,8.7rem)] font-black leading-[0.92] tracking-normal text-white">
-            O mundo não para.
-            <span className="block text-[#BFFF3C]">E você não pode</span>
-            <span className="block">ficar para trás.</span>
-          </h1>
-
-          <p className="mt-7 max-w-2xl text-lg font-semibold leading-8 text-zinc-300 sm:text-xl">
-            Enquanto a maioria lê manchetes, uma minoria entende o que está por trás delas e age
-            antes que o resto perceba. <span className="text-white">Geopolítica para Investidores</span>{' '}
-            existe para quem quer estar nessa minoria.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm font-bold text-zinc-400">
-            {['Briefing diário', 'Alertas por IA', 'Cenários de risco'].map((item) => (
-              <span key={item} className="inline-flex items-center gap-2">
-                <CheckIcon className="h-4 w-4 text-[#BFFF3C]" />
-                {item}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-
+      <section className="relative z-10 mx-auto flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-10 lg:grid lg:min-h-[calc(100vh-73px)] lg:max-w-[1500px] lg:grid-cols-[minmax(0,1.05fr)_430px] lg:items-center lg:gap-10 lg:py-16">
         <motion.form
           id="acesso"
-          className="rounded-md border border-[#BFFF3C]/15 bg-[#0d0e0e]/88 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-6"
+          className="order-1 w-full rounded-md border border-[#BFFF3C]/15 bg-[#0d0e0e]/88 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-6 lg:order-2"
           initial={prefersReduced ? false : { opacity: 0, x: 16 }}
           animate={prefersReduced ? undefined : { opacity: 1, x: 0 }}
           transition={{ duration: prefersReduced ? 0 : 0.4, ease: 'easeOut', delay: 0.08 }}
@@ -179,6 +146,39 @@ export function Login() {
             Esqueci minha senha
           </Link>
         </motion.form>
+
+        <motion.div
+          className="order-2 max-w-5xl lg:order-1"
+          initial={prefersReduced ? false : { opacity: 0, y: 14 }}
+          animate={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+          transition={{ duration: prefersReduced ? 0 : 0.4, ease: 'easeOut' }}
+        >
+          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#BFFF3C]/30 bg-[#BFFF3C]/8 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#D7FF69]">
+            <StarFilledIcon className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">Plataforma de inteligência geopolítica aplicada</span>
+          </div>
+
+          <h1 className="mt-5 max-w-5xl text-[clamp(2.4rem,8vw,8.7rem)] font-black leading-[0.92] tracking-normal text-white lg:mt-7">
+            O mundo não para.
+            <span className="block text-[#BFFF3C]">E você não pode</span>
+            <span className="block">ficar para trás.</span>
+          </h1>
+
+          <p className="mt-5 hidden max-w-2xl text-lg font-semibold leading-8 text-zinc-300 sm:block sm:text-xl lg:mt-7">
+            Enquanto a maioria lê manchetes, uma minoria entende o que está por trás delas e age
+            antes que o resto perceba. <span className="text-white">Geopolítica para Investidores</span>{' '}
+            existe para quem quer estar nessa minoria.
+          </p>
+
+          <div className="mt-6 hidden flex-wrap gap-x-8 gap-y-3 text-sm font-bold text-zinc-400 sm:flex lg:mt-8">
+            {['Briefing diário', 'Alertas por IA', 'Cenários de risco'].map((item) => (
+              <span key={item} className="inline-flex items-center gap-2">
+                <CheckIcon className="h-4 w-4 text-[#BFFF3C]" />
+                {item}
+              </span>
+            ))}
+          </div>
+        </motion.div>
       </section>
     </main>
   )

@@ -75,7 +75,7 @@ export function ChatBriefings() {
       {/* Layout principal */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
         {/* Coluna principal — chat */}
-        <div className="flex flex-col rounded-xl border border-zinc-800 bg-[#0f1117] lg:w-[70%] h-[calc(100dvh-280px)] sm:h-[calc(100dvh-220px)] lg:min-h-[600px] lg:h-auto">
+        <div className="flex flex-col rounded-xl border border-zinc-800 bg-[#0f1117] lg:w-[70%] h-[calc(100dvh-280px)] sm:h-[calc(100dvh-220px)] lg:min-h-[600px] lg:h-auto overflow-hidden">
           {/* Banner de limite */}
           {limiteAtingido && limiteErro && (
             <div className="px-4 pt-4 shrink-0">
@@ -87,12 +87,11 @@ export function ChatBriefings() {
           )}
 
           {/* Área de mensagens — cresce para preencher */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <ChatMessages mensagens={mensagens} isLoading={isLoading && mensagens.length === 0} />
           </div>
 
-          {/* Input — sticky no mobile para não ser coberto pelo teclado virtual */}
-          <div className="border-t border-zinc-800 p-4 shrink-0 sticky bottom-0 bg-[#0f1117] rounded-b-xl">
+          <div className="border-t border-zinc-800 p-4 shrink-0 bg-[#0f1117] rounded-b-xl">
             <ChatInput
               onEnviar={enviar}
               disabled={isLoading || limiteAtingido}
