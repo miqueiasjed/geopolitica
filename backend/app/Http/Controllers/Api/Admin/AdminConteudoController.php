@@ -45,6 +45,11 @@ class AdminConteudoController extends Controller
         ]);
     }
 
+    public function show(Conteudo $conteudo): JsonResponse
+    {
+        return response()->json(new ConteudoResource($conteudo));
+    }
+
     public function store(CriarConteudoRequest $request): JsonResponse
     {
         $conteudo = $this->conteudoService->criar($request->validated());

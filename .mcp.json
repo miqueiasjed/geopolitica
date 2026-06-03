@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "conteudo": {
+      "command": "node",
+      "args": ["/Users/miqueias/Sites/geopolitica/mcp-conteudo/server.js"],
+      "env": {
+        "API_BASE_URL": "${GPI_API_BASE_URL:-https://mygip.com.br/api}",
+        "ADMIN_TOKEN": "${GPI_ADMIN_TOKEN:-}",
+        "ADMIN_EMAIL": "${GPI_ADMIN_EMAIL:-}",
+        "ADMIN_PASSWORD": "${GPI_ADMIN_PASSWORD:-}"
+      }
+    }
+  }
+}

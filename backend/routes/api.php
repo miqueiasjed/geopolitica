@@ -187,6 +187,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/webhook-offer-planos/{webhookOfferPlano}', [AdminWebhookOfferPlanoController::class, 'destroy']);
 
     Route::get('/conteudos', [AdminConteudoController::class, 'index']);
+    Route::get('/conteudos/{conteudo}', [AdminConteudoController::class, 'show']);
     Route::post('/conteudos/parse-docx', [AdminImportarBriefingController::class, 'parsear']);
     Route::post('/conteudos/enriquecer-briefing', [AdminEnriquecerBriefingController::class, 'enriquecer']);
     Route::post('/conteudos', [AdminConteudoController::class, 'store']);
