@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Services\Ai\AiProviderFactory;
+use App\Support\CategoriaNormalizer;
 use Illuminate\Support\Facades\Log;
 
 class AiAnalyzerService
@@ -150,7 +151,7 @@ class AiAnalyzerService
                 ? (string) ($analise['analise_ia'] ?? '')
                 : (string) ($analise['analise_ia'] ?? 'Item sem relevância geopolítica material para investidores brasileiros.'),
             'regiao' => $analise['regiao'] ?? null,
-            'categorias' => array_values(array_filter((array) ($analise['categorias'] ?? []))),
+            'categorias' => CategoriaNormalizer::normalizar((array) ($analise['categorias'] ?? [])),
         ];
     }
 
