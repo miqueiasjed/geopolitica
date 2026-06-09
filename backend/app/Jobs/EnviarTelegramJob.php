@@ -17,12 +17,15 @@ class EnviarTelegramJob implements ShouldQueue
     /**
      * @param  string  $canal  Chave do canal (feed, war, elections)
      * @param  string  $texto  Mensagem já formatada em HTML
+     *
+     * Usa a fila default (consumida por qualquer queue:work) de propósito:
+     * o volume é baixo e evita depender de uma fila dedicada estar na lista
+     * de --queue do worker em produção.
      */
     public function __construct(
         public string $canal,
         public string $texto,
     ) {
-        $this->onQueue('telegram');
     }
 
     public function handle(TelegramService $telegram): void
