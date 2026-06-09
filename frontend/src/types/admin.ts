@@ -17,6 +17,7 @@ export interface AdminAssinante {
   status: string
   ativo: boolean
   assinado_em: string | null
+  expira_em: string | null
   addons?: string[]
 }
 

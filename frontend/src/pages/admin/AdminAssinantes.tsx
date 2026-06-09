@@ -15,6 +15,7 @@ import {
   Select,
   Separator,
   Spinner,
+  Switch,
   Table,
   Text,
   TextField,
@@ -28,6 +29,7 @@ import {
   ExclamationTriangleIcon,
   LockClosedIcon,
   MagnifyingGlassIcon,
+  Pencil1Icon,
   PersonIcon,
   ResetIcon,
   UpdateIcon,
@@ -48,9 +50,10 @@ import {
   resetarPrimeiroAcessoAssinante,
   trocarPlanoEmMassa,
   buscarStatusTrocaPlano,
+  atualizarAssinante,
 } from '../../services/admin'
 import type { CriarAddonUsuarioPayload, TrocaPlanoStatus } from '../../services/admin'
-import type { ImportacaoAssinantesPayload, ImportacaoAssinantesStatus, LinhaImportacaoAssinante } from '../../types/admin'
+import type { AdminAssinante, ImportacaoAssinantesPayload, ImportacaoAssinantesStatus, LinhaImportacaoAssinante } from '../../types/admin'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatarDataCurta } from '../../utils/formatters'
 
@@ -556,6 +559,13 @@ export function AdminAssinantes() {
     enviar_email: true,
   })
   const [addonFeedback, setAddonFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
+  const [edicao, setEdicao] = useState<AdminAssinante | null>(null)
+  const [editForm, setEditForm] = useState<{ ativo: boolean; status: string; expira_em: string }>({
+    ativo: false,
+    status: 'ativo',
+    expira_em: '',
+  })
+  const [editFeedback, setEditFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null)
   const searchDebounced = useDebouncedValue(search, 300)
 
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set())
@@ -637,6 +647,33 @@ export function AdminAssinantes() {
       setAddonFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao criar usuário addon.' })
     },
   })
+
+  const mutacaoEdicao = useMutation({
+    mutationFn: ({ id, ...payload }: { id: number; ativo: boolean; status: string; expira_em: string }) =>
+      atualizarAssinante(id, {
+        ativo: payload.ativo,
+        status: payload.status as 'ativo' | 'pendente' | 'cancelado' | 'expirado' | 'reembolsado' | 'chargeback',
+        expira_em: payload.expira_em || null,
+      }),
+    onSuccess: (data) => {
+      setEditFeedback({ tipo: 'sucesso', mensagem: data.message })
+      setEdicao(null)
+      void queryClient.invalidateQueries({ queryKey: adminKeys.assinantes({}) })
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      setEditFeedback({ tipo: 'erro', mensagem: err.response?.data?.message ?? 'Erro ao atualizar assinante.' })
+    },
+  })
+
+  function abrirEdicao(assinante: AdminAssinante) {
+    setEditFeedback(null)
+    setEdicao(assinante)
+    setEditForm({
+      ativo: assinante.ativo,
+      status: assinante.status,
+      expira_em: assinante.expira_em ? assinante.expira_em.slice(0, 10) : '',
+    })
+  }
 
   const query = useQuery({
     queryKey: adminKeys.assinantes({
@@ -899,6 +936,24 @@ export function AdminAssinantes() {
               </Callout.Root>
             )}
 
+            {editFeedback && (
+              <Callout.Root color={editFeedback.tipo === 'sucesso' ? 'green' : 'ruby'} size="1">
+                <Callout.Icon>
+                  {editFeedback.tipo === 'sucesso' ? <CheckCircledIcon /> : <ExclamationTriangleIcon />}
+                </Callout.Icon>
+                <Callout.Text>{editFeedback.mensagem}</Callout.Text>
+                <Button
+                  variant="ghost"
+                  size="1"
+                  color={editFeedback.tipo === 'sucesso' ? 'green' : 'ruby'}
+                  ml="auto"
+                  onClick={() => setEditFeedback(null)}
+                >
+                  Fechar
+                </Button>
+              </Callout.Root>
+            )}
+
             {query.isLoading ? (
               <Flex justify="center" py="8">
                 <Spinner size="3" />
@@ -976,6 +1031,16 @@ export function AdminAssinantes() {
                           <Table.Cell>{formatarDataCurta(assinante.assinado_em)}</Table.Cell>
                           <Table.Cell>
                             <Flex gap="1">
+                              <Tooltip content="Editar plano e vencimento">
+                                <IconButton
+                                  size="1"
+                                  variant="ghost"
+                                  color="cyan"
+                                  onClick={() => abrirEdicao(assinante)}
+                                >
+                                  <Pencil1Icon />
+                                </IconButton>
+                              </Tooltip>
                               <Tooltip content="Gerenciar addons">
                                 <IconButton
                                   size="1"
@@ -1075,6 +1140,75 @@ export function AdminAssinantes() {
       </div>
 
       <ModalImportacao aberto={importando} onFechar={() => setImportando(false)} />
+
+      <Dialog.Root open={edicao !== null} onOpenChange={(aberto) => { if (!aberto) setEdicao(null) }}>
+        <Dialog.Content maxWidth="440px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">
+          <Dialog.Title>Editar assinante</Dialog.Title>
+          <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
+            {edicao?.email} — reative o plano e ajuste a data de vencimento.
+          </Dialog.Description>
+
+          <Flex direction="column" gap="4">
+            <Flex align="center" justify="between" gap="3" className="rounded-md border border-cyan-400/10 bg-slate-900/40 px-3 py-2.5">
+              <Box>
+                <Text size="2" weight="medium" as="div">Plano ativo</Text>
+                <Text size="1" color="gray">Libera o acesso do assinante.</Text>
+              </Box>
+              <Switch
+                checked={editForm.ativo}
+                onCheckedChange={(v) => setEditForm((f) => ({
+                  ...f,
+                  ativo: v,
+                  status: v && f.status !== 'ativo' ? 'ativo' : f.status,
+                }))}
+              />
+            </Flex>
+
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">Status</Text>
+              <Select.Root
+                value={editForm.status}
+                onValueChange={(v) => setEditForm((f) => ({ ...f, status: v }))}
+              >
+                <Select.Trigger className="w-full" />
+                <Select.Content>
+                  <Select.Item value="ativo">Ativo</Select.Item>
+                  <Select.Item value="pendente">Pendente</Select.Item>
+                  <Select.Item value="cancelado">Cancelado</Select.Item>
+                  <Select.Item value="expirado">Expirado</Select.Item>
+                  <Select.Item value="reembolsado">Reembolsado</Select.Item>
+                  <Select.Item value="chargeback">Chargeback</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </label>
+
+            <label>
+              <Text size="2" weight="medium" mb="1" as="div">Data de vencimento <Text size="1" color="gray">(opcional)</Text></Text>
+              <TextField.Root
+                type="date"
+                value={editForm.expira_em}
+                onChange={(e) => setEditForm((f) => ({ ...f, expira_em: e.target.value }))}
+              />
+            </label>
+          </Flex>
+
+          <Flex gap="3" justify="end" mt="5">
+            <Dialog.Close>
+              <Button variant="soft" color="gray">Cancelar</Button>
+            </Dialog.Close>
+            <Button
+              loading={mutacaoEdicao.isPending}
+              onClick={() => {
+                if (edicao) {
+                  mutacaoEdicao.mutate({ id: edicao.id, ...editForm })
+                }
+              }}
+            >
+              Salvar alterações
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
 
       <Dialog.Root open={modalAddonAberto} onOpenChange={(aberto) => { if (!aberto) setModalAddonAberto(false) }}>
         <Dialog.Content maxWidth="460px" className="w-full max-w-[calc(100vw-2rem)] overflow-y-auto max-h-[90vh]">

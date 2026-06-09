@@ -85,4 +85,23 @@ class AdminAssinanteController extends Controller
 
         return response()->json(['message' => 'E-mail de boas-vindas reenviado com sucesso.']);
     }
+
+    public function atualizar(Request $request, int $id): JsonResponse
+    {
+        $dados = $request->validate([
+            'ativo'     => ['sometimes', 'boolean'],
+            'status'    => ['sometimes', 'string', Rule::in(['ativo', 'pendente', 'cancelado', 'expirado', 'reembolsado', 'chargeback'])],
+            'expira_em' => ['sometimes', 'nullable', 'date'],
+        ]);
+
+        $assinante = $this->adminAssinanteService->atualizarAssinante($id, $dados);
+
+        return response()->json([
+            'message'   => 'Assinante atualizado com sucesso.',
+            'id'        => $assinante->id,
+            'ativo'     => $assinante->ativo,
+            'status'    => $assinante->status,
+            'expira_em' => $assinante->expira_em?->toIso8601String(),
+        ]);
+    }
 }

@@ -60,6 +60,29 @@ class AdminAssinanteService
         $assinante->user->update(['password' => Hash::make('12345678')]);
     }
 
+    public function atualizarAssinante(int $assinanteId, array $dados): Assinante
+    {
+        $assinante = Assinante::with('user')->findOrFail($assinanteId);
+
+        $atualizacao = [];
+
+        if (array_key_exists('ativo', $dados)) {
+            $atualizacao['ativo'] = $dados['ativo'];
+        }
+
+        if (array_key_exists('status', $dados)) {
+            $atualizacao['status'] = $dados['status'];
+        }
+
+        if (array_key_exists('expira_em', $dados)) {
+            $atualizacao['expira_em'] = $dados['expira_em'] ?: null;
+        }
+
+        $assinante->update($atualizacao);
+
+        return $assinante->refresh();
+    }
+
     public function reenviarBoasVindas(int $assinanteId): void
     {
         $assinante = Assinante::with('user')->findOrFail($assinanteId);

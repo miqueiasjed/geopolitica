@@ -337,6 +337,23 @@ export async function resetarPrimeiroAcessoAssinante(id: number): Promise<{ mess
   return resposta.data
 }
 
+export interface AtualizarAssinantePayload {
+  ativo?: boolean
+  status?: 'ativo' | 'pendente' | 'cancelado' | 'expirado' | 'reembolsado' | 'chargeback'
+  expira_em?: string | null
+}
+
+export async function atualizarAssinante(
+  id: number,
+  payload: AtualizarAssinantePayload,
+): Promise<{ message: string; id: number; ativo: boolean; status: string; expira_em: string | null }> {
+  const resposta = await api.patch<{ message: string; id: number; ativo: boolean; status: string; expira_em: string | null }>(
+    `/admin/assinantes/${id}`,
+    payload,
+  )
+  return resposta.data
+}
+
 export interface CriarAddonUsuarioPayload {
   nome: string
   email: string
