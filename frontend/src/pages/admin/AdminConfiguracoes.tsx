@@ -181,6 +181,106 @@ function TesteApiIa() {
   )
 }
 
+// ─── Painel de teste do Telegram ──────────────────────────────────────────────
+
+interface CanalTelegramTeste {
+  canal: string
+  label: string
+  enviado: boolean
+  mensagem: string
+}
+
+interface RespostaTesteTelegram {
+  ok: boolean
+  mensagem?: string | null
+  canais?: CanalTelegramTeste[]
+}
+
+async function testarConexaoTelegram(): Promise<RespostaTesteTelegram> {
+  const res = await api.post<RespostaTesteTelegram>('/admin/configuracoes/testar-telegram')
+  return res.data
+}
+
+function TesteTelegram() {
+  const [resultado, setResultado] = useState<RespostaTesteTelegram | null>(null)
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: testarConexaoTelegram,
+    onSuccess: (data) => setResultado(data),
+    onError: (err: any) => {
+      const msg = err?.response?.data?.mensagem ?? 'Erro inesperado ao testar os canais.'
+      const canais = err?.response?.data?.canais
+      setResultado({ ok: false, mensagem: msg, canais })
+    },
+  })
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-[#1e1e20] bg-[#111113]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1e1e20] px-5 py-4">
+        <div className="space-y-1">
+          <h2 className="text-sm font-semibold tracking-tight text-white">📢 Telegram</h2>
+          <p className="text-xs text-zinc-500">
+            Envia uma mensagem de teste para cada canal configurado (feed, guerra, eleições).
+          </p>
+        </div>
+
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() => mutate()}
+          className="inline-flex items-center gap-2 rounded-full border border-[#C9B882]/30 bg-[#C9B882]/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.14em] text-[#C9B882] transition-colors hover:bg-[#C9B882]/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isPending ? (
+            <>
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              Enviando...
+            </>
+          ) : (
+            'Enviar teste'
+          )}
+        </button>
+      </div>
+
+      <div className="p-5">
+        {!resultado ? (
+          <p className="text-xs text-zinc-500">
+            Clique em “Enviar teste” para disparar uma mensagem nos canais. O bot precisa ser administrador de cada canal com permissão de postar.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {resultado.mensagem && !resultado.ok && (
+              <p className="flex items-center gap-2 text-xs text-red-400">
+                <ExclamationTriangleIcon className="h-4 w-4 shrink-0" />
+                {resultado.mensagem}
+              </p>
+            )}
+            {resultado.canais?.map((c) => (
+              <div
+                key={c.canal}
+                className={`flex items-center justify-between gap-3 rounded-md border px-3 py-2 ${
+                  c.enviado ? 'border-green-500/20 bg-green-500/5' : 'border-red-500/20 bg-red-500/5'
+                }`}
+              >
+                <div>
+                  <p className="text-xs font-semibold text-zinc-200">{c.label}</p>
+                  <p className="font-mono text-[10px] text-zinc-500">{c.mensagem}</p>
+                </div>
+                {c.enviado ? (
+                  <CheckCircledIcon className="h-4 w-4 shrink-0 text-green-400" />
+                ) : (
+                  <ExclamationTriangleIcon className="h-4 w-4 shrink-0 text-red-400" />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── API: defaults ────────────────────────────────────────────────────────────
 
 async function buscarDefaults(): Promise<Record<string, string>> {
@@ -886,6 +986,9 @@ export function AdminConfiguracoes() {
           ))}
         </div>
       )}
+
+      {/* Teste de canais do Telegram (configurado via .env) */}
+      {!isLoading && <TesteTelegram />}
 
       {/* Nota de segurança */}
       <p className="text-center font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-600">

@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Jobs\EnviarTelegramJob;
 use App\Models\ContentCache;
 use App\Models\Event;
 use App\Models\Source;
+use App\Support\TelegramMessageFormatter;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -177,10 +179,31 @@ class FeedUpdaterService
             Log::channel('pipeline')->info('[FeedUpdater] Editorial gerado.', [
                 'event_id' => $event->id,
             ]);
+
+            $this->publicarNoTelegram($event);
         } catch (\Throwable $e) {
             $event->update(['relevante' => false]);
 
             Log::channel('pipeline')->warning('[FeedUpdater] Falha ao gerar editorial — evento ocultado do feed.', [
+                'event_id' => $event->id,
+                'erro' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Enfileira o broadcast do evento no canal do Telegram correspondente.
+     * Evento de guerra vai para o canal de guerra; os demais, para o feed.
+     * Falha aqui jamais interrompe o pipeline (apenas loga).
+     */
+    private function publicarNoTelegram(Event $event): void
+    {
+        try {
+            $canal = $event->pertenceAoMonitorGuerra() ? 'war' : 'feed';
+
+            EnviarTelegramJob::dispatch($canal, TelegramMessageFormatter::paraEvento($event));
+        } catch (\Throwable $e) {
+            Log::channel('pipeline')->warning('[FeedUpdater] Falha ao enfileirar broadcast do Telegram.', [
                 'event_id' => $event->id,
                 'erro' => $e->getMessage(),
             ]);

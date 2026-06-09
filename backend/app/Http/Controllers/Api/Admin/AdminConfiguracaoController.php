@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AtualizarConfiguracoesRequest;
 use App\Services\AlphaVantageService;
 use App\Services\ConfiguracaoService;
+use App\Services\TelegramService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AdminConfiguracaoController extends Controller
 {
@@ -108,5 +110,62 @@ class AdminConfiguracaoController extends Controller
             'ok'       => true,
             'cotacoes' => $resultado,
         ]);
+    }
+
+    private const CANAIS_TELEGRAM = [
+        'feed'      => 'Feed / Geopolítica',
+        'war'       => 'Monitor de Guerra',
+        'elections' => 'Monitor de Eleições',
+    ];
+
+    public function testarTelegram(Request $request, TelegramService $telegram): JsonResponse
+    {
+        if (empty(config('services.telegram.bot_token'))) {
+            return response()->json([
+                'ok'       => false,
+                'mensagem' => 'TELEGRAM_BOT_TOKEN não configurado no .env. Defina o token do bot antes de testar.',
+            ], 422);
+        }
+
+        $canalSolicitado = $request->input('canal');
+        $canais = $canalSolicitado && isset(self::CANAIS_TELEGRAM[$canalSolicitado])
+            ? [$canalSolicitado => self::CANAIS_TELEGRAM[$canalSolicitado]]
+            : self::CANAIS_TELEGRAM;
+
+        $texto = "✅ <b>Teste de conexão</b>\n\n"
+            . 'Mensagem de teste enviada pelo painel admin do Geopolítica para Investidores. '
+            . 'Se você está vendo isto, o canal está configurado corretamente.';
+
+        $resultados = [];
+        foreach ($canais as $canal => $label) {
+            $chatId = config("services.telegram.channels.$canal");
+
+            if (empty($chatId)) {
+                $resultados[] = [
+                    'canal'    => $canal,
+                    'label'    => $label,
+                    'enviado'  => false,
+                    'mensagem' => 'Canal não configurado no .env.',
+                ];
+
+                continue;
+            }
+
+            $enviado = $telegram->enviarParaCanal($canal, $texto);
+            $resultados[] = [
+                'canal'    => $canal,
+                'label'    => $label,
+                'enviado'  => $enviado,
+                'mensagem' => $enviado ? 'Mensagem enviada.' : 'Falha ao enviar (verifique se o bot é admin do canal).',
+            ];
+        }
+
+        $algumEnviado = collect($resultados)->contains('enviado', true);
+
+        return response()->json([
+            'ok'       => $algumEnviado,
+            'mensagem' => $algumEnviado ? null : 'Nenhuma mensagem foi enviada. Verifique os chat_ids e se o bot é administrador dos canais.',
+            'canais'   => $resultados,
+        ], $algumEnviado ? 200 : 422);
     }
 }

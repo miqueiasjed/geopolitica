@@ -67,4 +67,43 @@ class AdminConfiguracaoTest extends TestCase
             ->assertJsonPath('ok', true)
             ->assertJsonCount(9, 'cotacoes');
     }
+
+    public function test_testar_telegram_falha_sem_token(): void
+    {
+        Config::set('services.telegram.bot_token', null);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        Sanctum::actingAs($admin, guard: 'sanctum');
+
+        $this->postJson('/api/admin/configuracoes/testar-telegram')
+            ->assertStatus(422)
+            ->assertJsonPath('ok', false);
+    }
+
+    public function test_testar_telegram_envia_para_canais_configurados(): void
+    {
+        Http::fake([
+            'api.telegram.org/*' => Http::response(['ok' => true, 'result' => []], 200),
+        ]);
+
+        Config::set('services.telegram.bot_token', 'token-teste');
+        Config::set('services.telegram.channels.feed', '@feed');
+        Config::set('services.telegram.channels.war', '@war');
+        Config::set('services.telegram.channels.elections', null);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        Sanctum::actingAs($admin, guard: 'sanctum');
+
+        $this->postJson('/api/admin/configuracoes/testar-telegram')
+            ->assertOk()
+            ->assertJsonPath('ok', true)
+            ->assertJsonCount(3, 'canais')
+            ->assertJsonPath('canais.0.enviado', true)   // feed
+            ->assertJsonPath('canais.1.enviado', true)   // war
+            ->assertJsonPath('canais.2.enviado', false); // elections (sem chat_id)
+
+        Http::assertSentCount(2);
+    }
 }

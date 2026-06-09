@@ -47,4 +47,13 @@ return [
         ],
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'channels' => [
+            'feed'      => env('TELEGRAM_CHANNEL_FEED'),       // geopolitica geral
+            'war'       => env('TELEGRAM_CHANNEL_WAR'),         // monitor de guerra
+            'elections' => env('TELEGRAM_CHANNEL_ELECTIONS'),   // monitor de eleicoes (preparado, sem fonte automatica)
+        ],
+    ],
+
 ];
