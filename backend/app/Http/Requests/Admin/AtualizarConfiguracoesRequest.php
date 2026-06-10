@@ -15,7 +15,7 @@ class AtualizarConfiguracoesRequest extends FormRequest
     {
         return [
             'configuracoes'   => ['required', 'array'],
-            'configuracoes.*' => ['nullable', 'string', 'max:1000'],
+            'configuracoes.*' => ['nullable', 'string', 'max:20000'],
         ];
     }
 }
