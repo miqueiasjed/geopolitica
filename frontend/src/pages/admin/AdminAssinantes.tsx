@@ -1051,7 +1051,7 @@ export function AdminAssinantes() {
                                   <LayersIcon />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip content="Reenviar e-mail de boas-vindas">
+                              <Tooltip content="Reenviar boas-vindas (gera senha aleatória e envia por e-mail)">
                                 <IconButton
                                   size="1"
                                   variant="ghost"
@@ -1069,7 +1069,7 @@ export function AdminAssinantes() {
                                   )}
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip content="Resetar para primeiro acesso (senha: 12345678)">
+                              <Tooltip content="Resetar acesso (gera senha aleatória e envia por e-mail)">
                                 <IconButton
                                   size="1"
                                   variant="ghost"
@@ -1306,9 +1306,9 @@ export function AdminAssinantes() {
 
       <Dialog.Root open={confirmarResetId !== null} onOpenChange={(aberto) => { if (!aberto) setConfirmarResetId(null) }}>
         <Dialog.Content maxWidth="420px" className="w-full max-w-[calc(100vw-2rem)]">
-          <Dialog.Title>Resetar para primeiro acesso</Dialog.Title>
+          <Dialog.Title>Resetar acesso</Dialog.Title>
           <Dialog.Description size="2" mb="4" className="text-cyan-100/60">
-            A senha deste assinante será redefinida para <strong>12345678</strong>. Ele precisará trocar a senha no próximo acesso.
+            Uma <strong>senha aleatória</strong> será gerada e enviada por e-mail para este assinante. Ele precisará trocar a senha no próximo acesso.
           </Dialog.Description>
           <Flex gap="3" justify="end">
             <Dialog.Close>

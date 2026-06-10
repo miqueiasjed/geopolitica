@@ -50,7 +50,7 @@ class AdminAssinanteController extends Controller
     {
         $this->adminAssinanteService->resetarPrimeiroAcesso($id);
 
-        return response()->json(['message' => 'Senha redefinida para o padrão de primeiro acesso.']);
+        return response()->json(['message' => 'Senha aleatória gerada e enviada por e-mail ao assinante.']);
     }
 
     public function criarAddonUsuario(Request $request): JsonResponse

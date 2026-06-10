@@ -57,7 +57,7 @@ class AdminAssinanteService
     {
         $assinante = Assinante::with('user')->findOrFail($assinanteId);
 
-        $assinante->user->update(['password' => Hash::make('12345678')]);
+        $this->gerarSenhaEEnviarBoasVindas($assinante);
     }
 
     public function atualizarAssinante(int $assinanteId, array $dados): Assinante
@@ -87,14 +87,36 @@ class AdminAssinanteService
     {
         $assinante = Assinante::with('user')->findOrFail($assinanteId);
 
+        $this->gerarSenhaEEnviarBoasVindas($assinante);
+    }
+
+    /**
+     * Gera uma senha aleatória, reseta o acesso do assinante (forçando troca no
+     * primeiro login) e envia o e-mail de boas-vindas com essa senha temporária.
+     */
+    private function gerarSenhaEEnviarBoasVindas(Assinante $assinante): void
+    {
+        $senha = $this->gerarSenhaAleatoria();
+
+        $assinante->user->update([
+            'password'           => Hash::make($senha),
+            'deve_alterar_senha' => true,
+        ]);
+
         $linkAcesso = rtrim((string) config('app.frontend_url', env('FRONTEND_URL')), '/').'/login';
 
         Mail::to($assinante->user->email)->send(new BoasVindasMail(
             $assinante->user,
             $linkAcesso,
             $assinante->plano ?? 'essencial',
-            reenvio: true,
+            senhaTemporaria: $senha,
         ));
+    }
+
+    private function gerarSenhaAleatoria(): string
+    {
+        // Sem símbolos para facilitar a digitação; o usuário troca no primeiro acesso.
+        return Str::password(10, letters: true, numbers: true, symbols: false);
     }
 
     public function criarAddonUsuario(array $dados): array
