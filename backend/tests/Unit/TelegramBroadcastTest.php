@@ -28,41 +28,47 @@ class TelegramBroadcastTest extends TestCase
 
         $this->publicar(new Event([
             'titulo'       => 'Acordo comercial',
-            'impact_label' => 'MONITORAR',
-            'categorias'   => ['economia'],
+            'impact_label' => 'CRÍTICO',
+            'categorias'   => ['cambio'],
         ]));
 
         Queue::assertPushed(EnviarTelegramJob::class, fn ($job) => $job->canal === 'feed');
         Queue::assertPushed(EnviarTelegramJob::class, 1);
     }
 
-    public function test_evento_de_guerra_vai_para_feed_e_war(): void
+    public function test_evento_de_guerra_vai_apenas_para_o_canal_war(): void
     {
         Queue::fake();
 
         $this->publicar(new Event([
             'titulo'       => 'Ataque na fronteira',
-            'impact_label' => 'ALTO',
-            'categorias'   => ['military'],
+            'impact_label' => 'MÉDIO',
+            'categorias'   => ['conflitos'],
         ]));
 
-        Queue::assertPushed(EnviarTelegramJob::class, fn ($job) => $job->canal === 'feed');
         Queue::assertPushed(EnviarTelegramJob::class, fn ($job) => $job->canal === 'war');
-        Queue::assertPushed(EnviarTelegramJob::class, 2);
+        Queue::assertPushed(EnviarTelegramJob::class, 1);
     }
 
-    public function test_evento_militar_pertence_ao_monitor_de_guerra(): void
+    public function test_evento_com_categoria_conflitos_pertence_ao_monitor_de_guerra(): void
     {
-        $evento = new Event(['categorias' => ['military', 'economia'], 'impact_label' => 'MÉDIO']);
+        $evento = new Event(['categorias' => ['conflitos', 'energia'], 'impact_label' => 'MÉDIO']);
 
         $this->assertTrue($evento->pertenceAoMonitorGuerra());
     }
 
-    public function test_evento_critico_pertence_ao_monitor_de_guerra(): void
+    public function test_evento_militar_legado_pertence_ao_monitor_de_guerra(): void
     {
-        $evento = new Event(['categorias' => ['economia'], 'impact_label' => 'CRÍTICO']);
+        $evento = new Event(['categorias' => ['military'], 'impact_label' => 'MÉDIO']);
 
         $this->assertTrue($evento->pertenceAoMonitorGuerra());
+    }
+
+    public function test_evento_critico_sem_categoria_de_guerra_nao_pertence_ao_monitor(): void
+    {
+        $evento = new Event(['categorias' => ['cambio'], 'impact_label' => 'CRÍTICO']);
+
+        $this->assertFalse($evento->pertenceAoMonitorGuerra());
     }
 
     public function test_evento_comum_nao_pertence_ao_monitor_de_guerra(): void

@@ -47,7 +47,7 @@ class FeedTest extends TestCase
     {
         $usuario = $this->criarAssinante('essencial');
 
-        Event::factory()->count(30)->relevante()->ultimas48h()->create();
+        Event::factory()->count(30)->relevante()->ultimas48h()->create(['categorias' => ['energia']]);
 
         Sanctum::actingAs($usuario, guard: 'sanctum');
 
@@ -60,8 +60,9 @@ class FeedTest extends TestCase
     {
         $usuario = $this->criarAssinante('reservado');
 
-        Event::factory()->count(10)->relevante()->ultimas48h()->create();
+        Event::factory()->count(10)->relevante()->ultimas48h()->create(['categorias' => ['energia']]);
         Event::factory()->count(15)->relevante()->create([
+            'categorias'   => ['energia'],
             'publicado_em' => now()->subDays(10),
         ]);
 
@@ -86,6 +87,28 @@ class FeedTest extends TestCase
         Sanctum::actingAs($usuario, guard: 'sanctum');
 
         $this->getJson('/api/feed?categoria=energia')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.categorias.0', 'energia');
+    }
+
+    public function test_feed_exclui_eventos_de_guerra(): void
+    {
+        $usuario = $this->criarAssinante('pro');
+
+        Event::factory()->relevante()->ultimas48h()->create([
+            'categorias' => ['energia'],
+        ]);
+        Event::factory()->relevante()->ultimas48h()->create([
+            'categorias' => ['conflitos'],
+        ]);
+        Event::factory()->relevante()->ultimas48h()->create([
+            'categorias' => ['military'],
+        ]);
+
+        Sanctum::actingAs($usuario, guard: 'sanctum');
+
+        $this->getJson('/api/feed?limite=50')
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.categorias.0', 'energia');

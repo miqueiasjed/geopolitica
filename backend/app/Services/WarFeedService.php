@@ -14,10 +14,7 @@ class WarFeedService
 
         $query = Event::query()
             ->where('relevante', true)
-            ->where(function ($q) {
-                $q->whereRaw("JSON_SEARCH(categorias, 'one', 'military') IS NOT NULL")
-                  ->orWhereIn('impact_label', ['CRÍTICO', 'ALTO']);
-            })
+            ->monitorGuerra()
             ->orderByDesc('impact_score')
             ->orderByDesc('publicado_em');
 

@@ -19,6 +19,7 @@ class FeedConsultaService
 
         return Event::query()
             ->relevantes()
+            ->foraDoMonitorGuerra()
             ->when($diasHistorico !== null, fn ($query) => $query->where('publicado_em', '>=', now()->subDays($diasHistorico)))
             ->when($filtros['categoria'] ?? null, fn ($query, $categoria) => $query->whereJsonContains('categorias', $categoria))
             ->when($filtros['regiao'] ?? null, fn ($query, $regiao) => $query->porRegiao($regiao))
