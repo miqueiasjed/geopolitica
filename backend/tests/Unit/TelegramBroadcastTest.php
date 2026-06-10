@@ -2,15 +2,55 @@
 
 namespace Tests\Unit;
 
+use App\Jobs\EnviarTelegramJob;
 use App\Models\Event;
+use App\Services\FeedUpdaterService;
 use App\Services\TelegramService;
 use App\Support\TelegramMessageFormatter;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class TelegramBroadcastTest extends TestCase
 {
+    private function publicar(Event $evento): void
+    {
+        $service = app(FeedUpdaterService::class);
+        $metodo = new \ReflectionMethod($service, 'publicarNoTelegram');
+        $metodo->setAccessible(true);
+        $metodo->invoke($service, $evento);
+    }
+
+    public function test_evento_comum_vai_apenas_para_o_canal_feed(): void
+    {
+        Queue::fake();
+
+        $this->publicar(new Event([
+            'titulo'       => 'Acordo comercial',
+            'impact_label' => 'MONITORAR',
+            'categorias'   => ['economia'],
+        ]));
+
+        Queue::assertPushed(EnviarTelegramJob::class, fn ($job) => $job->canal === 'feed');
+        Queue::assertPushed(EnviarTelegramJob::class, 1);
+    }
+
+    public function test_evento_de_guerra_vai_para_feed_e_war(): void
+    {
+        Queue::fake();
+
+        $this->publicar(new Event([
+            'titulo'       => 'Ataque na fronteira',
+            'impact_label' => 'ALTO',
+            'categorias'   => ['military'],
+        ]));
+
+        Queue::assertPushed(EnviarTelegramJob::class, fn ($job) => $job->canal === 'feed');
+        Queue::assertPushed(EnviarTelegramJob::class, fn ($job) => $job->canal === 'war');
+        Queue::assertPushed(EnviarTelegramJob::class, 2);
+    }
+
     public function test_evento_militar_pertence_ao_monitor_de_guerra(): void
     {
         $evento = new Event(['categorias' => ['military', 'economia'], 'impact_label' => 'MÉDIO']);

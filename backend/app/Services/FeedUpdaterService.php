@@ -192,16 +192,22 @@ class FeedUpdaterService
     }
 
     /**
-     * Enfileira o broadcast do evento no canal do Telegram correspondente.
-     * Evento de guerra vai para o canal de guerra; os demais, para o feed.
+     * Enfileira o broadcast do evento espelhando exatamente os dashboards:
+     * todo evento relevante está no dashboard/feed, então sempre vai para o
+     * canal de geopolítica (feed). Os que também pertencem ao monitor de
+     * guerra (dashboard/monitor-guerra) vão adicionalmente para o canal war.
      * Falha aqui jamais interrompe o pipeline (apenas loga).
      */
     private function publicarNoTelegram(Event $event): void
     {
         try {
-            $canal = $event->pertenceAoMonitorGuerra() ? 'war' : 'feed';
+            $mensagem = TelegramMessageFormatter::paraEvento($event);
 
-            EnviarTelegramJob::dispatch($canal, TelegramMessageFormatter::paraEvento($event));
+            EnviarTelegramJob::dispatch('feed', $mensagem);
+
+            if ($event->pertenceAoMonitorGuerra()) {
+                EnviarTelegramJob::dispatch('war', $mensagem);
+            }
         } catch (\Throwable $e) {
             Log::channel('pipeline')->warning('[FeedUpdater] Falha ao enfileirar broadcast do Telegram.', [
                 'event_id' => $event->id,
