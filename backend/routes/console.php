@@ -5,6 +5,7 @@ use App\Jobs\AtualizarGdeltJob;
 use App\Jobs\AtualizarIndicadoresJob;
 use App\Jobs\DetectarSinaisJob;
 use App\Jobs\ProcessFeedUpdateJob;
+use App\Models\Automacao;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -17,37 +18,44 @@ Artisan::command('inspire', function () {
 // M01 – Tier A (notícias): coleta a cada hora
 Schedule::job(new ProcessFeedUpdateJob(tier: 'A'))
     ->hourly()
+    ->when(fn () => Automacao::estaAtiva('feed_noticias'))
     ->withoutOverlapping();
 
 // M01 – Tier B (think tanks): coleta às 6h e 18h BRT (9h e 21h UTC)
 Schedule::job(new ProcessFeedUpdateJob(tier: 'B'))
     ->twiceDaily(9, 21)
+    ->when(fn () => Automacao::estaAtiva('feed_noticias'))
     ->withoutOverlapping();
 
 // M09 – detecção de sinais: roda no minuto :00 (após feed)
 Schedule::job(new DetectarSinaisJob)
     ->hourly()
+    ->when(fn () => Automacao::estaAtiva('deteccao_sinais'))
     ->withoutOverlapping();
 
 // M10 – análise de convergência: roda no minuto :05 (após detecção de sinais)
 Schedule::job(new AnalisarConvergenciaJob)
     ->hourlyAt(5)
+    ->when(fn () => Automacao::estaAtiva('analise_convergencia'))
     ->withoutOverlapping();
 
 // GDELT – dados de intensidade por país: roda no minuto :30 (sem conflito com M01)
 Schedule::job(new AtualizarGdeltJob)
     ->hourlyAt(30)
+    ->when(fn () => Automacao::estaAtiva('gdelt'))
     ->withoutOverlapping();
 
 // M04 – Indicadores de Risco: atualiza cotações a cada minuto
 Schedule::job(new AtualizarIndicadoresJob)
     ->everyMinute()
+    ->when(fn () => Automacao::estaAtiva('indicadores'))
     ->withoutOverlapping()
     ->onFailure(fn () => Log::error('AtualizarIndicadoresJob falhou'));
 
 // Perfis de Países – gera análises via IA toda segunda-feira às 03:00
 Schedule::command('paises:gerar-perfis')
     ->weeklyOn(1, '03:00')
+    ->when(fn () => Automacao::estaAtiva('perfis_paises'))
     ->withoutOverlapping()
     ->runInBackground();
 

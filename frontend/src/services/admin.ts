@@ -33,6 +33,7 @@ import type {
   IniciarReprocessamentoResponse,
   AdminProduto,
 } from '../types/admin'
+import type { AutomacoesResponse } from '../types/automacao'
 import type { TipoConteudo, VerticalConteudo, Conteudo } from '../types/biblioteca'
 import type { EmpresaB2B, CriarLicencaPayload, RenovarLicencaPayload } from '../types/b2b'
 
@@ -95,6 +96,7 @@ export const adminKeys = {
   paises: () => [...adminKeys.all, 'paises'] as const,
   sources: () => [...adminKeys.all, 'sources'] as const,
   eventosSemEditorial: (filtros: import('../types/admin').EventosSemEditorialFiltros) => [...adminKeys.all, 'eventos-sem-editorial', filtros] as const,
+  automacoes: () => [...adminKeys.all, 'automacoes'] as const,
 }
 
 function montarParams<T extends object>(filtros: T) {
@@ -193,6 +195,16 @@ export async function toggleWebhookToken(id: number): Promise<AdminWebhookToken>
 
 export async function excluirWebhookToken(id: number): Promise<void> {
   await api.delete(`/admin/webhook-tokens/${id}`)
+}
+
+export async function buscarAutomacoes(): Promise<AutomacoesResponse> {
+  const resposta = await api.get<AutomacoesResponse>('/admin/automacoes')
+  return resposta.data
+}
+
+export async function definirAutomacao(chave: string, ativa: boolean): Promise<{ chave: string; ativa: boolean }> {
+  const resposta = await api.patch<{ data: { chave: string; ativa: boolean } }>(`/admin/automacoes/${chave}`, { ativa })
+  return resposta.data.data
 }
 
 // --- Planos ativos (para dropdowns) ---

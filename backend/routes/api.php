@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Admin\AdminSuporteController;
 use App\Http\Controllers\Api\Admin\AdminPlanoController;
 use App\Http\Controllers\Api\Admin\AdminAiUsoController;
 use App\Http\Controllers\Api\Admin\AdminB2BController;
+use App\Http\Controllers\Api\Admin\AdminAutomacaoController;
 use App\Http\Controllers\Api\Admin\AdminConfiguracaoController;
 use App\Http\Controllers\Api\Admin\AdminConteudoController;
 use App\Http\Controllers\Api\Admin\AdminUsuarioController;
@@ -206,6 +207,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/configuracoes/testar-telegram', [AdminConfiguracaoController::class, 'testarTelegram']);
     Route::get('/configuracoes', [AdminConfiguracaoController::class, 'index']);
     Route::patch('/configuracoes', [AdminConfiguracaoController::class, 'update']);
+
+    // Automações (ligar/desligar)
+    Route::get('/automacoes', [AdminAutomacaoController::class, 'index']);
+    Route::patch('/automacoes/{chave}', [AdminAutomacaoController::class, 'update']);
 
     // Relatório de uso de IA
     Route::get('ai/uso', [AdminAiUsoController::class, 'index']);

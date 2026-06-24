@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\EnviarTelegramJob;
+use App\Models\Automacao;
 use App\Models\ContentCache;
 use App\Models\Event;
 use App\Models\Source;
@@ -199,6 +200,14 @@ class FeedUpdaterService
      */
     private function publicarNoTelegram(Event $event): void
     {
+        if (! Automacao::estaAtiva('telegram')) {
+            Log::channel('pipeline')->info('[FeedUpdater] Publicação no Telegram desligada nas automações — evento não enviado.', [
+                'event_id' => $event->id,
+            ]);
+
+            return;
+        }
+
         try {
             $canal = $event->pertenceAoMonitorGuerra() ? 'war' : 'feed';
 

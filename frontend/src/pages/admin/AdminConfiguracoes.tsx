@@ -4,6 +4,7 @@ import { EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon, 
 import api from '../../lib/axios'
 import type { Configuracao, GrupoConfiguracao, GruposConfiguracao } from '../../types/configuracao'
 import { PromptTestPanel } from '../../components/admin/PromptTestPanel'
+import { AutomacoesPanel } from '../../components/admin/AutomacoesPanel'
 import { testarConexaoIa } from '../../services/admin'
 import type { ResultadoTesteIa } from '../../services/admin'
 
@@ -986,6 +987,9 @@ export function AdminConfiguracoes() {
           ))}
         </div>
       )}
+
+      {/* Automações (ligar/desligar rotinas automáticas) */}
+      <AutomacoesPanel />
 
       {/* Teste de canais do Telegram (configurado via .env) */}
       {!isLoading && <TesteTelegram />}
