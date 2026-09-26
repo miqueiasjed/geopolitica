@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(\App\Http\Middleware\BloquearSiteDesativado::class);
         $middleware->appendToGroup('api', \App\Http\Middleware\ForcarAlteracaoSenha::class);
         $middleware->alias([
             'assinante.ativo'      => \App\Http\Middleware\EnsureAssinanteAtivo::class,

@@ -54,6 +54,9 @@ use App\Http\Controllers\WebhookHotmartController;
 use App\Http\Controllers\WebhookLastlinkController;
 use Illuminate\Support\Facades\Route;
 
+// Consultado pelo frontend ao carregar. Com SITE_DESATIVADO=true o middleware global responde 503 antes daqui.
+Route::get('/status-site', fn () => response()->json(['site_desativado' => false]));
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 

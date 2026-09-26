@@ -127,6 +127,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'site_desativado'          => (bool) env('SITE_DESATIVADO', false),
     'cron_secret'              => env('CRON_SECRET'),
     'frontend_url'             => env('FRONTEND_URL', 'http://localhost:5173'),
     'alerta_threshold_critico' => (int) env('ALERTA_THRESHOLD_CRITICAL', 10),

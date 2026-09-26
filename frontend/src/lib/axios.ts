@@ -25,6 +25,10 @@ api.interceptors.request.use((configuracao) => {
 api.interceptors.response.use(
   (resposta) => resposta,
   (erro) => {
+    if (erro.response?.status === 503 && erro.response.data?.site_desativado) {
+      window.dispatchEvent(new Event('site-desativado'))
+    }
+
     if (erro.response?.status === 401) {
       removerTokenAutenticacao()
 

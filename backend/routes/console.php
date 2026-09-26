@@ -15,6 +15,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Site desativado (SITE_DESATIVADO=true): nenhuma automação é agendada.
+if (config('app.site_desativado')) {
+    return;
+}
+
 // M01 – Tier A (notícias): coleta a cada hora
 Schedule::job(new ProcessFeedUpdateJob(tier: 'A'))
     ->hourly()
